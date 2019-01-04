@@ -11,7 +11,8 @@ funksjonalitet som WS eller databaser.
     - `git clone --bare git@github.com:navikt/syfospringboot-kickstarter.git temp`
     - `cd temp`
     - `git push --mirror git@github.com:navikt/$APPLIKASJONSNAVN$.git`
-    - Fjern temp repo: `rm -rf temp.git`
+    - `cd ..`
+    - Fjern temp repo: `rm -rf temp`
 3. oppdater pom.xml, README.md med riktig app-informasjon
 4. gjør en stringreplace på $APPLIKASJONSNAVN$ med nytt navn
 5. merge inn evt. brancher for funksjonalitet du trenger (DB, WS, Kafka osv.)
