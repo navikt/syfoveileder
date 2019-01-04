@@ -6,7 +6,7 @@ Appen som ligger på master har ingen eksterne avhengigheter, men det finnes bra
 funksjonalitet som WS eller databaser.
 
 ## Bruk:
-1. lag et nytt _TOMT_ repo for appen du skal lage på github uten license og .gitignore
+1. lag et nytt _TOMT_ repo for appen du skal lage **på GitHub** uten license og .gitignore
 2. klon ned innholdet i syfospringboot-kickstarter:
     - `git clone --bare git@github.com:navikt/syfospringboot-kickstarter.git temp`
     - `cd temp`
