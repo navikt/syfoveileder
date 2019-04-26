@@ -1,5 +1,6 @@
-name: $APPLIKASJONSNAVN$
-image: "repo.adeo.no:5443/$APPLIKASJONSNAVN$"
+name: syfoprediksjoner
+team: teamsykefravr
+image: "repo.adeo.no:5443/syfoprediksjoner"
 replicas:
   min: 1
   max: 2
@@ -18,7 +19,7 @@ healthcheck:
     timeout: 1
 prometheus:
   enabled: true
-  path: /internal/prometheus
+  path: /syfoprediksjoner/internal/prometheus
 resources:
   limits:
     cpu: 1000m
@@ -29,7 +30,7 @@ resources:
 fasitResources:
   exposed:
   used:
-  - alias: $APPLIKASJONSNAVN$DB
+  - alias: syfoprediksjonerDB
       resourceType: datasource
       propertyMap:
         url: SPRING_DATASOURCE_URL

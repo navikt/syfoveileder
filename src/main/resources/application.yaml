@@ -7,8 +7,13 @@ management:
     path-mapping.prometheus: '/prometheus'
   endpoint.prometheus.enabled: true
 
+server:
+  servlet:
+    context-path: /syfoprediksjoner
+
 spring:
   main.banner-mode: 'off'
   jta.atomikos.datasource:
           max-pool-size: 32
           min-pool-size: 8
+
