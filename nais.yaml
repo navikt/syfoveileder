@@ -8,13 +8,13 @@ replicas:
 port: 8080
 healthcheck:
   liveness:
-    path: /internal/isAlive
+    path: /syfoprediksjoner/internal/isAlive
     initialDelay: 60
     timeout: 1
     periodSeconds: 10
     failureThreshold: 3
   readiness:
-    path: /internal/isReady
+    path: /syfoprediksjoner/internal/isReady
     initialDelay: 60
     timeout: 1
 prometheus:
