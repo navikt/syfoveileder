@@ -6,6 +6,9 @@ management:
     base-path: '/internal'
     exposure.include: 'prometheus'
     path-mapping.prometheus: '/prometheus'
+  endpoint:
+    flyway:
+      enabled: false
   health:
     db:
       enabled: false
@@ -20,4 +23,6 @@ spring:
   jta.atomikos.datasource:
           max-pool-size: 32
           min-pool-size: 8
+  flyway:
+    enabled: false
 
