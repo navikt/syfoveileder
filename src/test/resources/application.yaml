@@ -23,22 +23,6 @@ srvsyfomotebehov:
   username: "username"
   password: "password"
 
-no.nav.security.oidc:
-  issuers: selvbetjening,intern,veileder
-  issuer:
-    selvbetjening:
-      discoveryurl: http://metadata
-      accepted_audience: aud-localhost
-      cookie_name: localhost-idtoken
-    intern:
-      discoveryurl: http://metadata
-      accepted_audience: aud-localhost
-      cookie_name: localhost-idtoken
-    veileder:
-      discoveryurl: http://metadata
-      accepted_audience: aud-localhost
-      cookie_name: localhost-idtoken
-
 fasit.environment.name: 'local'
 
 dev: true
