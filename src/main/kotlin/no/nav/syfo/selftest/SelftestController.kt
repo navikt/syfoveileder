@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController
 const val APPLICATION_LIVENESS = "Application is alive!"
 const val APPLICATION_READY = "Application is ready!"
 
+
 @RestController
 @RequestMapping(value = ["/internal"])
 class SelftestController {

@@ -2,27 +2,19 @@ logging.config: 'classpath:logback-spring.xml'
 
 management:
   endpoint.prometheus.enabled: true
+  endpoint.flyway.enabled: false
   endpoints.web:
     base-path: '/internal'
     exposure.include: 'prometheus'
     path-mapping.prometheus: '/prometheus'
-  endpoint:
-    flyway:
-      enabled: false
-  health:
-    db:
-      enabled: false
-
 
 server:
   servlet:
     context-path: /syfoprediksjoner
 
 spring:
+  flyway.enabled: false
   main.banner-mode: 'off'
   jta.atomikos.datasource:
           max-pool-size: 32
           min-pool-size: 8
-  flyway:
-    enabled: false
-
