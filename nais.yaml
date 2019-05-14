@@ -30,7 +30,7 @@ resources:
 fasitResources:
   exposed:
   used:
-  - alias: syfoprediksjonerDB
+    - alias: syfoprediksjonerDB
       resourceType: datasource
       propertyMap:
         url: SPRING_DATASOURCE_URL
