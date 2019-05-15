@@ -16,7 +16,7 @@ class EiaController @Inject constructor(val eiaService: EiaService){
 
     @ResponseBody
     @GetMapping(value = ["/sykmeldingerMedPerioder"], produces = [APPLICATION_JSON_VALUE])
-    fun hentEiaSykmeldingerMedPeriode(@RequestParam(required = true) offset: Long?, @RequestParam(required = true) rows: Long?) : List<SmSykmeldMedPeriode> {
+    fun hentEiaSykmeldingerMedPeriode(@RequestParam(required = false) offset: Long?, @RequestParam(required = false) rows: Long?) : List<SmSykmeldMedPeriode> {
         if (offset == null || rows == null)
             return eiaService.hentSykmeldingerMedPeriodeFraEia()
         return eiaService.hentSykmeldingerMedPeriodeFraEia(offset, rows)
