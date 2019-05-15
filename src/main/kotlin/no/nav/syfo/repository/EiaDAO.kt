@@ -16,7 +16,11 @@ class EiaDAO(private val jdbcTemplate: JdbcTemplate) {
 
 
     fun hentSykmeldingerKombinertMedPerioder() : List<SmSykmeldMedPeriode> {
-        return jdbcTemplate.query("select sp.fom_dato, sp.tom_dato, sp.grad, sm.signaturdato, sm.annendato, sm.pasientfodselsnummer, sm.harflerearbeidsforhold, navnfastlege, navkontor, navnarbeidsgiver, yrkesbetegnelse, antalltimer, stillingsprosent, skadedato, sm.AKTIVITETMULIGFRADATO, sm.VEILEDNINGBESKRIVELSE, hartilbakemeldingarbeidsgiver, harerklering, harinformasjon, meldingtilnav, friskmeldingsdato, erarbeidsforetterperiode, gjelder_type, ersvangerskap, erannenfraversgrunn, eryrkessykdom from SM_SYKMELD sm, SM_PERIODE sp where sm.sykmelding_id = sp.sykmelding_id", SmSykmeldOgPeriodeRowMapper())
+        return jdbcTemplate.query("select sp.fom_dato, sp.tom_dato, sp.grad, sm.signaturdato, sm.annendato, sm.pasientfodselsnummer, sm.harflerearbeidsforhold, navnfastlege, navkontor, navnarbeidsgiver, yrkesbetegnelse, antalltimer, stillingsprosent, skadedato, aktivitetmuligfradato, veiledningbeskrivelse, hartilbakemeldingarbeidsgiver, harerklering, harinformasjon, meldingtilnav, friskmeldingsdato, erarbeidsforetterperiode, gjelder_type, ersvangerskap, erannenfraversgrunn, eryrkessykdom from SM_SYKMELD sm, SM_PERIODE sp where sm.sykmelding_id = sp.sykmelding_id", SmSykmeldOgPeriodeRowMapper())
+    }
+
+    fun hentSykmeldingerKombinertMedPerioder(offset: Long, nrRows: Long) : List<SmSykmeldMedPeriode> {
+        return jdbcTemplate.query("select sp.fom_dato, sp.tom_dato, sp.grad, sm.signaturdato, sm.annendato, sm.pasientfodselsnummer, sm.harflerearbeidsforhold, navnfastlege, navkontor, navnarbeidsgiver, yrkesbetegnelse, antalltimer, stillingsprosent, skadedato, aktivitetmuligfradato, veiledningbeskrivelse, hartilbakemeldingarbeidsgiver, harerklering, harinformasjon, meldingtilnav, friskmeldingsdato, erarbeidsforetterperiode, gjelder_type, ersvangerskap, erannenfraversgrunn, eryrkessykdom from SM_SYKMELD sm, SM_PERIODE sp where sm.sykmelding_id = sp.sykmelding_id order by sm.sykmelding_id offset ? rows fetch next ? rows only", SmSykmeldOgPeriodeRowMapper(), offset, nrRows)
     }
 
     private inner class SmSykmeldOgPeriodeRowMapper : RowMapper<SmSykmeldMedPeriode> {

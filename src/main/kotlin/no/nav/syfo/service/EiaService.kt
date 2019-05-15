@@ -9,4 +9,6 @@ class EiaService(val eiaDAO: EiaDAO) {
 
     fun hentSykmeldingerMedPeriodeFraEia() : List<SmSykmeldMedPeriode> = eiaDAO.hentSykmeldingerKombinertMedPerioder()
 
+    fun hentSykmeldingerMedPeriodeFraEia(offset: Long, nrRows: Long) : List<SmSykmeldMedPeriode> = eiaDAO.hentSykmeldingerKombinertMedPerioder(offset, nrRows)
+
 }
