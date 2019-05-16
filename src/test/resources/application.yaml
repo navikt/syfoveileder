@@ -10,4 +10,35 @@ spring:
   jta.atomikos.datasource:
     max-pool-size: 32
     min-pool-size: 8
+  cache:
+    type: none
 
+server:
+  port: 8814
+  servlet:
+    context-path: /syfoveileder
+
+securitytokenservice.url: "sts.url"
+srvsyfomotebehov:
+  username: "username"
+  password: "password"
+
+no.nav.security.oidc:
+  issuers: selvbetjening,intern,veileder
+  issuer:
+    selvbetjening:
+      discoveryurl: http://metadata
+      accepted_audience: aud-localhost
+      cookie_name: localhost-idtoken
+    intern:
+      discoveryurl: http://metadata
+      accepted_audience: aud-localhost
+      cookie_name: localhost-idtoken
+    veileder:
+      discoveryurl: http://metadata
+      accepted_audience: aud-localhost
+      cookie_name: localhost-idtoken
+
+fasit.environment.name: 'local'
+
+dev: true
