@@ -25,4 +25,6 @@ srvsyfomotebehov:
 
 fasit.environment.name: 'local'
 
+mockVirksomhetEnhet_V1: true
+
 dev: true

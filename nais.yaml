@@ -30,3 +30,7 @@ resources:
 fasitResources:
   exposed:
   used:
+  - alias: srvsyfoveileder
+    resourceType: credential
+  - alias: virksomhet:Enhet_v1
+    resourceType: webserviceendpoint
