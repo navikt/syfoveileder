@@ -1,4 +1,5 @@
-FROM navikt/java:8
+FROM navikt/java:8-appdynamics
+ENV APPD_ENABLED=true
 COPY target/app.jar /app/
 
 #ENV NAIS_SECRETS="/var/run/secrets/naisd.io/"
