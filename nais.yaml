@@ -32,7 +32,14 @@ fasitResources:
   used:
   - alias: appdynamics
     resourceType: applicationproperties
-  - alias: srvsyfoveileder
+  - alias: loginservice_oidc
+    resourceType: azureoidc
+    propertyMap:
+      discoveryUri: NO_NAV_SECURITY_OIDC_ISSUER_VEILEDER_DISCOVERYURL
+      clientId: NO_NAV_SECURITY_OIDC_ISSUER_VEILEDER_ACCEPTEDAUDIENCE
+  - alias: aadaccesstoken
+    resourceType: baseurl
+  - alias: aad_syfoveileder_clientid
     resourceType: credential
-  - alias: virksomhet:Enhet_v1
-    resourceType: webserviceendpoint
+    propertyMap:
+      username: NO_NAV_SECURITY_OIDC_ISSUER_AZUREAD_ACCEPTEDAUDIENCE

@@ -47,6 +47,7 @@
         <oidc-spring-support.version>0.2.4</oidc-spring-support.version>
         <tjenestespesifikasjoner.version>1.2019.04.03-23.09-56488320520a</tjenestespesifikasjoner.version>
         <cxf.version>3.2.0</cxf.version>
+        <adal4j.vresion>1.6.4</adal4j.vresion>
     </properties>
 
     <dependencies>
@@ -97,6 +98,13 @@
             <groupId>no.nav.security</groupId>
             <artifactId>oidc-support</artifactId>
             <version>${oidc-spring-support.version}</version>
+        </dependency>
+
+        <!-- Azure -->
+        <dependency>
+            <groupId>com.microsoft.azure</groupId>
+            <artifactId>adal4j</artifactId>
+            <version>${adal4j.vresion}</version>
         </dependency>
 
 

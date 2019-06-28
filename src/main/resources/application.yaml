@@ -1,3 +1,11 @@
+no.nav.security.oidc:
+  issuers: veileder
+  issuer:
+    veileder:
+      discoveryurl: <SETTES FRA FASIT>
+      accepted_audience: <SETTES FRA FASIT>
+      cookie_name: isso-idtoken
+
 logging.config: 'classpath:logback-spring.xml'
 
 management:
@@ -13,10 +21,13 @@ management:
     db:
       enabled: false
 
-
 server:
   servlet:
     context-path: /syfoveileder
+
+graphApi:
+  url: 'https://graph.microsoft.com/v1.0/'
+  authority: 'https://login.microsoftonline.com/navq.onmicrosoft.com'
 
 spring:
   main.banner-mode: 'off'

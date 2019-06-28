@@ -9,13 +9,12 @@ import org.springframework.web.bind.annotation.*
 import javax.inject.Inject
 
 @RestController
-@RequestMapping(value = ["/api/veileder"])
-class VeilederDataController @Inject constructor(val virksomhetEnhetConsumer: VirksomhetEnhetConsumer) {
+@RequestMapping(value = ["/api/veiledere"])
+class VeilederDataController @Inject constructor(val graphService: GraphService) {
 
     @ProtectedWithClaims(issuer = AZURE)
-    @Unprotected
-    @GetMapping(value = ["/{ident}"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun hentVeilederNavn(@PathVariable ident: String): Veileder {
-        return virksomhetEnhetConsumer.hentVeilederInfo(ident)
+    @GetMapping(value = ["/enhet/{enhet}/enhetNavn/{enhetNavn}"], produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun hentVeiledere(@PathVariable enhet: String, @PathVariable enhetNavn: String): List<Veileder> {
+        return graphService.getVeiledere(enhetNr = enhet, enhetNavn = enhetNavn)
     }
 }

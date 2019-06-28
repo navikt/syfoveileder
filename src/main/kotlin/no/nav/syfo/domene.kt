@@ -1,3 +1,32 @@
 package no.nav.syfo
 
-data class Veileder(val ident: String, val navn: String, val fornavn: String?, val etternavn: String?)
+import java.time.LocalDateTime
+
+data class Veileder(val ident: String,
+                    val fornavn: String,
+                    val etternavn: String,
+                    val enhetNr: String,
+                    val enhetNavn: String)
+
+data class AADVeileder(
+        val givenName: String,
+        val surname: String,
+        val onPremisesSamAccountName: String, // Ident - feks Z991234
+        val streetAddress: String, // Enhet nummer - feks 0315
+        val city: String // Enhet navn - feks  Nav Grünerløkka
+        )
+
+fun AADVeileder.toVeileder(): Veileder =
+    Veileder(fornavn = givenName, etternavn = surname, ident = onPremisesSamAccountName,
+            enhetNr = streetAddress, enhetNavn = city)
+
+
+data class GetUsersResponse( val value: List<AADVeileder>)
+
+data class AADToken(
+        val accessToken: String,
+        val refreshToken: String?,
+        val expires: LocalDateTime
+)
+
+
