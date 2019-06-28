@@ -42,4 +42,5 @@ fasitResources:
   - alias: aad_syfoveileder_clientid
     resourceType: credential
     propertyMap:
-      username: NO_NAV_SECURITY_OIDC_ISSUER_AZUREAD_ACCEPTEDAUDIENCE
+      username: AAD-SYFOVEILEDER-CLIENTID_USERNAME
+      password: AAD-SYFOVEILEDER-CLIENTID_PASSWORD

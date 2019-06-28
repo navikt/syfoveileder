@@ -36,6 +36,7 @@ dev: true
 
 aadaccesstoken:
   url: 'aadaccesstoken.url'
+
 aad_syfoveileder_clientid:
   username: "test"
   password: "trustno1"

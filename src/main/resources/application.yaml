@@ -6,6 +6,10 @@ no.nav.security.oidc:
       accepted_audience: <SETTES FRA FASIT>
       cookie_name: isso-idtoken
 
+aad_syfoveileder_clientid:
+  username: <SETTES FRA FASIT>
+  password: <SETTES FRA FASIT>
+
 logging.config: 'classpath:logback-spring.xml'
 
 management:
