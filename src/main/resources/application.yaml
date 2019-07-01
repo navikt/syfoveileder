@@ -29,6 +29,7 @@ server:
   servlet:
     context-path: /syfoveileder
 
+adal4j.resource: 'https://graph.microsoft.com'
 graphApi:
   url: 'https://graph.microsoft.com/v1.0/'
   authority: 'https://login.microsoftonline.com/navq.onmicrosoft.com'

@@ -13,7 +13,7 @@ import java.util.concurrent.Future
 
 @Component
 class AADTokenService(
-        @Value("\${aadaccesstoken.url}") val aadUrl: String,
+        @Value("\${adal4j.resource}") val resource: String,
         @Value("\${aad_syfoveileder_clientid.username}") val clientId: String,
         @Value("\${aad_syfoveileder_clientid.password}") val clientSecret: String,
         private val context: AuthenticationContext
@@ -29,7 +29,7 @@ class AADTokenService(
 
     fun getAADToken(): AADToken {
         val futureToken: Future<AuthenticationResult> = context
-                .acquireToken(aadUrl, ClientCredential(clientId, clientSecret), null)
+                .acquireToken(resource, ClientCredential(clientId, clientSecret), null)
 
         val result: AuthenticationResult = futureToken.get()
 
