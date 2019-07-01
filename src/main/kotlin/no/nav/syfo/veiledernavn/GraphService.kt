@@ -19,7 +19,7 @@ import org.springframework.web.client.RestTemplate
 class GraphService(
         private val AADTokenService: AADTokenService,
         private val restTemplate: RestTemplate,
-        @Value("\${graphApi.url}") val graphApiUrl: String
+        @Value("\${graphApi.v1.url}") val graphApiUrl: String
 ) {
 
     fun getVeiledere(

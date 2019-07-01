@@ -28,9 +28,8 @@ no.nav.security.oidc:
 
 fasit.environment.name: 'local'
 
-graphApi:
-  url: 'https://graph.microsoft.com/v1.0/'
-  authority: 'https://login.microsoftonline.com/navq.onmicrosoft.com'
+graphApi.v1.url: 'https://graph.microsoft.com/v1.0/'
+aadauthority.url: 'https://login.microsoftonline.com/navq.onmicrosoft.com'
 adal4j.resource: 'https://graph.microsoft.com'
 
 dev: true

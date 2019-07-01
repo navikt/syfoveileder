@@ -37,10 +37,12 @@ fasitResources:
     propertyMap:
       discoveryUri: NO_NAV_SECURITY_OIDC_ISSUER_VEILEDER_DISCOVERYURL
       clientId: NO_NAV_SECURITY_OIDC_ISSUER_VEILEDER_ACCEPTEDAUDIENCE
-  - alias: aadaccesstoken
-    resourceType: baseurl
   - alias: aad_syfoveileder_clientid
     resourceType: credential
     propertyMap:
       username: AAD-SYFOVEILEDER-CLIENTID_USERNAME
       password: AAD-SYFOVEILEDER-CLIENTID_PASSWORD
+  - alias: aadauthority
+    resourceType: baseurl
+  - alias: graphapi_v1
+    resourceType: baseurl
