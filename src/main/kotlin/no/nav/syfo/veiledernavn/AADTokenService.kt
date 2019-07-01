@@ -1,7 +1,6 @@
 package no.nav.syfo.veiledernavn
 
 import com.microsoft.aad.adal4j.AuthenticationContext
-import com.microsoft.aad.adal4j.AuthenticationResult
 import com.microsoft.aad.adal4j.ClientCredential
 import no.nav.syfo.AADToken
 import org.slf4j.LoggerFactory
@@ -9,14 +8,14 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.util.concurrent.Future
+import java.util.concurrent.Executors
 
 @Component
 class AADTokenService(
         @Value("\${adal4j.resource}") val resource: String,
         @Value("\${aad_syfoveileder_clientid.username}") val clientId: String,
         @Value("\${aad_syfoveileder_clientid.password}") val clientSecret: String,
-        private val context: AuthenticationContext
+        @Value("\${aadauthority.url}") val authority: String
 ){
 
     fun renewTokenIfExpired(token: AADToken): AADToken =
@@ -28,10 +27,9 @@ class AADTokenService(
         }
 
     fun getAADToken(): AADToken {
-        val futureToken: Future<AuthenticationResult> = context
-                .acquireToken(resource, ClientCredential(clientId, clientSecret), null)
-
-        val result: AuthenticationResult = futureToken.get()
+        val service = Executors.newFixedThreadPool(1)
+        val context = AuthenticationContext(authority, true, service)
+        val result = context.acquireToken(resource, ClientCredential(clientId, clientSecret), null).get()
 
         return AADToken(
                 result.accessToken,
