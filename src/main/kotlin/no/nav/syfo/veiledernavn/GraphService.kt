@@ -19,7 +19,7 @@ import org.springframework.web.client.RestTemplate
 class GraphService(
         private val tokenService: AADTokenService,
         private val restTemplate: RestTemplate,
-        @Value("\${graphApi.v1.url}") val graphApiUrl: String
+        @Value("\${graphapi.url}") val graphApiUrl: String
 ) {
 
     fun getVeiledere(
@@ -49,7 +49,7 @@ class GraphService(
                    ?: throw RuntimeException("Svar fra Graph API har ikke forventet format.")
 
         } catch (e: HttpClientErrorException) {
-            LOG.error("Feil ved oppslag i Graph API feiler med response ${e.responseBodyAsString}", e)
+            LOG.warn("Feil ved oppslag i Graph API feiler med response ${e.responseBodyAsString}", e)
             throw RuntimeException(e)
         }
     }

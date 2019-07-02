@@ -29,8 +29,6 @@ server:
   servlet:
     context-path: /syfoveileder
 
-adal4j.resource: 'https://graph.microsoft.com'
-
 spring:
   main.banner-mode: 'off'
   jta.atomikos.datasource:

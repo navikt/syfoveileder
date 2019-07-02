@@ -44,5 +44,5 @@ fasitResources:
       password: AAD-SYFOVEILEDER-CLIENTID_PASSWORD
   - alias: aadauthority
     resourceType: baseurl
-  - alias: graphapi_v1
+  - alias: graphapi
     resourceType: baseurl
