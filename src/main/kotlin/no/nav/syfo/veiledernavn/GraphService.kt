@@ -17,7 +17,7 @@ import org.springframework.web.client.RestTemplate
 
 @Component
 class GraphService(
-        private val AADTokenService: AADTokenService,
+        private val tokenService: AADTokenService,
         private val restTemplate: RestTemplate,
         @Value("\${graphApi.v1.url}") val graphApiUrl: String
 ) {
@@ -25,15 +25,16 @@ class GraphService(
     fun getVeiledere(
             enhetNr: String,
             enhetNavn: String,
-            token: AADToken = AADTokenService.getAADToken()
+            token: AADToken = tokenService.getAADToken()
     ): List<Veileder>{
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
-        // Todo: Cache token in AADTokenService, and let it renew itself
-        headers.set("Authorization", "Bearer " + AADTokenService.renewTokenIfExpired(token).accessToken)
+        // Todo: Cache token i tokenService, og la den fornye seg selv
+        headers.set("Authorization", "Bearer " + tokenService.renewTokenIfExpired(token).accessToken)
+
         val url = "${graphApiUrl}/v1.0/users/?${'$'}filter=city eq '$enhetNavn'&${'$'}select=onPremisesSamAccountName,givenName,surname,streetAddress,city"
         try {
-            LOG.debug("Azure Graph - get users - URL: '$url'")
+            LOG.info("Azure Graph - get users - URL: '$url'")
             val responseEntity = restTemplate.exchange(url, GET, HttpEntity<Any>(headers), GetUsersResponse::class.java)
             if (responseEntity.statusCode != OK) {
                 val message = "Kall mot Graph Apiet feiler med HTTP statuskode" + responseEntity.statusCode
@@ -48,7 +49,7 @@ class GraphService(
                    ?: throw RuntimeException("Svar fra Graph API har ikke forventet format.")
 
         } catch (e: HttpClientErrorException) {
-            LOG.error("Feil ved oppslag i Graph API", e)
+            LOG.error("Feil ved oppslag i Graph API feiler med response ${e.responseBodyAsString}", e)
             throw RuntimeException(e)
         }
     }
