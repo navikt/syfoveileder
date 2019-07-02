@@ -1,5 +1,6 @@
 package no.nav.syfo
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.time.LocalDateTime
 
 data class Veileder(val ident: String,
@@ -20,7 +21,7 @@ fun AADVeileder.toVeileder(): Veileder =
     Veileder(fornavn = givenName, etternavn = surname, ident = onPremisesSamAccountName,
             enhetNr = streetAddress, enhetNavn = city)
 
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class GetUsersResponse( val value: List<AADVeileder>)
 
 data class AADToken(
