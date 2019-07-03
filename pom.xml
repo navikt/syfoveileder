@@ -49,6 +49,7 @@
         <cxf.version>3.2.0</cxf.version>
         <adal4j.version>1.6.4</adal4j.version>
         <oauth2-oidc-sdk.version>6.5</oauth2-oidc-sdk.version>
+        <jackson-version>2.9.8</jackson-version>
     </properties>
 
     <dependencies>
@@ -112,6 +113,11 @@
             <artifactId>oauth2-oidc-sdk</artifactId>
             <version>${oauth2-oidc-sdk.version}</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-kotlin</artifactId>
+            <version>${jackson-version}</version>
         </dependency>
 
 
