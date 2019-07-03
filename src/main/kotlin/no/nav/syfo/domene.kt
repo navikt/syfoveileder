@@ -13,13 +13,13 @@ data class AADVeileder(
         val givenName: String,
         val surname: String,
         val onPremisesSamAccountName: String, // Ident - feks Z991234
-        val streetAddress: String, // Enhet nummer - feks 0315
+        val streetAddress: String?, // Enhet nummer - feks 0315
         val city: String // Enhet navn - feks  Nav Grünerløkka
         )
 
 fun AADVeileder.toVeileder(): Veileder =
     Veileder(fornavn = givenName, etternavn = surname, ident = onPremisesSamAccountName,
-            enhetNr = streetAddress, enhetNavn = city)
+            enhetNr = streetAddress ?:"0000", enhetNavn = city)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class GetUsersResponse( val value: List<AADVeileder>)
