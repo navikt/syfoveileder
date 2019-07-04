@@ -15,7 +15,7 @@ class AADTokenService(
         @Value("\${graphapi.url}") val resource: String, // resource er url-en hvor tokenet er gyldig
         @Value("\${aad_syfoveileder_clientid.username}") val clientId: String,
         @Value("\${aad_syfoveileder_clientid.password}") val clientSecret: String,
-        @Value("\${aadauthority.url}") val authority: String
+        private val context: AuthenticationContext
 ){
 
     fun renewTokenIfExpired(token: AADToken): AADToken =
@@ -27,8 +27,6 @@ class AADTokenService(
         }
 
     fun getAADToken(): AADToken {
-        val service = Executors.newFixedThreadPool(1)
-        val context = AuthenticationContext(authority, true, service)
         val result = context.acquireToken(resource, ClientCredential(clientId, clientSecret), null).get()
 
         return AADToken(
