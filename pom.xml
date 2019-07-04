@@ -76,14 +76,6 @@
             <version>${cxf.version}</version>
         </dependency>
 
-        <!-- Soap dependencies -->
-        <dependency>
-            <groupId>no.nav.tjenestespesifikasjoner</groupId>
-            <artifactId>enhet-v1-tjenestespesifikasjon</artifactId>
-            <version>${tjenestespesifikasjoner.version}</version>
-        </dependency>
-
-
         <!-- OIDC -->
         <dependency>
             <groupId>no.nav.security</groupId>
