@@ -1,5 +1,6 @@
 package no.nav.syfo.veiledernavn
 
+import no.nav.security.spring.oidc.validation.interceptor.OIDCUnauthorizedException
 import org.slf4j.LoggerFactory
 import org.springframework.http.*
 import org.springframework.web.bind.annotation.ControllerAdvice
@@ -19,7 +20,15 @@ class VeilederNavnExceptionHandler: ResponseEntityExceptionHandler() {
         val bodyOfResponse = "Uventet feil internt i syfoveileder"
         LOG.error(bodyOfResponse, e)
         return handleExceptionInternal(e, bodyOfResponse,
-                HttpHeaders(), HttpStatus.FAILED_DEPENDENCY, request)
+                HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request)
+    }
+
+    @ExceptionHandler(OIDCUnauthorizedException::class)
+    protected fun handleUnauthorized(e: RuntimeException, request: WebRequest): ResponseEntity<Any> {
+        val bodyOfResponse = "Bruker er ikke logget inn"
+        LOG.error(bodyOfResponse, e)
+        return handleExceptionInternal(e, bodyOfResponse,
+                HttpHeaders(), HttpStatus.UNAUTHORIZED, request)
     }
 
     @ExceptionHandler(ServiceUnavailableException::class, InternalServerErrorException::class)
