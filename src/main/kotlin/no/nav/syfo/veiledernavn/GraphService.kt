@@ -34,11 +34,6 @@ class GraphService(
         try {
             LOG.info("Azure Graph - get users - URL: '$url'")
             val responseEntity = restTemplate.exchange(url, GET, HttpEntity<Any>(headers), GetUsersResponse::class.java)
-            /*if (!responseEntity.statusCode.is2xxSuccessful()){
-                val message = "Kall mot Graph Apiet feiler med HTTP statuskode" + responseEntity.statusCode
-                LOG.error(message)
-                throw RuntimeException(message)
-            }*/
            return responseEntity
                    .body
                    ?.value
