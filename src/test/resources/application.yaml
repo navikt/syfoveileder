@@ -18,11 +18,21 @@ server:
   servlet:
     context-path: /syfoveileder
 
-securitytokenservice.url: "sts.url"
-srvsyfomotebehov:
-  username: "username"
-  password: "password"
+no.nav.security.oidc:
+  issuers: veileder
+  issuer:
+    veileder:
+      discoveryurl: http://metadata
+      accepted_audience: aud-localhost
+      cookie_name: localhost-idtoken
 
 fasit.environment.name: 'local'
 
+graphapi.url: 'https://graph.microsoft.com'
+aadauthority.url: 'https://login.microsoftonline.com/navq.onmicrosoft.com'
+
 dev: true
+
+aad_syfoveileder_clientid:
+  username: "test"
+  password: "trustno1"
