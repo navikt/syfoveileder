@@ -16,6 +16,10 @@ data class AADVeileder(
         val streetAddress: String?, // Enhet nummer - feks 0315
         val city: String // Enhet navn - feks  Nav Grünerløkka
         )
+data class EnhetResponse (
+        val navn: String,
+        val enhetNr: String
+)
 
 fun AADVeileder.toVeileder(): Veileder =
     Veileder(fornavn = givenName, etternavn = surname, ident = onPremisesSamAccountName,
@@ -29,5 +33,3 @@ data class AADToken(
         val refreshToken: String?,
         val expires: LocalDateTime
 )
-
-

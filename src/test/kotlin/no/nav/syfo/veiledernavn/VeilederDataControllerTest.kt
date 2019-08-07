@@ -3,10 +3,9 @@ package no.nav.syfo.veiledernavn
 import no.nav.security.oidc.context.OIDCRequestContextHolder
 import no.nav.syfo.AADToken
 import no.nav.syfo.LocalApplication
-import no.nav.syfo.util.OIDCIssuer
-import no.nav.syfo.util.TestData.errorResponseBody
+import no.nav.syfo.util.*
+import no.nav.syfo.util.TestData.errorResponseBodyGraphApi
 import no.nav.syfo.util.TestData.userListResponseBody
-import no.nav.syfo.util.TestUtils
 import no.nav.syfo.util.TestUtils.loggInnSomVeileder
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.*
@@ -70,6 +69,7 @@ class VeilederDataComponentTest {
     fun setup() {
         loggInnSomVeileder(oidcRequestContextHolder, ident)
         this.mockRestServiceServer = MockRestServiceServer.bindTo(restTemplate).build()
+        MockUtils.mockNorg2Response(mockRestServiceServer)
     }
 
     @After
@@ -122,7 +122,7 @@ class VeilederDataComponentTest {
                 .andExpect(method(HttpMethod.GET))
                 .andExpect(header(AUTHORIZATION, "Bearer ${token.accessToken}"))
                 .andRespond(withServerError()
-                        .body(errorResponseBody)
+                        .body(errorResponseBodyGraphApi)
                         .contentType(MediaType.APPLICATION_JSON))
     }
 

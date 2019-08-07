@@ -46,3 +46,7 @@ fasitResources:
     resourceType: baseurl
   - alias: graphapi
     resourceType: baseurl
+  - alias: norg2.api.v1
+    resourceType: Restservice
+    propertyMap:
+      url: norg2.url

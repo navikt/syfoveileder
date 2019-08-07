@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.*
 import org.springframework.http.HttpMethod.GET
-import org.springframework.http.HttpStatus.OK
 import org.springframework.stereotype.Component
 import org.springframework.web.client.*
 import javax.ws.rs.*
@@ -17,6 +16,7 @@ import javax.ws.rs.*
 class GraphService(
         private val tokenService: AADTokenService,
         private val restTemplate: RestTemplate,
+        private val norg2Consumer: Norg2Consumer,
         @Value("\${graphapi.url}") val graphApiUrl: String
 ) {
 
@@ -25,6 +25,8 @@ class GraphService(
             enhetNavn: String,
             token: AADToken = tokenService.getAADToken()
     ): List<Veileder>{
+
+        val enhetnavn = norg2Consumer.hentEnhetNavn(enhetNr) // Håndter exception
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
         // Todo: Cache token i tokenService, og la den fornye seg selv
