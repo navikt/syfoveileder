@@ -101,15 +101,14 @@ class VeilederDataComponentTest {
                 .header("Authorization", "Bearer $idToken"))
                 .andReturn().response
 
-        assertThat(respons.contentAsString).isEqualTo("Feil i tjenester som syfoVeileder bruker")
-        assertThat(respons.status).isEqualTo(424)
+        assertThat(respons.contentAsString).isEqualTo("[]")
+        assertThat(respons.status).isEqualTo(200)
     }
 
     @Test
-    fun veilederNavnFeiler() {
+    fun feilHosAvhengighet() {
         val idToken = oidcRequestContextHolder.oidcValidationContext.getToken(OIDCIssuer.AZURE).idToken
         mockAADToken()
-        MockUtils.mockNorg2Response(mockRestServiceServer)
         mockGetUsersResponse500()
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/veiledere/enhet/$enhet")
@@ -131,7 +130,7 @@ class VeilederDataComponentTest {
         mockRestServiceServer.expect(manyTimes(), anything())
                 .andExpect(method(HttpMethod.GET))
                 .andExpect(header(AUTHORIZATION, "Bearer ${token.accessToken}"))
-                .andRespond(withServerError()
+                .andRespond(withSuccess()
                         .body(userListEmptyValueResponseBody)
                         .contentType(MediaType.APPLICATION_JSON))
     }
