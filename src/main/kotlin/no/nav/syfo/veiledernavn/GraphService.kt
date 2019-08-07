@@ -22,11 +22,10 @@ class GraphService(
 
     fun getVeiledere(
             enhetNr: String,
-            enhetNavn: String,
             token: AADToken = tokenService.getAADToken()
     ): List<Veileder>{
 
-        val enhetnavn = norg2Consumer.hentEnhetNavn(enhetNr) // Håndter exception
+        val enhetNavn = norg2Consumer.hentEnhetNavn(enhetNr)
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
         // Todo: Cache token i tokenService, og la den fornye seg selv

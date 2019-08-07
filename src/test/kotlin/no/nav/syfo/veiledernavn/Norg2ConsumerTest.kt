@@ -5,18 +5,21 @@ import no.nav.syfo.util.MockUtils
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.*
 import org.junit.runner.RunWith
+import org.mockito.Mock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.client.MockRestServiceServer
-import org.springframework.web.client.RestTemplate
+import org.springframework.web.client.*
 import javax.inject.Inject
+import javax.ws.rs.BadRequestException
+import javax.ws.rs.InternalServerErrorException
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK,
         classes = [LocalApplication::class])
 @DirtiesContext
-class Norg2ConsumerTest{
+class Norg2ConsumerTest {
 
     @Inject
     lateinit var restTemplate: RestTemplate
@@ -38,12 +41,15 @@ class Norg2ConsumerTest{
 
     @Test
     fun hentEnhetNavn() {
-        MockUtils.mockNorg2Response(mockRestServiceServer);
+        MockUtils.mockNorg2Response(mockRestServiceServer)
         val enhetNavn = norg2Consumer.hentEnhetNavn("0123")
 
         assertThat(enhetNavn).isEqualTo("NAV X-Files")
     }
 
-    //Todo: test for håndtering av feilmeldinger
-
+    @Test(expected = BadRequestException::class)
+    fun enhetsNummerFinnesIkke() {
+        MockUtils.mockNorg2EnhetsNummerFinnesIkke(mockRestServiceServer)
+        norg2Consumer.hentEnhetNavn("0000")
+    }
 }

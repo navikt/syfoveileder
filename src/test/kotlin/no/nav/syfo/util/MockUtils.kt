@@ -17,4 +17,13 @@ object MockUtils{
                         .contentType(MediaType.APPLICATION_JSON)
                 )
     }
+
+    fun mockNorg2EnhetsNummerFinnesIkke(mockRestServiceServer: MockRestServiceServer) {
+        mockRestServiceServer.expect(ExpectedCount.manyTimes(), requestTo("https://norg2.url/enhet/0000"))
+                .andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
+                .andRespond(MockRestResponseCreators.withBadRequest()
+                        .body(TestData.enhetNavnUkjentEnhetsnummer)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+    }
 }

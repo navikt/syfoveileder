@@ -29,6 +29,11 @@ object TestData {
             "    ]\n" +
             "}"
 
+    val userListEmptyValueResponseBody = "{\n" +
+            "    \"@odata.context\": \"https://graph.microsoft.com/v1.0/\$metadata#users(onPremisesSamAccountName,givenName,surname,streetAddress,city)\",\n" +
+            "    \"value\": []\n" +
+            "}"
+
     val errorResponseBodyGraphApi = "{\n" +
             "  \"error\": {\n" +
             "    \"code\": \"serviceNotAvailable\",\n" +
@@ -58,5 +63,10 @@ object TestData {
             "            \"sosialeTjeneste\": \"Bla bla\",\n" +
             "            \"kanalstrategi\": \"Bla bla\",\n" +
             "            \"orgNrTilKommunaltNavKontor\": \"876543219\"\n" +
+            "}"
+
+    val enhetNavnUkjentEnhetsnummer = "{\n" +
+            "            \"field\": null,\n" +
+            "            \"message\": \"Enheten med nummeret \'0000\' eksisterer ikke\"\n" +
             "}"
 }
