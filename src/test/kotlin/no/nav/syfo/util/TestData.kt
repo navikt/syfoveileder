@@ -29,7 +29,12 @@ object TestData {
             "    ]\n" +
             "}"
 
-    val errorResponseBody = "{\n" +
+    val userListEmptyValueResponseBody = "{\n" +
+            "    \"@odata.context\": \"https://graph.microsoft.com/v1.0/\$metadata#users(onPremisesSamAccountName,givenName,surname,streetAddress,city)\",\n" +
+            "    \"value\": []\n" +
+            "}"
+
+    val errorResponseBodyGraphApi = "{\n" +
             "  \"error\": {\n" +
             "    \"code\": \"serviceNotAvailable\",\n" +
             "    \"message\": \"There was an internal server error while processing the request..\",\n" +
@@ -39,6 +44,29 @@ object TestData {
             "    }\n" +
             "  }\n" +
             "}"
+
+    val enhetNavnResponseBody = "{\n" +
+            "            \"enhedId\": 100000099,\n" +
+            "            \"navn\": \"NAV X-Files\",\n" +
+            "            \"enhetNr\": \"0123\",\n" +
+            "            \"antallRessurser\": 111,\n" +
+            "            \"status\": \"Aktiv\",\n" +
+            "            \"orgNivaa\": \"EN\",\n" +
+            "            \"type\": \"LOKAL\",\n" +
+            "            \"organisasjonsnummer\": \"987654321\",\n" +
+            "            \"underEtableringsDato\": \"1970-01-01\",\n" +
+            "            \"aktiveringsdato\": \"1970-01-01\",\n" +
+            "            \"underAvviklingDato\": null,\n" +
+            "            \"nedleggelsesdato\": null,\n" +
+            "            \"oppgavebehandler\": true,\n" +
+            "            \"versjon\": 42,\n" +
+            "            \"sosialeTjeneste\": \"Bla bla\",\n" +
+            "            \"kanalstrategi\": \"Bla bla\",\n" +
+            "            \"orgNrTilKommunaltNavKontor\": \"876543219\"\n" +
+            "}"
+
+    val enhetNavnUkjentEnhetsnummer = "{\n" +
+            "            \"field\": null,\n" +
+            "            \"message\": \"Enheten med nummeret \'0000\' eksisterer ikke\"\n" +
+            "}"
 }
-
-

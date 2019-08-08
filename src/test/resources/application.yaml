@@ -30,6 +30,7 @@ fasit.environment.name: 'local'
 
 graphapi.url: 'https://graph.microsoft.com'
 aadauthority.url: 'https://login.microsoftonline.com/navq.onmicrosoft.com'
+norg2.url: 'https://norg2.url'
 
 dev: true
 

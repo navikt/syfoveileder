@@ -13,8 +13,8 @@ import javax.inject.Inject
 class VeilederDataController @Inject constructor(val graphService: GraphService) {
 
     @ProtectedWithClaims(issuer = AZURE)
-    @GetMapping(value = ["/enhet/{enhet}/enhetNavn/{enhetNavn}"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun hentVeiledere(@PathVariable enhet: String, @PathVariable enhetNavn: String): List<Veileder> {
-        return graphService.getVeiledere(enhetNr = enhet, enhetNavn = enhetNavn)
+    @GetMapping(value = ["/enhet/{enhet}"], produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun hentVeiledere(@PathVariable enhet: String): List<Veileder> {
+        return graphService.getVeiledere(enhetNr = enhet)
     }
 }

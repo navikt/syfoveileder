@@ -12,7 +12,7 @@ import java.util.concurrent.Executors
 
 @Component
 class AADTokenService(
-        @Value("\${graphapi.url}") val resource: String, // resource er url-en hvor tokenet er gyldig
+        @Value("\${graphapi.url}") val resource: String, // resource er en url som tokenet er gyldig for bruk mot
         @Value("\${aad_syfoveileder_clientid.username}") val clientId: String,
         @Value("\${aad_syfoveileder_clientid.password}") val clientSecret: String,
         private val context: AuthenticationContext

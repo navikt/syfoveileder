@@ -3,10 +3,10 @@ package no.nav.syfo.veiledernavn
 import no.nav.security.oidc.context.OIDCRequestContextHolder
 import no.nav.syfo.AADToken
 import no.nav.syfo.LocalApplication
-import no.nav.syfo.util.OIDCIssuer
-import no.nav.syfo.util.TestData.errorResponseBody
+import no.nav.syfo.util.*
+import no.nav.syfo.util.TestData.errorResponseBodyGraphApi
+import no.nav.syfo.util.TestData.userListEmptyValueResponseBody
 import no.nav.syfo.util.TestData.userListResponseBody
-import no.nav.syfo.util.TestUtils
 import no.nav.syfo.util.TestUtils.loggInnSomVeileder
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.*
@@ -56,7 +56,6 @@ class VeilederDataComponentTest {
 
     private val ident = "Z999999"
     private val enhet = "0123"
-    private val enhetNavn = "NAV X-files"
     private val token = AADToken(
             "token",
             "refreshtoken",
@@ -70,6 +69,7 @@ class VeilederDataComponentTest {
     fun setup() {
         loggInnSomVeileder(oidcRequestContextHolder, ident)
         this.mockRestServiceServer = MockRestServiceServer.bindTo(restTemplate).build()
+        MockUtils.mockNorg2Response(mockRestServiceServer)
     }
 
     @After
@@ -78,14 +78,13 @@ class VeilederDataComponentTest {
         TestUtils.loggUt(oidcRequestContextHolder)
     }
 
-
     @Test
     fun hentVeilederNavn() {
         val idToken = oidcRequestContextHolder.oidcValidationContext.getToken(OIDCIssuer.AZURE).idToken
         mockAADToken()
         mockGetUsersResponse()
 
-        val respons = mockMvc.perform(MockMvcRequestBuilders.get("/api/veiledere/enhet/$enhet/enhetNavn/$enhetNavn")
+        val respons = mockMvc.perform(MockMvcRequestBuilders.get("/api/veiledere/enhet/$enhet")
                 .header("Authorization", "Bearer $idToken"))
                 .andReturn().response.contentAsString
 
@@ -96,22 +95,23 @@ class VeilederDataComponentTest {
     fun ingenVeilederNavn() {
         val idToken = oidcRequestContextHolder.oidcValidationContext.getToken(OIDCIssuer.AZURE).idToken
         mockAADToken()
-        mockGetUsersResponse()
+        mockEmptyGetUsersResponse()
 
-        val respons = mockMvc.perform(MockMvcRequestBuilders.get("/api/veiledere/enhet/00/enhetNavn/finnesikke")
+        val respons = mockMvc.perform(MockMvcRequestBuilders.get("/api/veiledere/enhet/$enhet")
                 .header("Authorization", "Bearer $idToken"))
-                .andReturn().response.contentAsString
+                .andReturn().response
 
-        assertThat(respons).isEqualTo("[]")
+        assertThat(respons.contentAsString).isEqualTo("[]")
+        assertThat(respons.status).isEqualTo(200)
     }
 
     @Test
-    fun veilederNavnFeiler() {
+    fun feilHosAvhengighet() {
         val idToken = oidcRequestContextHolder.oidcValidationContext.getToken(OIDCIssuer.AZURE).idToken
         mockAADToken()
         mockGetUsersResponse500()
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/veiledere/enhet/$enhet/enhetNavn/$enhetNavn")
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/veiledere/enhet/$enhet")
                 .header("Authorization", "Bearer $idToken"))
                 .andExpect(status().isFailedDependency())
                 .andReturn().response.contentAsString
@@ -122,7 +122,16 @@ class VeilederDataComponentTest {
                 .andExpect(method(HttpMethod.GET))
                 .andExpect(header(AUTHORIZATION, "Bearer ${token.accessToken}"))
                 .andRespond(withServerError()
-                        .body(errorResponseBody)
+                        .body(errorResponseBodyGraphApi)
+                        .contentType(MediaType.APPLICATION_JSON))
+    }
+
+    private fun mockEmptyGetUsersResponse() {
+        mockRestServiceServer.expect(manyTimes(), anything())
+                .andExpect(method(HttpMethod.GET))
+                .andExpect(header(AUTHORIZATION, "Bearer ${token.accessToken}"))
+                .andRespond(withSuccess()
+                        .body(userListEmptyValueResponseBody)
                         .contentType(MediaType.APPLICATION_JSON))
     }
 
