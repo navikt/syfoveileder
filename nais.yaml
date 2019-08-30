@@ -50,3 +50,7 @@ fasitResources:
     resourceType: Restservice
     propertyMap:
       url: norg2.url
+  - alias: axsys.rest-api
+    resourceType: Restservice
+    propertyMap:
+      url: axsys.url
