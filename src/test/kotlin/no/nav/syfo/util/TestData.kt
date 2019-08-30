@@ -29,6 +29,21 @@ object TestData {
             "    ]\n" +
             "}"
 
+    val getAxsysVeiledereResponseBody = "[\n" +
+            "    {\n" +
+            "        \"appIdent\": \"Z999999\",\n" +
+            "        \"historiskIdent\": 123456789\n" +
+            "    },\n" +
+            "    {\n" +
+            "        \"appIdent\": \"Z8888888\",\n" +
+            "        \"historiskIdent\": 987654321\n" +
+            "    }\n" +
+            "]"
+
+    val errorResponseBodyAxsys = "{\n" +
+            "    \"melding\": \"Enhet 0999 eksisterer ikke\"\n" +
+            "}"
+
     val userListEmptyValueResponseBody = "{\n" +
             "    \"@odata.context\": \"https://graph.microsoft.com/v1.0/\$metadata#users(onPremisesSamAccountName,givenName,surname,streetAddress,city)\",\n" +
             "    \"value\": []\n" +
