@@ -46,7 +46,7 @@
         <flyway-core.version>5.0.7</flyway-core.version>
         <oidc-spring-support.version>0.2.4</oidc-spring-support.version>
         <tjenestespesifikasjoner.version>1.2019.04.03-23.09-56488320520a</tjenestespesifikasjoner.version>
-        <cxf.version>3.2.0</cxf.version>
+        <cxf.version>3.3.3</cxf.version>
         <adal4j.version>1.6.4</adal4j.version>
         <oauth2-oidc-sdk.version>6.5</oauth2-oidc-sdk.version>
         <jackson-version>2.9.8</jackson-version>
