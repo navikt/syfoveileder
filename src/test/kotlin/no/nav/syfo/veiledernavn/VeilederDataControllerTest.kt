@@ -44,7 +44,7 @@ class VeilederDataComponentTest {
     lateinit var restTemplate: RestTemplate
 
     @MockBean
-    lateinit var aadTokenService: AADTokenService
+    lateinit var aadTokenService: AADTokenConsumer
 
     @Inject
     private lateinit var mockMvc: MockMvc
