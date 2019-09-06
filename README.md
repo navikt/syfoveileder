@@ -1,10 +1,14 @@
-# syfoveileder
+# Syfoveileder
 
-## Om syfoveileder
-syfoveileder er en Spring Boot applikasjon skrevet i Kotlin. Hovedoppgaven til syfoveileder
-er å være en mikrotjeneste som tilbyr data med knytning til veiledere. Feks veileder navn og tildelte brukere. 
+## About Syfoveileder
+Syfoveileder is a Spring Boot application written in Kotlin. Its main job is to be a microservice offering data relating
+to veiledere. So far this means a list of veileder names with access to an enhet.
 
-## Database
-Appen kjører med en lokal H2 in-memory database. Den spinnes opp som en del av applikasjonen og er 
-også tilgjengelig i tester. Du kan logge inn og kjøre spørringer på:
-`localhost/h2` med jdbc_url: `jdbc:h2:mem:testdb`
+
+## Dependencies
+The data quality of veileder in Azure AD is not good enough for veileder to enhet relations. It contains employee
+relations to an enhet, but not access rights to an enhet. This data lives in Axsys. Veileder names on the other hand,
+exists only in Azure AD.
+
+Thus, Syfoveileder collects the veileder to enhet relation from Axsys, and the names from Azure AD's Graph Api. We collect the
+name of the enhet, needed to fetch veileder names from Azure AD, from Norg2.
