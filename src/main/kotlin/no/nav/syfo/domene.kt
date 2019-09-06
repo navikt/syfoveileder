@@ -5,10 +5,8 @@ import java.time.LocalDateTime
 
 data class Veileder(
         val ident: String,
-        val fornavn: String,
-        val etternavn: String,
-        val enhetNr: String,
-        val enhetNavn: String
+        val fornavn: String?,
+        val etternavn: String?
 )
 
 data class AADVeileder(
@@ -25,8 +23,7 @@ data class EnhetResponse (
 )
 
 fun AADVeileder.toVeileder(): Veileder =
-    Veileder(fornavn = givenName, etternavn = surname, ident = onPremisesSamAccountName,
-            enhetNr = streetAddress ?:"0000", enhetNavn = city)
+    Veileder(fornavn = givenName, etternavn = surname, ident = onPremisesSamAccountName)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class GetUsersResponse( val value: List<AADVeileder>)
@@ -35,6 +32,9 @@ data class AxsysVeileder(
         val appIdent: String,
         val historiskIdent: Number
 )
+
+fun AxsysVeileder.toVeileder(): Veileder =
+        Veileder(fornavn = "", etternavn = "", ident = appIdent)
 
 data class AADToken(
         val accessToken: String,

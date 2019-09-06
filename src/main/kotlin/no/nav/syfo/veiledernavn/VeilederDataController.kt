@@ -9,11 +9,11 @@ import javax.inject.Inject
 
 @RestController
 @RequestMapping(value = ["/api/veiledere"])
-class VeilederDataController @Inject constructor(val graphApiConsumer: GraphApiConsumer) {
+class VeilederDataController @Inject constructor(val veilederService: VeilederService) {
 
     @ProtectedWithClaims(issuer = AZURE)
     @GetMapping(value = ["/enhet/{enhet}"], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun hentVeiledere(@PathVariable enhet: String): List<Veileder> {
-        return graphApiConsumer.getVeiledere(enhetNr = enhet)
+        return veilederService.getVeiledere(enhetNr = enhet)
     }
 }

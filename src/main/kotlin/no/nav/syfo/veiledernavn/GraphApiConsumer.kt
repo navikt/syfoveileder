@@ -11,22 +11,22 @@ import javax.ws.rs.*
 
 @Component
 class GraphApiConsumer(
-        private val tokenService: AADTokenConsumer,
+        private val aadTokenConsumer: AADTokenConsumer,
         private val restTemplate: RestTemplate,
         private val norg2Consumer: Norg2Consumer,
         @Value("\${graphapi.url}") val graphApiUrl: String
 ) {
 
     fun getVeiledere(
-            enhetNr: String,
-            token: AADToken = tokenService.getAADToken()
+            enhetNr: String
     ): List<Veileder> {
 
+        val token: AADToken = aadTokenConsumer.getAADToken()
         val enhetNavn = norg2Consumer.hentEnhetNavn(enhetNr)
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
-        // Todo: Cache token i tokenService, og la den fornye seg selv
-        headers.set("Authorization", "Bearer " + tokenService.renewTokenIfExpired(token).accessToken)
+        // Todo: Cache token i aadTokenConsumer, og la den fornye seg selv
+        headers.set("Authorization", "Bearer " + aadTokenConsumer.renewTokenIfExpired(token).accessToken)
 
         val url = "${graphApiUrl}/v1.0/users/?${'$'}filter=city eq '$enhetNavn'&${'$'}select=onPremisesSamAccountName,givenName,surname,streetAddress,city"
         try {
