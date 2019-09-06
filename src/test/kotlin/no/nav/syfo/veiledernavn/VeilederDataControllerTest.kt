@@ -4,6 +4,7 @@ import no.nav.security.oidc.context.OIDCRequestContextHolder
 import no.nav.syfo.AADToken
 import no.nav.syfo.LocalApplication
 import no.nav.syfo.util.*
+import no.nav.syfo.util.TestData.brukereResponseBody
 import no.nav.syfo.util.TestData.errorResponseBodyGraphApi
 import no.nav.syfo.util.TestData.userListEmptyValueResponseBody
 import no.nav.syfo.util.TestData.userListResponseBody
@@ -62,8 +63,15 @@ class VeilederDataComponentTest {
             LocalDateTime.parse("2019-01-01T10:00:00")
     )
 
-    private val veilederListe: String = "[{\"ident\":\"Z999999\",\"fornavn\":\"Dana\"," +
-            "\"etternavn\":\"Scully\",\"enhetNr\":\"0123\",\"enhetNavn\":\"NAV X-FILES\"}]"
+    private val veilederListe: String = "[" +
+            "{\"ident\":\"Z999999\",\"fornavn\":\"Dana\",\"etternavn\":\"Scully\"}," +
+            "{\"ident\":\"Z666666\",\"fornavn\":\"\",\"etternavn\":\"\"}" +
+            "]"
+
+    private val noNamesList: String = "[" +
+            "{\"ident\":\"Z999999\",\"fornavn\":\"\",\"etternavn\":\"\"}," +
+            "{\"ident\":\"Z666666\",\"fornavn\":\"\",\"etternavn\":\"\"}" +
+            "]"
 
     @Before
     fun setup() {
@@ -83,6 +91,7 @@ class VeilederDataComponentTest {
         val idToken = oidcRequestContextHolder.oidcValidationContext.getToken(OIDCIssuer.AZURE).idToken
         mockAADToken()
         mockGetUsersResponse()
+        mockAxsysVeiledere()
 
         val respons = mockMvc.perform(MockMvcRequestBuilders.get("/api/veiledere/enhet/$enhet")
                 .header("Authorization", "Bearer $idToken"))
@@ -96,12 +105,13 @@ class VeilederDataComponentTest {
         val idToken = oidcRequestContextHolder.oidcValidationContext.getToken(OIDCIssuer.AZURE).idToken
         mockAADToken()
         mockEmptyGetUsersResponse()
+        mockAxsysVeiledere()
 
         val respons = mockMvc.perform(MockMvcRequestBuilders.get("/api/veiledere/enhet/$enhet")
                 .header("Authorization", "Bearer $idToken"))
                 .andReturn().response
 
-        assertThat(respons.contentAsString).isEqualTo("[]")
+        assertThat(respons.contentAsString).isEqualTo(noNamesList)
         assertThat(respons.status).isEqualTo(200)
     }
 
@@ -151,5 +161,13 @@ class VeilederDataComponentTest {
                                 .contentType(MediaType.APPLICATION_JSON))
     }
 
-
+    private fun mockAxsysVeiledere() {
+        mockRestServiceServer.expect(manyTimes(), anything())
+                .andExpect(method(HttpMethod.GET))
+                .andExpect(header("Nav-Call-Id", "default"))
+                .andExpect(header("Nav-Consumer-Id", "srvsyfoveileder"))
+                .andRespond(withSuccess()
+                        .body(brukereResponseBody)
+                        .contentType(MediaType.APPLICATION_JSON))
+    }
 }

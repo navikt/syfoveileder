@@ -88,6 +88,18 @@ object TestData {
             "            \"message\": \"Enheten med nummeret \'0000\' eksisterer ikke\"\n" +
             "}"
 
+    val brukereResponseBody = "[\n" +
+            "    {\n" +
+            "        \"appIdent\": \"Z999999\",\n" +
+            "        \"historiskIdent\": 123456789\n" +
+            "    },\n" +
+            "    {\n" +
+            "        \"appIdent\": \"Z666666\",\n" +
+            "        \"historiskIdent\": 111111111\n" +
+            "    }" +
+            "]"
+
+
 
     val AxsysVeiledere = listOf(
             AxsysVeileder(appIdent = "Z999999", historiskIdent = 123),
