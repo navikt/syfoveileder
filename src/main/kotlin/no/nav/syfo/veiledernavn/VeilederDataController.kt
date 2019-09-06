@@ -13,7 +13,7 @@ class VeilederDataController @Inject constructor(val veilederService: VeilederSe
 
     @ProtectedWithClaims(issuer = AZURE)
     @GetMapping(value = ["/enhet/{enhet}"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun hentVeiledere(@PathVariable enhet: String): List<Veileder> {
+    fun getVeiledere(@PathVariable enhet: String): List<Veileder> {
         return veilederService.getVeiledere(enhetNr = enhet)
     }
 }

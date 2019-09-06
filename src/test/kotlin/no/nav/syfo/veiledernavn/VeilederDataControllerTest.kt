@@ -39,7 +39,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
         classes = [LocalApplication::class])
 @AutoConfigureMockMvc
 @DirtiesContext
-class VeilederDataComponentTest {
+class VeilederDataControllerTest {
 
     @Inject
     lateinit var restTemplate: RestTemplate
@@ -87,7 +87,7 @@ class VeilederDataComponentTest {
     }
 
     @Test
-    fun hentVeilederNavn() {
+    fun getVeilederNames() {
         val idToken = oidcRequestContextHolder.oidcValidationContext.getToken(OIDCIssuer.AZURE).idToken
         mockAADToken()
         mockGetUsersResponse()
@@ -101,7 +101,7 @@ class VeilederDataComponentTest {
     }
 
     @Test
-    fun ingenVeilederNavn() {
+    fun noHitsOnVeilederNames() {
         val idToken = oidcRequestContextHolder.oidcValidationContext.getToken(OIDCIssuer.AZURE).idToken
         mockAADToken()
         mockEmptyGetUsersResponse()
@@ -116,7 +116,7 @@ class VeilederDataComponentTest {
     }
 
     @Test
-    fun feilHosAvhengighet() {
+    fun dependencyError() {
         val idToken = oidcRequestContextHolder.oidcValidationContext.getToken(OIDCIssuer.AZURE).idToken
         mockAADToken()
         mockGetUsersResponse500()

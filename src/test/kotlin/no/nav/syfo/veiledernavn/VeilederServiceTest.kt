@@ -25,12 +25,10 @@ class VeilederServiceTest {
     @Mock
     lateinit var axsysConsumer: AxsysConsumer
 
-
     @InjectMocks
     private lateinit var veilederService: VeilederService
 
     private val ENHET_NR: String = "9999"
-
 
     @Before
     fun setup() {
@@ -41,7 +39,6 @@ class VeilederServiceTest {
 
     @Test
     fun getVeiledere() {
-
         val veiledere: List<Veileder> = veilederService.getVeiledere(ENHET_NR)
 
         assertThat(veiledere).isEqualTo(listOf(
