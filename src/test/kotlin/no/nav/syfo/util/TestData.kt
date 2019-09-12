@@ -1,5 +1,8 @@
 package no.nav.syfo.util
 
+import no.nav.syfo.AxsysVeileder
+import no.nav.syfo.Veileder
+
 object TestData {
     val userListResponseBody = "{\n" +
             "    \"@odata.context\": \"https://graph.microsoft.com/v1.0/\$metadata#users(onPremisesSamAccountName,givenName,surname,streetAddress,city)\",\n" +
@@ -84,4 +87,26 @@ object TestData {
             "            \"field\": null,\n" +
             "            \"message\": \"Enheten med nummeret \'0000\' eksisterer ikke\"\n" +
             "}"
+
+    val brukereResponseBody = "[\n" +
+            "    {\n" +
+            "        \"appIdent\": \"Z999999\",\n" +
+            "        \"historiskIdent\": 123456789\n" +
+            "    },\n" +
+            "    {\n" +
+            "        \"appIdent\": \"Z666666\",\n" +
+            "        \"historiskIdent\": 111111111\n" +
+            "    }" +
+            "]"
+
+
+
+    val AxsysVeiledere = listOf(
+            AxsysVeileder(appIdent = "Z999999", historiskIdent = 123),
+            AxsysVeileder(appIdent = "Z888888", historiskIdent = 123)
+    )
+
+    val AADVeiledere = listOf<Veileder>(
+            Veileder(ident = "Z999999", fornavn = "Dana", etternavn = "Scully")
+    )
 }
