@@ -19,7 +19,7 @@ object MockUtils{
     }
 
     fun mockAxsysResponse(mockRestServiceServer: MockRestServiceServer) {
-        mockRestServiceServer.expect(ExpectedCount.manyTimes(), requestTo("https://axsys.url/api/v1/enhet/0123/brukere"))
+        mockRestServiceServer.expect(ExpectedCount.manyTimes(), requestTo("https://axsys.url/v1/enhet/0123/brukere"))
                 .andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
                 .andRespond(MockRestResponseCreators.withSuccess()
                         .body(TestData.getAxsysVeiledereResponseBody)
@@ -37,7 +37,7 @@ object MockUtils{
     }
 
     fun mockAxsysEnhetsNummerFinnesIkke(mockRestServiceServer: MockRestServiceServer) {
-        mockRestServiceServer.expect(ExpectedCount.manyTimes(), requestTo("https://axsys.url/api/v1/enhet/0999/brukere"))
+        mockRestServiceServer.expect(ExpectedCount.manyTimes(), requestTo("https://axsys.url/v1/enhet/0999/brukere"))
                 .andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
                 .andRespond(MockRestResponseCreators.withBadRequest()
                         .body(TestData.errorResponseBodyAxsys)
