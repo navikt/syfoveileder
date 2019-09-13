@@ -27,7 +27,7 @@ class AxsysConsumer(
         headers.set("Nav-Consumer-Id", "srvsyfoveileder")
         headers.contentType = MediaType.APPLICATION_JSON
 
-        val url = "${axsysUrl}/api/v1/enhet/$enhetNr/brukere"
+        val url = "${axsysUrl}/v1/enhet/$enhetNr/brukere"
         try {
             LOG.info("Axsys - get brukere - URL: '$url'")
 
