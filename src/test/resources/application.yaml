@@ -35,6 +35,6 @@ axsys.url: 'https://axsys.url'
 
 dev: true
 
-aad_syfoveileder_clientid:
+aad.syfoveileder.clientid:
   username: "test"
   password: "trustno1"
