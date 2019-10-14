@@ -67,10 +67,6 @@ tasks {
     withType<Jar> {
         manifest.attributes["Main-Class"] = "no.nav.syfo.ApplicationKt"
     }
-    
-    create("printVersion") {
-        println(project.version)
-    }
 
     create("printVersion") {
         doLast {
