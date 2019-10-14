@@ -1,5 +1,6 @@
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -62,8 +63,19 @@ dependencies {
 
 
 tasks {
+
+    withType<Jar> {
+        manifest.attributes["Main-Class"] = "no.nav.syfo.ApplicationKt"
+    }
+    
     create("printVersion") {
         println(project.version)
+    }
+
+    create("printVersion") {
+        doLast {
+            println(project.version)
+        }
     }
 
     withType<ShadowJar> {
@@ -71,17 +83,19 @@ tasks {
             setPath("META-INF/cxf")
             include("bus-extensions.txt")
         }
+        transform(PropertiesFileTransformer::class.java) {
+            paths = listOf("META-INF/spring.factories")
+            mergeStrategy = "append"
+        }
+        mergeServiceFiles()
     }
 
-    withType<KotlinCompile> {
+    named<KotlinCompile>("compileKotlin") {
         kotlinOptions.jvmTarget = "1.8"
     }
 
-    withType<Test> {
-        useJUnitPlatform {
-            includeEngines("spek2")
-        }
-        testLogging.showStandardStreams = true
+    named<KotlinCompile>("compileTestKotlin") {
+        kotlinOptions.jvmTarget = "1.8"
     }
 }
 
