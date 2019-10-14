@@ -1,3 +1,17 @@
+# Gradle files
+out/
+build/
+.gradle/
+
+# Generated sources
+src/generated
+
+# OS specific
+.DS_Store
+
+# Local environment
+localEnv.json
+
 
 *.iml
 .idea
@@ -5,6 +19,8 @@ target
 
 # Compiled class file
 *.class
+
+# Gradle files
 
 # Log file
 *.log
