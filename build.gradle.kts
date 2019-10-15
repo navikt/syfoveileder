@@ -7,6 +7,9 @@ group = "no.nav.syfo"
 version = "1.0.0-SNAPSHOT"
 description = "syfoveileder"
 
+val springBootVersion = "2.1.8.RELEASE"
+val cxfVersion = "3.3.3"
+
 tasks.withType<Jar> {
     manifest.attributes["Main-Class"] = "no.nav.syfo.ApplicationKt"
 }
@@ -15,6 +18,7 @@ plugins {
     kotlin("jvm") version "1.3.50"
     id("com.diffplug.gradle.spotless") version "3.18.0"
     id("com.github.johnrengelman.shadow") version "4.0.4"
+    id("org.jetbrains.kotlin.plugin.allopen") version "1.3.50"
 }
 
 buildscript {
@@ -22,7 +26,16 @@ buildscript {
         classpath("javax.xml.bind:jaxb-api:2.4.0-b180830.0359")
         classpath("org.glassfish.jaxb:jaxb-runtime:2.4.0-b180830.0438")
         classpath("com.sun.activation:javax.activation:1.2.0")
+        classpath("org.jetbrains.kotlin:kotlin-allopen:1.3.50")
     }
+}
+
+
+allOpen {
+    annotation("org.springframework.context.annotation.Configuration")
+    annotation("org.springframework.stereotype.Service")
+    annotation("org.springframework.stereotype.Component")
+    annotation("org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc")
 }
 
 repositories {
@@ -36,32 +49,31 @@ repositories {
 }
 
 dependencies {
-    compile("org.apache.cxf:cxf-spring-boot-starter-jaxws:3.3.3")
-    compile("org.apache.cxf:cxf-rt-features-logging:3.3.3")
-    compile("org.apache.cxf:cxf-rt-ws-security:3.3.3")
-    compile("org.apache.cxf:cxf-rt-ws-policy:3.3.3")
-    compile("no.nav.security:oidc-spring-support:0.2.4")
-    compile("no.nav.security:oidc-support:0.2.4")
-    compile("com.microsoft.azure:adal4j:1.6.4")
-    compile("com.nimbusds:oauth2-oidc-sdk:6.5")
-    compile("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.8")
-    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.71")
-    compile("org.jetbrains.kotlin:kotlin-reflect:1.2.71")
-    compile("javax.inject:javax.inject:1")
-    compile("org.springframework.boot:spring-boot-starter-jersey:2.0.6.RELEASE")
-    compile("org.springframework.boot:spring-boot-starter-web:2.0.6.RELEASE")
-    compile("org.springframework.boot:spring-boot-starter-actuator:2.0.6.RELEASE")
-    compile("org.bitbucket.b_c:jose4j:0.5.0")
-    compile("io.micrometer:micrometer-registry-prometheus:1.0.7")
-    compile("org.slf4j:slf4j-api:1.7.25")
-    compile("org.springframework.boot:spring-boot-starter-logging:2.0.6.RELEASE")
-    compile("net.logstash.logback:logstash-logback-encoder:4.10")
-    compile("org.springframework.boot:spring-boot-starter-jta-atomikos:2.0.6.RELEASE")
-    compile("com.oracle:ojdbc8:12.2.0.1")
-    testCompile("no.nav.security:oidc-spring-test:0.2.4")
-    testCompile("com.h2database:h2:1.4.196")
-    testCompile("org.springframework.boot:spring-boot-starter-test:2.0.6.RELEASE")
-    compile("org.flywaydb:flyway-core:5.0.7")
+    implementation("org.apache.cxf:cxf-rt-features-logging:$cxfVersion")
+    implementation("org.apache.cxf:cxf-rt-ws-security:$cxfVersion")
+    implementation("org.apache.cxf:cxf-rt-ws-policy:$cxfVersion")
+    implementation("org.apache.cxf:cxf-rt-transports-http:$cxfVersion")
+    implementation("org.apache.cxf:cxf-rt-frontend-jaxws:$cxfVersion")
+
+    implementation("no.nav.security:oidc-spring-support:0.2.4")
+    implementation("no.nav.security:oidc-support:0.2.4")
+    implementation("com.microsoft.azure:adal4j:1.6.4")
+    implementation("com.nimbusds:oauth2-oidc-sdk:6.5")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.8")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.71")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.2.71")
+    implementation("javax.inject:javax.inject:1")
+    implementation("org.springframework.boot:spring-boot-starter-jersey:$springBootVersion")
+    implementation("org.springframework.boot:spring-boot-starter-web:$springBootVersion")
+    implementation("org.springframework.boot:spring-boot-starter-actuator:$springBootVersion")
+    implementation("org.bitbucket.b_c:jose4j:0.5.0")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.0.7")
+    implementation("org.slf4j:slf4j-api:1.7.25")
+    implementation("org.springframework.boot:spring-boot-starter-logging:$springBootVersion")
+    implementation("net.logstash.logback:logstash-logback-encoder:4.10")
+    implementation("org.springframework.boot:spring-boot-starter-jta-atomikos:$springBootVersion")
+    testImplementation("no.nav.security:oidc-spring-test:0.2.4")
+    testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
 }
 
 tasks {
