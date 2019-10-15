@@ -2,13 +2,13 @@ no.nav.security.oidc:
   issuers: veileder
   issuer:
     veileder:
-      discoveryurl: <SETTES FRA FASIT>
-      accepted_audience: <SETTES FRA FASIT>
+      discoveryurl: <SETTES FRA NAISERATOR>
+      accepted_audience: <SETTES FRA NAISERATOR>
       cookie_name: isso-idtoken
 
-aad_syfoveileder_clientid:
-  username: <SETTES FRA FASIT>
-  password: <SETTES FRA FASIT>
+aad.syfoveileder.clientid:
+  username: <SETTES FRA NAISERATOR>
+  password: <SETTES FRA NAISERATOR>
 
 logging.config: 'classpath:logback-spring.xml'
 
@@ -31,9 +31,5 @@ server:
 
 spring:
   main.banner-mode: 'off'
-  jta.atomikos.datasource:
-          max-pool-size: 32
-          min-pool-size: 8
-  flyway:
-    enabled: false
+
 

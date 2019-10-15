@@ -12,8 +12,8 @@ import java.time.ZoneId
 @Component
 class AADTokenConsumer(
         @Value("\${graphapi.url}") val resource: String, // resource er en url som tokenet er gyldig for bruk mot
-        @Value("\${aad_syfoveileder_clientid.username}") val clientId: String,
-        @Value("\${aad_syfoveileder_clientid.password}") val clientSecret: String,
+        @Value("\${aad.syfoveileder.clientid.username}") val clientId: String,
+        @Value("\${aad.syfoveileder.clientid.password}") val clientSecret: String,
         private val context: AuthenticationContext
 ) {
 
