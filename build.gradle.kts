@@ -21,7 +21,6 @@ buildscript {
     }
 }
 
-
 repositories {
     mavenCentral()
     jcenter()
@@ -30,6 +29,11 @@ repositories {
     maven(url = "https://dl.bintray.com/spekframework/spek-dev")
     maven(url = "https://dl.bintray.com/kotlin/kotlinx/")
     maven(url = "http://packages.confluent.io/maven/")
+}
+
+sourceSets {
+    getByName("main").java.srcDirs("src/main/kotlin")
+    getByName("test").java.srcDirs("src/test/kotlin")
 }
 
 dependencies {
@@ -60,7 +64,6 @@ dependencies {
     testCompile("org.springframework.boot:spring-boot-starter-test:2.0.6.RELEASE")
     compile("org.flywaydb:flyway-core:5.0.7")
 }
-
 
 tasks {
 
