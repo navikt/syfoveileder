@@ -1,16 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<included>
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
 	<appender name="stdout_json" class="ch.qos.logback.core.ConsoleAppender">
-		<encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+		<encoder class="net.logstash.logback.encoder.LogstashEncoder">
+			<provider class="net.logstash.logback.composite.loggingevent.ArgumentsJsonProvider" />
+		</encoder>
 	</appender>
 
-	<root level="WARN">
+	<logger name="no.nav" level="INFO"/>
+	<logger name="org.apache.cxf.services" level="WARN"/>
+	<logger name="org.apache.cxf.ws.addressing" level="ERROR" />
+
+	<root level="INFO">
 		<appender-ref ref="stdout_json"/>
 	</root>
-
-	<logger name="no.nav.syfo" level="INFO" additivity="false">
-		<appender-ref ref="stdout_json"/>
-	</logger>
-
-	<logger name="org.springframework" level="INFO"/>
-</included>
+</configuration>
