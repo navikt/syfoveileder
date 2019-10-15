@@ -7,6 +7,10 @@ group = "no.nav.syfo"
 version = "1.0.0-SNAPSHOT"
 description = "syfoveileder"
 
+tasks.withType<Jar> {
+    manifest.attributes["Main-Class"] = "no.nav.syfo.ApplicationKt"
+}
+
 plugins {
     kotlin("jvm") version "1.3.50"
     id("com.diffplug.gradle.spotless") version "3.18.0"
@@ -66,10 +70,6 @@ dependencies {
 }
 
 tasks {
-
-    withType<Jar> {
-        manifest.attributes["Main-Class"] = "no.nav.syfo.ApplicationKt"
-    }
 
     create("printVersion") {
         doLast {
