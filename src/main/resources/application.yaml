@@ -6,7 +6,7 @@ no.nav.security.oidc:
       accepted_audience: <SETTES FRA NAISERATOR>
       cookie_name: isso-idtoken
 
-aad_syfoveileder_clientid:
+aad.syfoveileder.clientid:
   username: <SETTES FRA NAISERATOR>
   password: <SETTES FRA NAISERATOR>
 
@@ -36,4 +36,5 @@ spring:
           min-pool-size: 8
   flyway:
     enabled: false
+
 
