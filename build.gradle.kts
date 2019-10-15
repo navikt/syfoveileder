@@ -35,11 +35,6 @@ repositories {
     maven(url = "http://packages.confluent.io/maven/")
 }
 
-sourceSets {
-    getByName("main").java.srcDirs("src/main/kotlin")
-    getByName("test").java.srcDirs("src/test/kotlin")
-}
-
 dependencies {
     compile("org.apache.cxf:cxf-spring-boot-starter-jaxws:3.3.3")
     compile("org.apache.cxf:cxf-rt-features-logging:3.3.3")
