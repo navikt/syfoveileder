@@ -9,6 +9,8 @@ description = "syfoveileder"
 
 val springBootVersion = "2.1.8.RELEASE"
 val cxfVersion = "3.3.3"
+val logstashEncoderVersion = "5.1"
+val logbackVersion = "1.2.3"
 
 tasks.withType<Jar> {
     manifest.attributes["Main-Class"] = "no.nav.syfo.ApplicationKt"
@@ -54,6 +56,9 @@ dependencies {
     implementation("org.apache.cxf:cxf-rt-ws-policy:$cxfVersion")
     implementation("org.apache.cxf:cxf-rt-transports-http:$cxfVersion")
     implementation("org.apache.cxf:cxf-rt-frontend-jaxws:$cxfVersion")
+
+    implementation("ch.qos.logback:logback-classic:$logbackVersion")
+    implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
 
     implementation("no.nav.security:oidc-spring-support:0.2.4")
     implementation("no.nav.security:oidc-support:0.2.4")
