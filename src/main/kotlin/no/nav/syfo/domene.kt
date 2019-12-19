@@ -1,6 +1,5 @@
 package no.nav.syfo
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.time.LocalDateTime
 
 data class Veileder(
@@ -12,21 +11,29 @@ data class Veileder(
 data class AADVeileder(
         val givenName: String,
         val surname: String,
-        val onPremisesSamAccountName: String, // Ident - feks Z991234
-        val streetAddress: String?, // Enhet nummer - feks 0315
-        val city: String // Enhet navn - feks  Nav Grünerløkka
-)
-
-data class EnhetResponse (
-        val navn: String,
-        val enhetNr: String
+        val mailNickname: String
 )
 
 fun AADVeileder.toVeileder(): Veileder =
-    Veileder(fornavn = givenName, etternavn = surname, ident = onPremisesSamAccountName)
+        Veileder(fornavn = givenName, etternavn = surname, ident = mailNickname)
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-data class GetUsersResponse( val value: List<AADVeileder>)
+data class GraphBatchRequest(val requests: List<RequestEntry>)
+
+data class RequestEntry(
+        val id: String,
+        val method: String,
+        val url: String,
+        val headers: Map<String, String>
+)
+
+data class BatchResponse(
+        val responses: List<BatchBody>)
+
+data class BatchBody(val id: String, val body: GetUsersResponse)
+
+data class GetUsersResponse(
+        val value: List<AADVeileder>
+)
 
 data class AxsysVeileder(
         val appIdent: String,

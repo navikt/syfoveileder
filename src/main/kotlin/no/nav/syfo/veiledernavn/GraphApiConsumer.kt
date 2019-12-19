@@ -1,43 +1,64 @@
 package no.nav.syfo.veiledernavn
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.syfo.*
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.*
-import org.springframework.http.HttpMethod.GET
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
-import org.springframework.web.client.*
-import javax.ws.rs.*
+import org.springframework.web.client.HttpClientErrorException
+import org.springframework.web.client.HttpServerErrorException
+import org.springframework.web.client.RestTemplate
+import javax.ws.rs.BadRequestException
+import javax.ws.rs.InternalServerErrorException
+import javax.ws.rs.ServiceUnavailableException
 
 @Component
 class GraphApiConsumer(
         private val aadTokenConsumer: AADTokenConsumer,
         private val restTemplate: RestTemplate,
-        private val norg2Consumer: Norg2Consumer,
         @Value("\${graphapi.url}") val graphApiUrl: String
 ) {
 
     fun getVeiledere(
-            enhetNr: String
+            axysVeileders: List<AxsysVeileder>
     ): List<Veileder> {
-
         val token: AADToken = aadTokenConsumer.getAADToken()
-        val enhetNavn = norg2Consumer.hentEnhetNavn(enhetNr)
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
         // Todo: Cache token i aadTokenConsumer, og la den fornye seg selv
         headers.set("Authorization", "Bearer " + aadTokenConsumer.renewTokenIfExpired(token).accessToken)
 
-        val url = "${graphApiUrl}/v1.0/users/?${'$'}filter=city eq '$enhetNavn'&${'$'}select=onPremisesSamAccountName,givenName,surname,streetAddress,city"
+        val identChunks = axysVeileders.chunked(15)
+
+        val url = "${graphApiUrl}/v1.0/\$batch"
+
+        val requests = identChunks.mapIndexed { index, idents ->
+            val query = idents.joinToString(separator = " or ") { "startsWith(mailNickname, '${it.appIdent}')" }
+            RequestEntry(
+                    id = (index + 1).toString(),
+                    method = "GET",
+                    url = "/users/?\$filter=${query}&\$select=mailNickname,givenName,surname",
+                    headers = mapOf("Content-Type" to "application/json")
+            )
+        }
+
         try {
-            LOG.info("Azure Graph - get users - URL: '$url'")
-            val responseEntity = restTemplate.exchange(url, GET, HttpEntity<Any>(headers), GetUsersResponse::class.java)
-            return responseEntity
-                    .body
-                    ?.value
-                    ?.filter { aadVeileder -> aadVeileder.streetAddress == enhetNr }
-                    ?.map { aadVeileder -> aadVeileder.toVeileder() }
-                    ?: throw RuntimeException("Svar fra Graph API har ikke forventet format.")
+            return requests.chunked(20).flatMap { requests ->
+                val body = GraphBatchRequest(requests)
+                val responseEntity = restTemplate.exchange(url, HttpMethod.POST, HttpEntity(body, headers), BatchResponse::class.java)
+
+                responseEntity
+                        .body
+                        ?.responses
+                        ?.flatMap {
+                            it.body.value.map { aadVeileder -> aadVeileder.toVeileder() }
+                        }
+                        ?: throw RuntimeException("Svar fra Graph API har ikke forventet format.")
+            }
 
         } catch (e: HttpClientErrorException) {
             LOG.warn("Oppslag i Graph API feiler med respons ${e.responseBodyAsString}", e)
@@ -56,3 +77,4 @@ class GraphApiConsumer(
         private val LOG = LoggerFactory.getLogger(GraphApiConsumer::class.java.name)
     }
 }
+
