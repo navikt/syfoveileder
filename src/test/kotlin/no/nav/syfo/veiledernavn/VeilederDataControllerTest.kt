@@ -6,14 +6,11 @@ import no.nav.syfo.LocalApplication
 import no.nav.syfo.util.OIDCIssuer
 import no.nav.syfo.util.TestData.brukereResponseBody
 import no.nav.syfo.util.TestData.errorResponseBodyGraphApi
-import no.nav.syfo.util.TestData.userListEmptyValueResponseBody
 import no.nav.syfo.util.TestData.userListResponseBodyGraphApi
 import no.nav.syfo.util.TestUtils
 import no.nav.syfo.util.TestUtils.loggInnSomVeileder
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.junit.*
 import org.junit.runner.RunWith
 import org.mockito.BDDMockito
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc

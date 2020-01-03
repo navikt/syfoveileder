@@ -1,20 +1,13 @@
 package no.nav.syfo.veiledernavn
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.syfo.*
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
+import org.springframework.http.*
 import org.springframework.http.HttpMethod
-import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
-import org.springframework.web.client.HttpClientErrorException
-import org.springframework.web.client.HttpServerErrorException
-import org.springframework.web.client.RestTemplate
-import javax.ws.rs.BadRequestException
-import javax.ws.rs.InternalServerErrorException
-import javax.ws.rs.ServiceUnavailableException
+import org.springframework.web.client.*
+import javax.ws.rs.*
 
 @Component
 class GraphApiConsumer(
