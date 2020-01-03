@@ -3,11 +3,11 @@ package no.nav.syfo.veiledernavn
 import no.nav.security.oidc.context.OIDCRequestContextHolder
 import no.nav.syfo.AADToken
 import no.nav.syfo.LocalApplication
-import no.nav.syfo.util.*
+import no.nav.syfo.util.OIDCIssuer
 import no.nav.syfo.util.TestData.brukereResponseBody
 import no.nav.syfo.util.TestData.errorResponseBodyGraphApi
-import no.nav.syfo.util.TestData.userListEmptyValueResponseBody
-import no.nav.syfo.util.TestData.userListResponseBody
+import no.nav.syfo.util.TestData.userListResponseBodyGraphApi
+import no.nav.syfo.util.TestUtils
 import no.nav.syfo.util.TestUtils.loggInnSomVeileder
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.*
@@ -28,10 +28,10 @@ import org.springframework.test.web.client.response.MockRestResponseCreators.wit
 import org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.web.client.RestTemplate
 import java.time.LocalDateTime
 import javax.inject.Inject
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 
 @RunWith(SpringRunner::class)
@@ -68,16 +68,10 @@ class VeilederDataControllerTest {
             "{\"ident\":\"Z666666\",\"fornavn\":\"\",\"etternavn\":\"\"}" +
             "]"
 
-    private val noNamesList: String = "[" +
-            "{\"ident\":\"Z999999\",\"fornavn\":\"\",\"etternavn\":\"\"}," +
-            "{\"ident\":\"Z666666\",\"fornavn\":\"\",\"etternavn\":\"\"}" +
-            "]"
-
     @Before
     fun setup() {
         loggInnSomVeileder(oidcRequestContextHolder, ident)
         this.mockRestServiceServer = MockRestServiceServer.bindTo(restTemplate).build()
-        MockUtils.mockNorg2Response(mockRestServiceServer)
     }
 
     @After
@@ -90,8 +84,8 @@ class VeilederDataControllerTest {
     fun getVeilederNames() {
         val idToken = oidcRequestContextHolder.oidcValidationContext.getToken(OIDCIssuer.AZURE).idToken
         mockAADToken()
-        mockGetUsersResponse()
         mockAxsysVeiledere()
+        mockGetUsersResponse()
 
         val respons = mockMvc.perform(MockMvcRequestBuilders.get("/api/veiledere/enhet/$enhet")
                 .header("Authorization", "Bearer $idToken"))
@@ -101,47 +95,24 @@ class VeilederDataControllerTest {
     }
 
     @Test
-    fun noHitsOnVeilederNames() {
-        val idToken = oidcRequestContextHolder.oidcValidationContext.getToken(OIDCIssuer.AZURE).idToken
-        mockAADToken()
-        mockEmptyGetUsersResponse()
-        mockAxsysVeiledere()
-
-        val respons = mockMvc.perform(MockMvcRequestBuilders.get("/api/veiledere/enhet/$enhet")
-                .header("Authorization", "Bearer $idToken"))
-                .andReturn().response
-
-        assertThat(respons.contentAsString).isEqualTo(noNamesList)
-        assertThat(respons.status).isEqualTo(200)
-    }
-
-    @Test
     fun dependencyError() {
         val idToken = oidcRequestContextHolder.oidcValidationContext.getToken(OIDCIssuer.AZURE).idToken
         mockAADToken()
+        mockAxsysVeiledere()
         mockGetUsersResponse500()
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/veiledere/enhet/$enhet")
                 .header("Authorization", "Bearer $idToken"))
-                .andExpect(status().isFailedDependency())
+                .andExpect(status().isFailedDependency)
                 .andReturn().response.contentAsString
     }
 
     private fun mockGetUsersResponse500() {
         mockRestServiceServer.expect(manyTimes(), anything())
-                .andExpect(method(HttpMethod.GET))
+                .andExpect(method(HttpMethod.POST))
                 .andExpect(header(AUTHORIZATION, "Bearer ${token.accessToken}"))
                 .andRespond(withServerError()
                         .body(errorResponseBodyGraphApi)
-                        .contentType(MediaType.APPLICATION_JSON))
-    }
-
-    private fun mockEmptyGetUsersResponse() {
-        mockRestServiceServer.expect(manyTimes(), anything())
-                .andExpect(method(HttpMethod.GET))
-                .andExpect(header(AUTHORIZATION, "Bearer ${token.accessToken}"))
-                .andRespond(withSuccess()
-                        .body(userListEmptyValueResponseBody)
                         .contentType(MediaType.APPLICATION_JSON))
     }
 
@@ -154,11 +125,11 @@ class VeilederDataControllerTest {
 
     private fun mockGetUsersResponse() {
         mockRestServiceServer.expect(manyTimes(), anything())
-                .andExpect(method(HttpMethod.GET))
+                .andExpect(method(HttpMethod.POST))
                 .andExpect(header(AUTHORIZATION, "Bearer ${token.accessToken}"))
                 .andRespond(withSuccess()
-                                .body(userListResponseBody)
-                                .contentType(MediaType.APPLICATION_JSON))
+                        .body(userListResponseBodyGraphApi)
+                        .contentType(MediaType.APPLICATION_JSON))
     }
 
     private fun mockAxsysVeiledere() {
@@ -170,4 +141,5 @@ class VeilederDataControllerTest {
                         .body(brukereResponseBody)
                         .contentType(MediaType.APPLICATION_JSON))
     }
+
 }

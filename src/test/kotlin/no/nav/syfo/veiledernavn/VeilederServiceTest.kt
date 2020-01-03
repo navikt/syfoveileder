@@ -32,9 +32,8 @@ class VeilederServiceTest {
 
     @Before
     fun setup() {
-        given(graphApiConsumer.getVeiledere(ENHET_NR)).willReturn(TestData.AADVeiledere)
         given(axsysConsumer.getAxsysVeiledere(ENHET_NR)).willReturn(TestData.AxsysVeiledere)
-
+        given(graphApiConsumer.getVeiledere(TestData.AxsysVeiledere)).willReturn(TestData.AADVeiledere)
     }
 
     @Test
