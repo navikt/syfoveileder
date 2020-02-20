@@ -7,6 +7,7 @@ group = "no.nav.syfo"
 version = "1.0.0-SNAPSHOT"
 description = "syfoveileder"
 
+val kotlinLibVersion = "1.3.60"
 val springBootVersion = "2.1.8.RELEASE"
 val cxfVersion = "3.3.3"
 val logstashEncoderVersion = "5.1"
@@ -17,10 +18,10 @@ tasks.withType<Jar> {
 }
 
 plugins {
-    kotlin("jvm") version "1.3.50"
+    kotlin("jvm") version "1.3.60"
     id("com.diffplug.gradle.spotless") version "3.18.0"
     id("com.github.johnrengelman.shadow") version "4.0.4"
-    id("org.jetbrains.kotlin.plugin.allopen") version "1.3.50"
+    id("org.jetbrains.kotlin.plugin.allopen") version "1.3.60"
 }
 
 buildscript {
@@ -28,7 +29,7 @@ buildscript {
         classpath("javax.xml.bind:jaxb-api:2.4.0-b180830.0359")
         classpath("org.glassfish.jaxb:jaxb-runtime:2.4.0-b180830.0438")
         classpath("com.sun.activation:javax.activation:1.2.0")
-        classpath("org.jetbrains.kotlin:kotlin-allopen:1.3.50")
+        classpath("org.jetbrains.kotlin:kotlin-allopen:1.3.60")
     }
 }
 
@@ -65,8 +66,8 @@ dependencies {
     implementation("com.microsoft.azure:adal4j:1.6.4")
     implementation("com.nimbusds:oauth2-oidc-sdk:6.5")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.8")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.71")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.2.71")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinLibVersion")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinLibVersion")
     implementation("javax.inject:javax.inject:1")
     implementation("org.springframework.boot:spring-boot-starter-jersey:$springBootVersion")
     implementation("org.springframework.boot:spring-boot-starter-web:$springBootVersion")
