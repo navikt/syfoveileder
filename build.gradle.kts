@@ -9,6 +9,7 @@ description = "syfoveileder"
 
 val kotlinLibVersion = "1.3.60"
 val springBootVersion = "2.1.8.RELEASE"
+val oidcSupportVersion = "0.2.18"
 val cxfVersion = "3.3.3"
 val logstashEncoderVersion = "5.1"
 val logbackVersion = "1.2.3"
@@ -48,7 +49,6 @@ repositories {
     maven(url = "https://repo.adeo.no/repository/maven-releases/")
     maven(url = "https://dl.bintray.com/spekframework/spek-dev")
     maven(url = "https://dl.bintray.com/kotlin/kotlinx/")
-    maven(url = "http://packages.confluent.io/maven/")
 }
 
 dependencies {
@@ -61,8 +61,7 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
 
-    implementation("no.nav.security:oidc-spring-support:0.2.4")
-    implementation("no.nav.security:oidc-support:0.2.4")
+    implementation("no.nav.security:oidc-spring-support:$oidcSupportVersion")
     implementation("com.microsoft.azure:adal4j:1.6.4")
     implementation("com.nimbusds:oauth2-oidc-sdk:6.5")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.8")
@@ -78,7 +77,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-logging:$springBootVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:4.10")
     implementation("org.springframework.boot:spring-boot-starter-jta-atomikos:$springBootVersion")
-    testImplementation("no.nav.security:oidc-spring-test:0.2.4")
+    testImplementation("no.nav.security:oidc-test-support:$oidcSupportVersion")
     testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
 }
 
