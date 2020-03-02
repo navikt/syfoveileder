@@ -1,6 +1,6 @@
 package no.nav.syfo.veiledernavn
 
-import no.nav.security.spring.oidc.validation.api.ProtectedWithClaims
+import no.nav.security.oidc.api.ProtectedWithClaims
 import no.nav.syfo.Veileder
 import no.nav.syfo.util.OIDCIssuer.AZURE
 import org.springframework.http.MediaType
