@@ -26,7 +26,7 @@ class VeilederNavnExceptionHandler: ResponseEntityExceptionHandler() {
     @ExceptionHandler(OIDCUnauthorizedException::class)
     protected fun handleUnauthorized(e: RuntimeException, request: WebRequest): ResponseEntity<Any> {
         val bodyOfResponse = "Bruker er ikke logget inn"
-        LOG.error(bodyOfResponse, e)
+        LOG.debug(bodyOfResponse, e)
         return handleExceptionInternal(e, bodyOfResponse,
                 HttpHeaders(), HttpStatus.UNAUTHORIZED, request)
     }
