@@ -62,7 +62,7 @@ dependencies {
 
     implementation("no.nav.security:oidc-spring-support:$oidcSupportVersion")
     implementation("com.microsoft.azure:adal4j:1.6.4")
-    implementation("com.nimbusds:oauth2-oidc-sdk:6.5")
+    implementation("com.nimbusds:oauth2-oidc-sdk:7.0.3")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.8")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinLibVersion")
     implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinLibVersion")
