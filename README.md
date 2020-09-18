@@ -14,5 +14,5 @@ Thus, Syfoveileder collects the veileder to enhet relation from Axsys, and the n
 name of the enhet, needed to fetch veileder names from Azure AD, from Norg2.
 
 Sometimes we can't find the given veilederident in Azure AD, this can be because the veileder has quit, or because data has been entered incorrectly.
-In these instances, we log the ident, then we can send it to a grown up, or ask for help in #tech-windows.
-![No Name!](https://upload.wikimedia.org/wikipedia/commons/9/9c/Clint_Eastwood1.png)
+In these instances, we log the ident, then we can send it to a grown up, or ask for help in #tech-windows.  
+<img src="https://upload.wikimedia.org/wikipedia/commons/9/9c/Clint_Eastwood1.png" alt="noname" width="200" height="88">
