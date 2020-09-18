@@ -1,7 +1,6 @@
 package no.nav.syfo.veiledernavn
 
-import no.nav.syfo.Veileder
-import no.nav.syfo.toVeileder
+import no.nav.syfo.*
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
@@ -12,12 +11,17 @@ class VeilederService(
 ) {
 
     fun getVeiledere(enhetNr: String): List<Veileder> {
-        val axsysVeiledere = axsysConsumer.getAxsysVeiledere(enhetNr);
+        val axsysVeiledere = axsysConsumer.getAxsysVeiledere(enhetNr)
         val graphApiVeiledere = graphApiConsumer.getVeiledere(axsysVeiledere)
 
         return axsysVeiledere.map { axsysVeileder ->
-            graphApiVeiledere.find { it.ident == axsysVeileder.appIdent } ?: axsysVeileder.toVeileder()
+            graphApiVeiledere.find { it.ident == axsysVeileder.appIdent } ?: noGraphApiVeileder(axsysVeileder)
         }
+    }
+
+    fun noGraphApiVeileder(axsysVeileder: AxsysVeileder): Veileder {
+        LOG.warn("Fant ikke navn for veileder i graphApi! Feillederident: ${axsysVeileder.appIdent}")
+        return axsysVeileder.toVeileder()
     }
 
     companion object {
