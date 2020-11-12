@@ -1,6 +1,7 @@
 package no.nav.syfo.veiledernavn
 
 import no.nav.syfo.*
+import no.nav.syfo.metric.Metric
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.*
@@ -11,9 +12,10 @@ import javax.ws.rs.*
 
 @Component
 class GraphApiConsumer(
-        private val aadTokenConsumer: AADTokenConsumer,
-        private val restTemplate: RestTemplate,
-        @Value("\${graphapi.url}") val graphApiUrl: String
+    private val aadTokenConsumer: AADTokenConsumer,
+    private val metric: Metric,
+    private val restTemplate: RestTemplate,
+    @Value("\${graphapi.url}") val graphApiUrl: String
 ) {
 
     fun getVeiledere(
@@ -40,7 +42,7 @@ class GraphApiConsumer(
         }
 
         try {
-            return requests.chunked(20).flatMap { requests ->
+            val responseEnitty = requests.chunked(20).flatMap { requests ->
                 val body = GraphBatchRequest(requests)
                 val responseEntity = restTemplate.exchange(url, HttpMethod.POST, HttpEntity(body, headers), BatchResponse::class.java)
 
@@ -52,12 +54,16 @@ class GraphApiConsumer(
                         }
                         ?: throw RuntimeException("Svar fra Graph API har ikke forventet format.")
             }
+            metric.countEvent(CALL_GRAPHAPI_VEILEDERE_SUCCESS)
+            return responseEnitty
 
         } catch (e: HttpClientErrorException) {
             LOG.warn("Oppslag i Graph API feiler med respons ${e.responseBodyAsString}", e)
+            metric.countEvent(CALL_GRAPHAPI_VEILEDERE_FAIL)
             throw BadRequestException("Oppslag i Graph API feiler pga feil i request", e)
         } catch (e: HttpServerErrorException) {
             LOG.error("Server feil fra Graph API ${e.responseBodyAsString}", e)
+            metric.countEvent(CALL_GRAPHAPI_VEILEDERE_FAIL)
             throw ServiceUnavailableException("Serverfeil fra Graph Api ved henting av veilederinformasjon")
         } catch (e: java.lang.RuntimeException) {
             val runtimeMelding = "RunTimeException på henting av veilederinformasjon i Graph API"
@@ -68,6 +74,10 @@ class GraphApiConsumer(
 
     companion object {
         private val LOG = LoggerFactory.getLogger(GraphApiConsumer::class.java.name)
+
+        private const val CALL_GRAPHAPI_VEILEDERE_BASE = "call_graphapi_veiledere"
+        private const val CALL_GRAPHAPI_VEILEDERE_FAIL = "${CALL_GRAPHAPI_VEILEDERE_BASE}_fail"
+        private const val CALL_GRAPHAPI_VEILEDERE_SUCCESS = "${CALL_GRAPHAPI_VEILEDERE_BASE}_success"
     }
 }
 

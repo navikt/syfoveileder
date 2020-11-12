@@ -2,6 +2,7 @@ package no.nav.syfo.veiledernavn
 
 import no.nav.syfo.LocalApplication
 import no.nav.syfo.Veileder
+import no.nav.syfo.metric.Metric
 import no.nav.syfo.util.TestData
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
@@ -24,6 +25,9 @@ class VeilederServiceTest {
 
     @Mock
     lateinit var axsysConsumer: AxsysConsumer
+
+    @Mock
+    lateinit var metric: Metric
 
     @InjectMocks
     private lateinit var veilederService: VeilederService
