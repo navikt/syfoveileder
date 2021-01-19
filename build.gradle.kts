@@ -10,7 +10,7 @@ description = "syfoveileder"
 val kotlinLibVersion = "1.3.60"
 val springBootVersion = "2.1.8.RELEASE"
 val oidcSupportVersion = "0.2.18"
-val cxfVersion = "3.3.3"
+val cxfVersion = "3.3.7"
 val logstashEncoderVersion = "5.1"
 val logbackVersion = "1.2.3"
 
