@@ -7,7 +7,7 @@ group = "no.nav.syfo"
 version = "1.0.0-SNAPSHOT"
 description = "syfoveileder"
 
-val springBootVersion = "2.1.8.RELEASE"
+val springBootVersion = "2.2.11.RELEASE"
 val oidcSupportVersion = "0.2.18"
 val cxfVersion = "3.3.7"
 val logstashEncoderVersion = "5.1"
