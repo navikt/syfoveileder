@@ -19,7 +19,6 @@ server:
     context-path: /syfoveileder
 
 no.nav.security.oidc:
-  issuers: veileder
   issuer:
     veileder:
       discoveryurl: http://metadata

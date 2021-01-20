@@ -1,38 +1,31 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer
-import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "no.nav.syfo"
 version = "1.0.0-SNAPSHOT"
 description = "syfoveileder"
 
-val springBootVersion = "2.2.11.RELEASE"
-val oidcSupportVersion = "0.2.18"
+val adal4jVersion = "1.6.4"
 val cxfVersion = "3.3.7"
-val logstashEncoderVersion = "5.1"
+val javaxActivationVersion = "1.2.0"
+val jaxRiVersion = "2.3.3"
+val kotlinJacksonVersion = "2.11.3"
+val logstashEncoderVersion = "6.3"
 val logbackVersion = "1.2.3"
-
-tasks.withType<Jar> {
-    manifest.attributes["Main-Class"] = "no.nav.syfo.ApplicationKt"
-}
+val nimbusSDKVersion = "7.0.3"
+val oidcSupportVersion = "0.2.18"
+val prometheusVersion = "1.5.5"
+val slf4jVersion = "1.7.30"
 
 plugins {
     kotlin("jvm") version "1.4.21"
     id("org.jetbrains.kotlin.plugin.allopen") version "1.4.21"
+    id("org.springframework.boot") version "2.3.8.RELEASE"
+    id("io.spring.dependency-management") version "1.0.10.RELEASE"
     id("com.diffplug.gradle.spotless") version "3.18.0"
-    id("com.github.johnrengelman.shadow") version "4.0.4"
+    id("com.github.johnrengelman.shadow") version "6.1.0"
 }
-
-buildscript {
-    dependencies {
-        classpath("javax.xml.bind:jaxb-api:2.4.0-b180830.0359")
-        classpath("org.glassfish.jaxb:jaxb-runtime:2.4.0-b180830.0438")
-        classpath("com.sun.activation:javax.activation:1.2.0")
-        classpath("org.jetbrains.kotlin:kotlin-allopen:1.3.60")
-    }
-}
-
 
 allOpen {
     annotation("org.springframework.context.annotation.Configuration")
@@ -43,45 +36,40 @@ allOpen {
 
 repositories {
     mavenCentral()
-    jcenter()
-    maven(url = "https://dl.bintray.com/kotlin/ktor")
-    maven(url = "https://dl.bintray.com/spekframework/spek-dev")
-    maven(url = "https://dl.bintray.com/kotlin/kotlinx/")
 }
 
 dependencies {
     implementation(kotlin("stdlib"))
     implementation(kotlin("reflect"))
 
-    implementation("org.apache.cxf:cxf-rt-features-logging:$cxfVersion")
-    implementation("org.apache.cxf:cxf-rt-ws-security:$cxfVersion")
-    implementation("org.apache.cxf:cxf-rt-ws-policy:$cxfVersion")
-    implementation("org.apache.cxf:cxf-rt-transports-http:$cxfVersion")
-    implementation("org.apache.cxf:cxf-rt-frontend-jaxws:$cxfVersion")
+    implementation("com.sun.xml.ws:jaxws-ri:$jaxRiVersion")
+    implementation("com.sun.activation:javax.activation:$javaxActivationVersion")
+
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-jersey")
+    implementation("org.springframework.boot:spring-boot-starter-jta-atomikos")
+    implementation("org.springframework.boot:spring-boot-starter-logging")
+    implementation("org.springframework.boot:spring-boot-starter-web")
 
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
 
     implementation("no.nav.security:oidc-spring-support:$oidcSupportVersion")
-    implementation("com.microsoft.azure:adal4j:1.6.4")
-    implementation("com.nimbusds:oauth2-oidc-sdk:7.0.3")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.8")
+    implementation("com.microsoft.azure:adal4j:$adal4jVersion")
+    implementation("com.nimbusds:oauth2-oidc-sdk:$nimbusSDKVersion")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$kotlinJacksonVersion")
 
-    implementation("javax.inject:javax.inject:1")
-    implementation("org.springframework.boot:spring-boot-starter-jersey:$springBootVersion")
-    implementation("org.springframework.boot:spring-boot-starter-web:$springBootVersion")
-    implementation("org.springframework.boot:spring-boot-starter-actuator:$springBootVersion")
-    implementation("org.bitbucket.b_c:jose4j:0.5.0")
-    implementation("io.micrometer:micrometer-registry-prometheus:1.0.7")
-    implementation("org.slf4j:slf4j-api:1.7.25")
-    implementation("org.springframework.boot:spring-boot-starter-logging:$springBootVersion")
-    implementation("net.logstash.logback:logstash-logback-encoder:4.10")
-    implementation("org.springframework.boot:spring-boot-starter-jta-atomikos:$springBootVersion")
+    implementation("io.micrometer:micrometer-registry-prometheus:$prometheusVersion")
+    implementation("org.slf4j:slf4j-api:$slf4jVersion")
+
     testImplementation("no.nav.security:oidc-test-support:$oidcSupportVersion")
-    testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
 tasks {
+    withType<Jar> {
+        manifest.attributes["Main-Class"] = "no.nav.syfo.ApplicationKt"
+    }
 
     create("printVersion") {
         doLast {
@@ -96,10 +84,6 @@ tasks {
     }
 
     withType<ShadowJar> {
-        transform(ServiceFileTransformer::class.java) {
-            setPath("META-INF/cxf")
-            include("bus-extensions.txt")
-        }
         transform(PropertiesFileTransformer::class.java) {
             paths = listOf("META-INF/spring.factories")
             mergeStrategy = "append"
