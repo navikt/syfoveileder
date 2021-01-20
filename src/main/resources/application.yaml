@@ -1,5 +1,4 @@
 no.nav.security.oidc:
-  issuers: veileder
   issuer:
     veileder:
       discoveryurl: <SETTES FRA NAISERATOR>
