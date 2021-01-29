@@ -11,7 +11,7 @@ relations to an enhet, but not access rights to an enhet. This data lives in Axs
 exists only in Azure AD.
 
 Thus, Syfoveileder collects the veileder to enhet relation from Axsys, and the names from Azure AD's Graph Api. We collect the
-name of the enhet, needed to fetch veileder names from Azure AD, from Norg2.
+name of the enhet, needed to fetch veileder names from Azure AD, from Axsys.
 
 Sometimes we can't find the given veilederident in Azure AD, this can be because the veileder has quit, or because data has been entered incorrectly.
 In these instances, we log the ident, then we can send it to a grown up, or ask for help in #tech-windows.  

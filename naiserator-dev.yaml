@@ -52,8 +52,6 @@ spec:
       value: 38e07d31-659d-4595-939a-f18dce3446c5
     - name: AXSYS_URL
       value: https://axsys.nais.preprod.local/api
-    - name: NORG2_URL
-      value: https://app-q1.adeo.no/norg2/api/v1
     - name: GRAPHAPI_URL
       value: https://graph.microsoft.com
     # Miljøvariabler som hentes fra vault:
