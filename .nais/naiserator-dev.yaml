@@ -34,6 +34,7 @@ spec:
     enabled: true
     path: /syfoveileder/internal/prometheus
   ingresses:
+    - "https://syfoveileder.dev.intern.nav.no"
     - "https://syfoveileder.nais.preprod.local"
   vault:
     enabled: true
