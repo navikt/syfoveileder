@@ -8,8 +8,24 @@ import no.nav.security.token.support.test.JwtTokenGenerator
 import java.util.*
 
 object TestUtils {
-    // OIDC-hack - legg til token og oidcclaims for en testbruker
-    fun loggInnSomVeileder(tokenValidationContextHolder: TokenValidationContextHolder, veilederIdent: String) {
+    fun loggInnSomVeilederV2(
+        tokenValidationContextHolder: TokenValidationContextHolder,
+        veilederIdent: String,
+    ) {
+        val claimsSet = JWTClaimsSet.parse("{\"NAVident\":\"$veilederIdent\"}")
+        val jwt = JwtTokenGenerator.createSignedJWT(claimsSet)
+
+        val jwtToken = JwtToken(jwt.serialize())
+        val issuerTokenMap: MutableMap<String, JwtToken> = HashMap()
+        issuerTokenMap[OIDCIssuer.VEILEDER_AZURE_V2] = jwtToken
+        val tokenValidationContext = TokenValidationContext(issuerTokenMap)
+        tokenValidationContextHolder.tokenValidationContext = tokenValidationContext
+    }
+
+    fun loggInnSomVeileder(
+        tokenValidationContextHolder: TokenValidationContextHolder,
+        veilederIdent: String,
+    ) {
         val claimsSet = JWTClaimsSet.parse("{\"NAVident\":\"$veilederIdent\"}")
         val jwt = JwtTokenGenerator.createSignedJWT(claimsSet)
 

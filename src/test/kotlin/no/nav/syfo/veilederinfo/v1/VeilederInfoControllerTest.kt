@@ -1,4 +1,4 @@
-package no.nav.syfo.veilederinfo
+package no.nav.syfo.veilederinfo.v1
 
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.syfo.LocalApplication
@@ -9,6 +9,8 @@ import no.nav.syfo.util.NAV_CALL_ID_HEADER
 import no.nav.syfo.util.TestUtils.loggInnSomVeileder
 import no.nav.syfo.util.TestUtils.loggUt
 import no.nav.syfo.util.createCallId
+import no.nav.syfo.veilederinfo.toVeilederDTO
+import no.nav.syfo.veilederinfo.toVeilederInfo
 import no.nav.syfo.veiledernavn.AADTokenConsumer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*

@@ -1,4 +1,4 @@
-package no.nav.syfo.veiledernavn
+package no.nav.syfo.veiledernavn.api.v1
 
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.syfo.*
@@ -7,6 +7,7 @@ import no.nav.syfo.util.TestData.errorResponseBodyGraphApi
 import no.nav.syfo.util.TestData.userListResponseBodyGraphApi
 import no.nav.syfo.util.TestUtils
 import no.nav.syfo.util.TestUtils.loggInnSomVeileder
+import no.nav.syfo.veiledernavn.AADTokenConsumer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith

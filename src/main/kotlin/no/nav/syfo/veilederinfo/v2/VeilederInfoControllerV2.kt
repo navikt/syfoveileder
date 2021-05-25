@@ -1,26 +1,28 @@
-package no.nav.syfo.veilederinfo
+package no.nav.syfo.veilederinfo.v2
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
-import no.nav.syfo.api.auth.getSubjectInternAzure
+import no.nav.syfo.api.auth.getSubjectInternAzureV2
 import no.nav.syfo.metric.Metric
-import no.nav.syfo.util.OIDCIssuer.AZURE
+import no.nav.syfo.util.OIDCIssuer.VEILEDER_AZURE_V2
 import no.nav.syfo.util.getOrCreateCallId
-import no.nav.syfo.veilederinfo.VeilederInfoController.Companion.API_VEILEDER_BASE_PATH
+import no.nav.syfo.veilederinfo.VeilederInfoDTO
+import no.nav.syfo.veilederinfo.toVeilederDTO
+import no.nav.syfo.veilederinfo.v2.VeilederInfoControllerV2.Companion.API_VEILEDER_BASE_PATH
 import no.nav.syfo.veiledernavn.VeilederService
 import org.springframework.http.MediaType
 import org.springframework.util.MultiValueMap
 import org.springframework.web.bind.annotation.*
 import javax.inject.Inject
 
+@ProtectedWithClaims(issuer = VEILEDER_AZURE_V2)
 @RestController
 @RequestMapping(value = [API_VEILEDER_BASE_PATH])
-class VeilederInfoController @Inject constructor(
+class VeilederInfoControllerV2 @Inject constructor(
     private val metric: Metric,
     private val contextHolder: TokenValidationContextHolder,
     private val veilederService: VeilederService
 ) {
-    @ProtectedWithClaims(issuer = AZURE)
     @GetMapping(
         value = [API_VEILEDER_SELF_PATH],
         produces = [MediaType.APPLICATION_JSON_VALUE]
@@ -30,7 +32,7 @@ class VeilederInfoController @Inject constructor(
     ): VeilederInfoDTO {
         val callId = getOrCreateCallId(headers)
 
-        val veilederIdent: String = getSubjectInternAzure(contextHolder)
+        val veilederIdent: String = getSubjectInternAzureV2(contextHolder)
         metric.countIncomingRequests("veileder_self")
         return veilederService.veilederInfo(
             callId = callId,
@@ -38,7 +40,6 @@ class VeilederInfoController @Inject constructor(
         ).toVeilederDTO()
     }
 
-    @ProtectedWithClaims(issuer = AZURE)
     @GetMapping(
         value = ["/{navident}"],
         produces = [MediaType.APPLICATION_JSON_VALUE]
@@ -57,7 +58,7 @@ class VeilederInfoController @Inject constructor(
     }
 
     companion object {
-        const val API_VEILEDER_BASE_PATH = "/api/v1/veileder"
+        const val API_VEILEDER_BASE_PATH = "/api/v2/veileder"
         const val API_VEILEDER_SELF_PATH = "/self"
     }
 }

@@ -1,9 +1,10 @@
-package no.nav.syfo.veiledernavn
+package no.nav.syfo.veiledernavn.api.v1
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.syfo.Veileder
 import no.nav.syfo.metric.Metric
 import no.nav.syfo.util.OIDCIssuer.AZURE
+import no.nav.syfo.veiledernavn.VeilederService
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 import javax.inject.Inject

@@ -12,3 +12,12 @@ fun getSubjectInternAzure(contextHolder: TokenValidationContextHolder): String {
         throw RuntimeException("Klarte ikke hente veileder-ident ut av OIDC-token (Azure)")
     }
 }
+
+fun getSubjectInternAzureV2(contextHolder: TokenValidationContextHolder): String {
+    val context = contextHolder.tokenValidationContext
+    return try {
+        context.getClaims(OIDCIssuer.VEILEDER_AZURE_V2).getStringClaim(OIDCClaim.NAVIDENT)
+    } catch (e: ParseException) {
+        throw RuntimeException("Klarte ikke hente veileder-ident ut av OIDC-token (Azure)")
+    }
+}
