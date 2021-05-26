@@ -2,6 +2,8 @@ package no.nav.syfo.util
 
 import no.nav.syfo.AxsysVeileder
 import no.nav.syfo.Veileder
+import no.nav.syfo.veilederinfo.GraphApiGetUserResponse
+import no.nav.syfo.veilederinfo.GraphApiUser
 
 object TestData {
     val userListResponseBodyGraphApi = "{\n" +

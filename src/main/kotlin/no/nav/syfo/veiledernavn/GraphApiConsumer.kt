@@ -2,6 +2,8 @@ package no.nav.syfo.veiledernavn
 
 import no.nav.syfo.*
 import no.nav.syfo.metric.Metric
+import no.nav.syfo.util.callIdArgument
+import no.nav.syfo.veilederinfo.GraphApiGetUserResponse
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.*
@@ -17,6 +19,38 @@ class GraphApiConsumer(
     private val restTemplate: RestTemplate,
     @Value("\${graphapi.url}") val graphApiUrl: String
 ) {
+    fun veileder(
+        callId: String,
+        veilederIdent: String
+    ): GraphApiGetUserResponse {
+        val token: AADToken = aadTokenConsumer.getAADToken()
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        headers.setBearerAuth(aadTokenConsumer.renewTokenIfExpired(token).accessToken)
+
+        try {
+            val queryFilter = "startsWith(mailNickname, '${veilederIdent}')"
+            val url = "${graphApiUrl}/v1.0//users/?\$filter=${queryFilter}&\$select=mailNickname,givenName,surname,mail,businessPhones"
+            val response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                HttpEntity<String>(headers),
+                GraphApiGetUserResponse::class.java,
+            )
+            val responseBody = response.body!!
+            metric.countEvent(CALL_GRAPHAPI_VEILEDER_SUCCESS)
+            return responseBody
+        } catch (e: RestClientResponseException) {
+            LOG.error(
+                "Call to get response from Microsoft Graph failed with status: {} and message: {}. {}",
+                e.rawStatusCode,
+                e.responseBodyAsString,
+                callIdArgument(callId),
+            )
+            metric.countEvent(CALL_GRAPHAPI_VEILEDER_FAIL)
+            throw e
+        }
+    }
 
     fun getVeiledere(
             axysVeileders: List<AxsysVeileder>
@@ -74,6 +108,10 @@ class GraphApiConsumer(
 
     companion object {
         private val LOG = LoggerFactory.getLogger(GraphApiConsumer::class.java.name)
+
+        private const val CALL_GRAPHAPI_VEILEDER_BASE = "call_graphapi_veileder"
+        private const val CALL_GRAPHAPI_VEILEDER_FAIL = "${CALL_GRAPHAPI_VEILEDER_BASE}_fail"
+        private const val CALL_GRAPHAPI_VEILEDER_SUCCESS = "${CALL_GRAPHAPI_VEILEDER_BASE}_success"
 
         private const val CALL_GRAPHAPI_VEILEDERE_BASE = "call_graphapi_veiledere"
         private const val CALL_GRAPHAPI_VEILEDERE_FAIL = "${CALL_GRAPHAPI_VEILEDERE_BASE}_fail"
