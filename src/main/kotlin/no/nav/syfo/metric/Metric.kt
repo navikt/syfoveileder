@@ -23,6 +23,18 @@ class Metric @Inject constructor(
         ).increment()
     }
 
+    fun countControllerHttpReponses(kode: Int) {
+        registry.counter(
+            addPrefix("httpstatus"),
+            Tags.of(
+                "type",
+                "info",
+                "kode",
+                kode.toString()
+            )
+        ).increment()
+    }
+
     private fun addPrefix(navn: String): String {
         val metricPrefix = "syfoveileder_"
         return metricPrefix + navn
