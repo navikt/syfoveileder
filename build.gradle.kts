@@ -14,7 +14,7 @@ val logstashEncoderVersion = "6.3"
 val logbackVersion = "1.2.3"
 val nimbusSDKVersion = "7.0.3"
 val oidcSupportVersion = "0.2.18"
-val prometheusVersion = "1.5.5"
+val prometheusVersion = "1.5.14"
 val slf4jVersion = "1.7.30"
 
 plugins {
