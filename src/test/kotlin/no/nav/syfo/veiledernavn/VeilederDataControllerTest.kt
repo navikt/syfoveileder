@@ -10,8 +10,8 @@ import no.nav.syfo.util.TestData.userListResponseBodyGraphApi
 import no.nav.syfo.util.TestUtils
 import no.nav.syfo.util.TestUtils.loggInnSomVeileder
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.*
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.*
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.BDDMockito
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -20,7 +20,7 @@ import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.test.annotation.DirtiesContext
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.client.ExpectedCount.manyTimes
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.*
@@ -33,10 +33,11 @@ import org.springframework.web.client.RestTemplate
 import java.time.LocalDateTime
 import javax.inject.Inject
 
-
-@RunWith(SpringRunner::class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK,
-        classes = [LocalApplication::class])
+@ExtendWith(SpringExtension::class)
+@SpringBootTest(
+    webEnvironment = SpringBootTest.WebEnvironment.MOCK,
+    classes = [LocalApplication::class],
+)
 @AutoConfigureMockMvc
 @DirtiesContext
 class VeilederDataControllerTest {
@@ -58,23 +59,23 @@ class VeilederDataControllerTest {
     private val ident = "Z999999"
     private val enhet = "0123"
     private val token = AADToken(
-            "token",
-            "refreshtoken",
-            LocalDateTime.parse("2019-01-01T10:00:00")
+        "token",
+        "refreshtoken",
+        LocalDateTime.parse("2019-01-01T10:00:00")
     )
 
     private val veilederListe: String = "[" +
-            "{\"ident\":\"Z999999\",\"fornavn\":\"Dana\",\"etternavn\":\"Scully\"}," +
-            "{\"ident\":\"Z666666\",\"fornavn\":\"\",\"etternavn\":\"\"}" +
-            "]"
+        "{\"ident\":\"Z999999\",\"fornavn\":\"Dana\",\"etternavn\":\"Scully\"}," +
+        "{\"ident\":\"Z666666\",\"fornavn\":\"\",\"etternavn\":\"\"}" +
+        "]"
 
-    @Before
+    @BeforeEach
     fun setup() {
         loggInnSomVeileder(oidcRequestContextHolder, ident)
         this.mockRestServiceServer = MockRestServiceServer.bindTo(restTemplate).build()
     }
 
-    @After
+    @AfterEach
     fun cleanUp() {
         mockRestServiceServer.verify()
         TestUtils.loggUt(oidcRequestContextHolder)
@@ -88,8 +89,8 @@ class VeilederDataControllerTest {
         mockGetUsersResponse()
 
         val respons = mockMvc.perform(MockMvcRequestBuilders.get("/api/veiledere/enhet/$enhet")
-                .header("Authorization", "Bearer $idToken"))
-                .andReturn().response.contentAsString
+            .header("Authorization", "Bearer $idToken"))
+            .andReturn().response.contentAsString
 
         assertThat(respons).isEqualTo(veilederListe)
     }
@@ -102,44 +103,44 @@ class VeilederDataControllerTest {
         mockGetUsersResponse500()
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/veiledere/enhet/$enhet")
-                .header("Authorization", "Bearer $idToken"))
-                .andExpect(status().isFailedDependency)
-                .andReturn().response.contentAsString
+            .header("Authorization", "Bearer $idToken"))
+            .andExpect(status().isFailedDependency)
+            .andReturn().response.contentAsString
     }
 
     private fun mockGetUsersResponse500() {
         mockRestServiceServer.expect(manyTimes(), anything())
-                .andExpect(method(HttpMethod.POST))
-                .andExpect(header(AUTHORIZATION, "Bearer ${token.accessToken}"))
-                .andRespond(withServerError()
-                        .body(errorResponseBodyGraphApi)
-                        .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(method(HttpMethod.POST))
+            .andExpect(header(AUTHORIZATION, "Bearer ${token.accessToken}"))
+            .andRespond(withServerError()
+                .body(errorResponseBodyGraphApi)
+                .contentType(MediaType.APPLICATION_JSON))
     }
 
     private fun mockAADToken() {
         BDDMockito.given(aadTokenService.getAADToken()).willReturn(token)
         BDDMockito.given(aadTokenService.renewTokenIfExpired(token)).willReturn(AADToken("token", "refreshtoken",
-                LocalDateTime.parse("2019-01-01T10:00:00")))
+            LocalDateTime.parse("2019-01-01T10:00:00")))
 
     }
 
     private fun mockGetUsersResponse() {
         mockRestServiceServer.expect(manyTimes(), anything())
-                .andExpect(method(HttpMethod.POST))
-                .andExpect(header(AUTHORIZATION, "Bearer ${token.accessToken}"))
-                .andRespond(withSuccess()
-                        .body(userListResponseBodyGraphApi)
-                        .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(method(HttpMethod.POST))
+            .andExpect(header(AUTHORIZATION, "Bearer ${token.accessToken}"))
+            .andRespond(withSuccess()
+                .body(userListResponseBodyGraphApi)
+                .contentType(MediaType.APPLICATION_JSON))
     }
 
     private fun mockAxsysVeiledere() {
         mockRestServiceServer.expect(manyTimes(), anything())
-                .andExpect(method(HttpMethod.GET))
-                .andExpect(header("Nav-Call-Id", "default"))
-                .andExpect(header("Nav-Consumer-Id", "srvsyfoveileder"))
-                .andRespond(withSuccess()
-                        .body(brukereResponseBody)
-                        .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(method(HttpMethod.GET))
+            .andExpect(header("Nav-Call-Id", "default"))
+            .andExpect(header("Nav-Consumer-Id", "srvsyfoveileder"))
+            .andRespond(withSuccess()
+                .body(brukereResponseBody)
+                .contentType(MediaType.APPLICATION_JSON))
     }
 
 }

@@ -12,21 +12,21 @@ import no.nav.syfo.veilederinfo.VeilederInfoController.Companion.API_VEILEDER_BA
 import no.nav.syfo.veilederinfo.VeilederInfoController.Companion.API_VEILEDER_SELF_PATH
 import no.nav.syfo.veiledernavn.AADTokenConsumer
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.*
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.*
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.test.annotation.DirtiesContext
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.web.client.RestTemplate
 import javax.inject.Inject
 
-@RunWith(SpringRunner::class)
+@ExtendWith(SpringExtension::class)
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.MOCK,
     classes = [LocalApplication::class],
@@ -58,13 +58,13 @@ class VeilederInfoControllerTest {
         .toVeilederInfo(VEILEDER_IDENT)
         .toVeilederDTO()
 
-    @Before
+    @BeforeEach
     fun setup() {
         loggInnSomVeileder(oidcRequestContextHolder, VEILEDER_IDENT)
         this.mockRestServiceServer = MockRestServiceServer.bindTo(restTemplate).build()
     }
 
-    @After
+    @AfterEach
     fun cleanUp() {
         mockRestServiceServer.verify()
         loggUt(oidcRequestContextHolder)

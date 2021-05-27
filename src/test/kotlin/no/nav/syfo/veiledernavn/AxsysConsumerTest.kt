@@ -4,19 +4,21 @@ import no.nav.syfo.AxsysVeileder
 import no.nav.syfo.LocalApplication
 import no.nav.syfo.util.MockUtils
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.*
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.*
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.annotation.DirtiesContext
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.client.MockRestServiceServer
-import org.springframework.web.client.*
+import org.springframework.web.client.RestTemplate
 import javax.inject.Inject
 import javax.ws.rs.BadRequestException
 
-@RunWith(SpringRunner::class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK,
-        classes = [LocalApplication::class])
+@ExtendWith(SpringExtension::class)
+@SpringBootTest(
+    webEnvironment = SpringBootTest.WebEnvironment.MOCK,
+    classes = [LocalApplication::class],
+)
 @DirtiesContext
 class AxsysConsumerTest {
 
@@ -28,12 +30,12 @@ class AxsysConsumerTest {
 
     private lateinit var mockRestServiceServer: MockRestServiceServer
 
-    @Before
+    @BeforeEach
     fun setup() {
         this.mockRestServiceServer = MockRestServiceServer.bindTo(restTemplate).build()
     }
 
-    @After
+    @AfterEach
     fun cleanUp() {
         mockRestServiceServer.verify()
     }
@@ -43,10 +45,11 @@ class AxsysConsumerTest {
         MockUtils.mockAxsysResponse(mockRestServiceServer)
         val veilederIdenter: List<AxsysVeileder> = axsysConsumer.getAxsysVeiledere("0123")
 
-        assertThat(veilederIdenter[0].appIdent).isEqualTo("Z999999")
+        assertThat(veilederIdenter.first().appIdent).isEqualTo("Z999999")
     }
 
-    @Test(expected = BadRequestException::class)
+    @Test
+    @Throws(BadRequestException::class)
     fun enhetsNummerFinnesIkke() {
         MockUtils.mockAxsysEnhetsNummerFinnesIkke(mockRestServiceServer)
         axsysConsumer.getAxsysVeiledere("0999")

@@ -5,19 +5,20 @@ import no.nav.syfo.Veileder
 import no.nav.syfo.metric.Metric
 import no.nav.syfo.util.TestData
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.BDDMockito.given
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.junit.MockitoJUnitRunner
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
-
-@RunWith(MockitoJUnitRunner::class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK,
-        classes = [LocalApplication::class])
+@ExtendWith(SpringExtension::class)
+@SpringBootTest(
+    webEnvironment = SpringBootTest.WebEnvironment.MOCK,
+    classes = [LocalApplication::class],
+)
 class VeilederServiceTest {
 
     @Mock
@@ -34,7 +35,7 @@ class VeilederServiceTest {
 
     private val ENHET_NR: String = "9999"
 
-    @Before
+    @BeforeEach
     fun setup() {
         given(axsysConsumer.getAxsysVeiledere(ENHET_NR)).willReturn(TestData.AxsysVeiledere)
         given(graphApiConsumer.getVeiledere(TestData.AxsysVeiledere)).willReturn(TestData.AADVeiledere)
@@ -45,9 +46,8 @@ class VeilederServiceTest {
         val veiledere: List<Veileder> = veilederService.getVeiledere(ENHET_NR)
 
         assertThat(veiledere).isEqualTo(listOf(
-                Veileder("Z999999", "Dana", "Scully"),
-                Veileder("Z888888", "", "")
+            Veileder("Z999999", "Dana", "Scully"),
+            Veileder("Z888888", "", "")
         ))
     }
-
 }
