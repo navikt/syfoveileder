@@ -1,6 +1,6 @@
 package no.nav.syfo.veiledernavn
 
-import no.nav.security.oidc.context.OIDCRequestContextHolder
+import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.syfo.AADToken
 import no.nav.syfo.LocalApplication
 import no.nav.syfo.util.OIDCIssuer
@@ -52,7 +52,7 @@ class VeilederDataControllerTest {
     private lateinit var mockMvc: MockMvc
 
     @Inject
-    private lateinit var oidcRequestContextHolder: OIDCRequestContextHolder
+    private lateinit var tokenValidationContextHolder: TokenValidationContextHolder
 
     private lateinit var mockRestServiceServer: MockRestServiceServer
 
@@ -71,19 +71,19 @@ class VeilederDataControllerTest {
 
     @BeforeEach
     fun setup() {
-        loggInnSomVeileder(oidcRequestContextHolder, ident)
+        loggInnSomVeileder(tokenValidationContextHolder, ident)
         this.mockRestServiceServer = MockRestServiceServer.bindTo(restTemplate).build()
     }
 
     @AfterEach
     fun cleanUp() {
         mockRestServiceServer.verify()
-        TestUtils.loggUt(oidcRequestContextHolder)
+        TestUtils.loggUt(tokenValidationContextHolder)
     }
 
     @Test
     fun getVeilederNames() {
-        val idToken = oidcRequestContextHolder.oidcValidationContext.getToken(OIDCIssuer.AZURE).idToken
+        val idToken = tokenValidationContextHolder.tokenValidationContext.getJwtToken(OIDCIssuer.AZURE).tokenAsString
         mockAADToken()
         mockAxsysVeiledere()
         mockGetUsersResponse()
@@ -97,7 +97,7 @@ class VeilederDataControllerTest {
 
     @Test
     fun dependencyError() {
-        val idToken = oidcRequestContextHolder.oidcValidationContext.getToken(OIDCIssuer.AZURE).idToken
+        val idToken = tokenValidationContextHolder.tokenValidationContext.getJwtToken(OIDCIssuer.AZURE).tokenAsString
         mockAADToken()
         mockAxsysVeiledere()
         mockGetUsersResponse500()

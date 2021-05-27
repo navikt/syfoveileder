@@ -1,6 +1,6 @@
 package no.nav.syfo.veiledernavn
 
-import no.nav.security.spring.oidc.validation.interceptor.OIDCUnauthorizedException
+import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
 import no.nav.syfo.metric.Metric
 import org.slf4j.LoggerFactory
 import org.springframework.http.*
@@ -26,7 +26,7 @@ class VeilederNavnExceptionHandler @Inject constructor(
             HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request)
     }
 
-    @ExceptionHandler(OIDCUnauthorizedException::class)
+    @ExceptionHandler(JwtTokenUnauthorizedException::class)
     protected fun handleUnauthorized(e: RuntimeException, request: WebRequest): ResponseEntity<Any> {
         val bodyOfResponse = "Bruker er ikke logget inn"
         LOG.debug(bodyOfResponse, e)
