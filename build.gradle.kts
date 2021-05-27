@@ -6,7 +6,7 @@ group = "no.nav.syfo"
 version = "1.0.0-SNAPSHOT"
 description = "syfoveileder"
 
-val adal4jVersion = "1.6.4"
+val adal4jVersion = "1.6.7"
 val javaxActivationVersion = "1.2.0"
 val jaxRiVersion = "2.3.3"
 val kotlinJacksonVersion = "2.11.3"
