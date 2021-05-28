@@ -1,7 +1,7 @@
 package no.nav.syfo.veilederinfo
 
-import no.nav.security.oidc.api.ProtectedWithClaims
-import no.nav.security.oidc.context.OIDCRequestContextHolder
+import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.syfo.api.auth.getSubjectInternAzure
 import no.nav.syfo.metric.Metric
 import no.nav.syfo.util.OIDCIssuer.AZURE
@@ -17,7 +17,7 @@ import javax.inject.Inject
 @RequestMapping(value = [API_VEILEDER_BASE_PATH])
 class VeilederInfoController @Inject constructor(
     private val metric: Metric,
-    private val contextHolder: OIDCRequestContextHolder,
+    private val contextHolder: TokenValidationContextHolder,
     private val veilederService: VeilederService
 ) {
     @ProtectedWithClaims(issuer = AZURE)

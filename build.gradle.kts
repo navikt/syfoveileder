@@ -12,10 +12,11 @@ val jaxRiVersion = "2.3.3"
 val kotlinJacksonVersion = "2.11.3"
 val logstashEncoderVersion = "6.3"
 val logbackVersion = "1.2.3"
+val mockOauth2ServerVersion = "0.3.3"
 val nimbusSDKVersion = "7.0.3"
-val oidcSupportVersion = "0.2.18"
 val prometheusVersion = "1.7.0"
 val slf4jVersion = "1.7.30"
+val tokenValidationSpringSupportVersion = "1.3.7"
 
 plugins {
     kotlin("jvm") version "1.4.30"
@@ -53,7 +54,6 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
 
-    implementation("no.nav.security:oidc-spring-support:$oidcSupportVersion")
     implementation("com.microsoft.azure:adal4j:$adal4jVersion")
     implementation("com.nimbusds:oauth2-oidc-sdk:$nimbusSDKVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$kotlinJacksonVersion")
@@ -61,7 +61,11 @@ dependencies {
     implementation("io.micrometer:micrometer-registry-prometheus:$prometheusVersion")
     implementation("org.slf4j:slf4j-api:$slf4jVersion")
 
-    testImplementation("no.nav.security:oidc-test-support:$oidcSupportVersion")
+    implementation("no.nav.security:token-validation-spring:$tokenValidationSpringSupportVersion")
+    testImplementation("no.nav.security:token-validation-test-support:$tokenValidationSpringSupportVersion")
+    testImplementation("no.nav.security:token-validation-spring-test:$tokenValidationSpringSupportVersion")
+    testImplementation("no.nav.security:mock-oauth2-server:$mockOauth2ServerVersion")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 

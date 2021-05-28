@@ -1,7 +1,7 @@
 package no.nav.syfo.veilederinfo
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import no.nav.security.oidc.context.OIDCRequestContextHolder
+import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.syfo.LocalApplication
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.UserConstants.VEILEDER_IDENT
@@ -13,20 +13,17 @@ import no.nav.syfo.veilederinfo.VeilederInfoController.Companion.API_VEILEDER_SE
 import no.nav.syfo.veiledernavn.AADTokenConsumer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
-import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.test.annotation.DirtiesContext
-import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.web.client.RestTemplate
 import javax.inject.Inject
 
-@ExtendWith(SpringExtension::class)
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.MOCK,
     classes = [LocalApplication::class],
@@ -48,7 +45,7 @@ class VeilederInfoControllerTest {
     private lateinit var mockMvc: MockMvc
 
     @Inject
-    private lateinit var oidcRequestContextHolder: OIDCRequestContextHolder
+    private lateinit var tokenValidationContextHolder: TokenValidationContextHolder
 
     private lateinit var mockRestServiceServer: MockRestServiceServer
 
@@ -60,19 +57,19 @@ class VeilederInfoControllerTest {
 
     @BeforeEach
     fun setup() {
-        loggInnSomVeileder(oidcRequestContextHolder, VEILEDER_IDENT)
+        loggInnSomVeileder(tokenValidationContextHolder, VEILEDER_IDENT)
         this.mockRestServiceServer = MockRestServiceServer.bindTo(restTemplate).build()
     }
 
     @AfterEach
     fun cleanUp() {
         mockRestServiceServer.verify()
-        loggUt(oidcRequestContextHolder)
+        loggUt(tokenValidationContextHolder)
     }
 
     @Test
     fun `Get VeilederInfo for Self`() {
-        val idToken = oidcRequestContextHolder.oidcValidationContext.getToken(OIDCIssuer.AZURE).idToken
+        val idToken = tokenValidationContextHolder.tokenValidationContext.getJwtToken(OIDCIssuer.AZURE).tokenAsString
         mockAADTokenConsumer(aadTokenService)
         mockGetUsersResponse(mockRestServiceServer)
 
@@ -89,7 +86,7 @@ class VeilederInfoControllerTest {
 
     @Test
     fun `Get VeilederInfo for Self wihout info in Graph throws exception`() {
-        val idToken = oidcRequestContextHolder.oidcValidationContext.getToken(OIDCIssuer.AZURE).idToken
+        val idToken = tokenValidationContextHolder.tokenValidationContext.getJwtToken(OIDCIssuer.AZURE).tokenAsString
         mockAADTokenConsumer(aadTokenService)
         mockGetUsersResponse(
             mockRestServiceServer = mockRestServiceServer,

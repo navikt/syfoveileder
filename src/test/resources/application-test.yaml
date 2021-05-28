@@ -18,10 +18,10 @@ server:
   servlet:
     context-path: /syfoveileder
 
-no.nav.security.oidc:
+no.nav.security.jwt:
   issuer:
     veileder:
-      discoveryurl: http://metadata
+      discoveryurl: http://localhost:${mock-oauth2-server.port}/veileder/.well-known/openid-configuration
       accepted_audience: aud-localhost
       cookie_name: localhost-idtoken
 

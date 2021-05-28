@@ -1,4 +1,4 @@
-no.nav.security.oidc:
+no.nav.security.jwt:
   issuer:
     veileder:
       discoveryurl: <SETTES FRA NAISERATOR>

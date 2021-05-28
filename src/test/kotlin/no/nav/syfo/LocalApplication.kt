@@ -1,11 +1,13 @@
 package no.nav.syfo
 
-import no.nav.security.spring.oidc.api.EnableOIDCTokenValidation
+import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
+import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-@EnableOIDCTokenValidation(ignore = ["org.springframework"])
+@EnableJwtTokenValidation
+@EnableMockOAuth2Server
 class LocalApplication
 
 fun main(args: Array<String>) {
