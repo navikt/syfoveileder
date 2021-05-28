@@ -63,8 +63,6 @@ dependencies {
 
     implementation("no.nav.security:token-validation-spring:$tokenValidationSpringSupportVersion")
     testImplementation("no.nav.security:token-validation-test-support:$tokenValidationSpringSupportVersion")
-    testImplementation("no.nav.security:token-validation-spring-test:$tokenValidationSpringSupportVersion")
-    testImplementation("no.nav.security:mock-oauth2-server:$mockOauth2ServerVersion")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
@@ -84,6 +82,7 @@ tasks {
         doFirst {
             systemProperty("spring.profiles.active", "test")
         }
+        useJUnitPlatform()
     }
 
     withType<ShadowJar> {

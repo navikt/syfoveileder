@@ -49,9 +49,11 @@ class AxsysConsumerTest {
     }
 
     @Test
-    @Throws(BadRequestException::class)
     fun enhetsNummerFinnesIkke() {
         MockUtils.mockAxsysEnhetsNummerFinnesIkke(mockRestServiceServer)
-        axsysConsumer.getAxsysVeiledere("0999")
+
+        Assertions.assertThrows(BadRequestException::class.java) {
+            axsysConsumer.getAxsysVeiledere("0999")
+        }
     }
 }
