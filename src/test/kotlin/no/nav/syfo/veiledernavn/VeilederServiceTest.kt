@@ -45,9 +45,11 @@ class VeilederServiceTest {
     fun getVeiledere() {
         val veiledere: List<Veileder> = veilederService.getVeiledere(ENHET_NR)
 
-        assertThat(veiledere).isEqualTo(listOf(
-            Veileder("Z999999", "Dana", "Scully"),
-            Veileder("Z888888", "", "")
-        ))
+        assertThat(veiledere).isEqualTo(
+            listOf(
+                Veileder("Z999999", "Dana", "Scully"),
+                Veileder("Z888888", "", "")
+            )
+        )
     }
 }

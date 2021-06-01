@@ -25,6 +25,7 @@ plugins {
     id("io.spring.dependency-management") version "1.0.10.RELEASE"
     id("com.diffplug.gradle.spotless") version "3.18.0"
     id("com.github.johnrengelman.shadow") version "6.1.0"
+    id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
 }
 
 allOpen {
@@ -97,4 +98,3 @@ tasks {
         kotlinOptions.jvmTarget = "11"
     }
 }
-

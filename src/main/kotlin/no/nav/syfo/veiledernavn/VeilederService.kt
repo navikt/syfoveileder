@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component
 
 @Component
 class VeilederService(
-        private val graphApiConsumer: GraphApiConsumer,
-        private val metric: Metric,
-        private val axsysConsumer: AxsysConsumer
+    private val graphApiConsumer: GraphApiConsumer,
+    private val metric: Metric,
+    private val axsysConsumer: AxsysConsumer
 ) {
     fun veilederInfo(
         callId: String,

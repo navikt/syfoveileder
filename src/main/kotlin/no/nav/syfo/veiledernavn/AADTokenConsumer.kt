@@ -11,27 +11,27 @@ import java.time.ZoneId
 
 @Component
 class AADTokenConsumer(
-        @Value("\${graphapi.url}") val resource: String, // resource er en url som tokenet er gyldig for bruk mot
-        @Value("\${aad.syfoveileder.clientid.username}") val clientId: String,
-        @Value("\${aad.syfoveileder.clientid.password}") val clientSecret: String,
-        private val context: AuthenticationContext
+    @Value("\${graphapi.url}") val resource: String, // resource er en url som tokenet er gyldig for bruk mot
+    @Value("\${aad.syfoveileder.clientid.username}") val clientId: String,
+    @Value("\${aad.syfoveileder.clientid.password}") val clientSecret: String,
+    private val context: AuthenticationContext
 ) {
 
     fun renewTokenIfExpired(token: AADToken): AADToken =
-            if (token.expires.isBefore(LocalDateTime.now().minusMinutes(2L))) {
-                LOG.debug("Azure - Renewing token")
-                getAADToken()
-            } else {
-                token
-            }
+        if (token.expires.isBefore(LocalDateTime.now().minusMinutes(2L))) {
+            LOG.debug("Azure - Renewing token")
+            getAADToken()
+        } else {
+            token
+        }
 
     fun getAADToken(): AADToken {
         val result = context.acquireToken(resource, ClientCredential(clientId, clientSecret), null).get()
 
         return AADToken(
-                result.accessToken,
-                result.refreshToken,
-                result.expiresOnDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+            result.accessToken,
+            result.refreshToken,
+            result.expiresOnDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
         )
     }
 

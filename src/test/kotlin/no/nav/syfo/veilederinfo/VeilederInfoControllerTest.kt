@@ -20,7 +20,6 @@ import org.springframework.util.MultiValueMap
 import org.springframework.web.client.RestTemplate
 import javax.inject.Inject
 
-
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.MOCK,
     classes = [LocalApplication::class],

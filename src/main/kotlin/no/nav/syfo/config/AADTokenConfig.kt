@@ -10,8 +10,8 @@ import java.util.concurrent.Executors
 class AADTokenConfig {
 
     @Bean
-    fun authenticationContext( @Value("\${aadauthority.url}") authority: String): AuthenticationContext {
+    fun authenticationContext(@Value("\${aadauthority.url}") authority: String): AuthenticationContext {
         val service = Executors.newFixedThreadPool(1)
-        return AuthenticationContext(authority,true, service) // Authority er url til Azure
+        return AuthenticationContext(authority, true, service) // Authority er url til Azure
     }
 }

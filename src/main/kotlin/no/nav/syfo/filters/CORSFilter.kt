@@ -14,8 +14,8 @@ import java.io.IOException
 class CORSFilter : Filter {
 
     private val whitelist = listOf(
-            "https://syfooversikt.nais.adeo.no",
-            "https://syfooversikt.nais.preprod.local"
+        "https://syfooversikt.nais.adeo.no",
+        "https://syfooversikt.nais.preprod.local"
     )
 
     @Throws(ServletException::class, IOException::class)
@@ -49,5 +49,4 @@ class CORSFilter : Filter {
     private fun erWhitelisted(origin: String?): Boolean {
         return origin != null && whitelist.contains(origin)
     }
-
 }

@@ -29,8 +29,8 @@ class GraphApiConsumer(
         headers.setBearerAuth(aadTokenConsumer.renewTokenIfExpired(token).accessToken)
 
         try {
-            val queryFilter = "startsWith(mailNickname, '${veilederIdent}')"
-            val url = "${graphApiUrl}/v1.0//users/?\$filter=${queryFilter}&\$select=mailNickname,givenName,surname,mail,businessPhones"
+            val queryFilter = "startsWith(mailNickname, '$veilederIdent')"
+            val url = "$graphApiUrl/v1.0//users/?\$filter=$queryFilter&\$select=mailNickname,givenName,surname,mail,businessPhones"
             val response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
@@ -53,7 +53,7 @@ class GraphApiConsumer(
     }
 
     fun getVeiledere(
-            axysVeileders: List<AxsysVeileder>
+        axysVeileders: List<AxsysVeileder>
     ): List<Veileder> {
         val token: AADToken = aadTokenConsumer.getAADToken()
         val headers = HttpHeaders()
@@ -63,15 +63,15 @@ class GraphApiConsumer(
 
         val identChunks = axysVeileders.chunked(15)
 
-        val url = "${graphApiUrl}/v1.0/\$batch"
+        val url = "$graphApiUrl/v1.0/\$batch"
 
         val requests = identChunks.mapIndexed { index, idents ->
             val query = idents.joinToString(separator = " or ") { "startsWith(mailNickname, '${it.appIdent}')" }
             RequestEntry(
-                    id = (index + 1).toString(),
-                    method = "GET",
-                    url = "/users/?\$filter=${query}&\$select=mailNickname,givenName,surname",
-                    headers = mapOf("Content-Type" to "application/json")
+                id = (index + 1).toString(),
+                method = "GET",
+                url = "/users/?\$filter=$query&\$select=mailNickname,givenName,surname",
+                headers = mapOf("Content-Type" to "application/json")
             )
         }
 
@@ -81,16 +81,15 @@ class GraphApiConsumer(
                 val responseEntity = restTemplate.exchange(url, HttpMethod.POST, HttpEntity(body, headers), BatchResponse::class.java)
 
                 responseEntity
-                        .body
-                        ?.responses
-                        ?.flatMap {
-                            it.body.value.map { aadVeileder -> aadVeileder.toVeileder() }
-                        }
-                        ?: throw RuntimeException("Svar fra Graph API har ikke forventet format.")
+                    .body
+                    ?.responses
+                    ?.flatMap {
+                        it.body.value.map { aadVeileder -> aadVeileder.toVeileder() }
+                    }
+                    ?: throw RuntimeException("Svar fra Graph API har ikke forventet format.")
             }
             metric.countEvent(CALL_GRAPHAPI_VEILEDERE_SUCCESS)
             return responseEnitty
-
         } catch (e: HttpClientErrorException) {
             LOG.warn("Oppslag i Graph API feiler med respons ${e.responseBodyAsString}", e)
             metric.countEvent(CALL_GRAPHAPI_VEILEDERE_FAIL)
@@ -118,4 +117,3 @@ class GraphApiConsumer(
         private const val CALL_GRAPHAPI_VEILEDERE_SUCCESS = "${CALL_GRAPHAPI_VEILEDERE_BASE}_success"
     }
 }
-
