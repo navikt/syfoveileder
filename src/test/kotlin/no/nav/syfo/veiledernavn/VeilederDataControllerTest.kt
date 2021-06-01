@@ -46,7 +46,7 @@ class VeilederDataControllerTest {
     private lateinit var tokenValidationContextHolder: TokenValidationContextHolder
 
     @Inject
-    private lateinit var veilederDataController: VeilederDataController;
+    private lateinit var veilederDataController: VeilederDataController
 
     private lateinit var mockRestServiceServer: MockRestServiceServer
 
@@ -109,25 +109,33 @@ class VeilederDataControllerTest {
         mockRestServiceServer.expect(manyTimes(), anything())
             .andExpect(method(HttpMethod.POST))
             .andExpect(header(AUTHORIZATION, "Bearer ${token.accessToken}"))
-            .andRespond(withServerError()
-                .body(errorResponseBodyGraphApi)
-                .contentType(MediaType.APPLICATION_JSON))
+            .andRespond(
+                withServerError()
+                    .body(errorResponseBodyGraphApi)
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
     }
 
     private fun mockAADToken() {
         BDDMockito.given(aadTokenService.getAADToken()).willReturn(token)
-        BDDMockito.given(aadTokenService.renewTokenIfExpired(token)).willReturn(AADToken("token", "refreshtoken",
-            LocalDateTime.parse("2019-01-01T10:00:00")))
-
+        BDDMockito.given(aadTokenService.renewTokenIfExpired(token)).willReturn(
+            AADToken(
+                "token",
+                "refreshtoken",
+                LocalDateTime.parse("2019-01-01T10:00:00")
+            )
+        )
     }
 
     private fun mockGetUsersResponse() {
         mockRestServiceServer.expect(manyTimes(), anything())
             .andExpect(method(HttpMethod.POST))
             .andExpect(header(AUTHORIZATION, "Bearer ${token.accessToken}"))
-            .andRespond(withSuccess()
-                .body(userListResponseBodyGraphApi)
-                .contentType(MediaType.APPLICATION_JSON))
+            .andRespond(
+                withSuccess()
+                    .body(userListResponseBodyGraphApi)
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
     }
 
     private fun mockAxsysVeiledere() {
@@ -135,8 +143,10 @@ class VeilederDataControllerTest {
             .andExpect(method(HttpMethod.GET))
             .andExpect(header("Nav-Call-Id", "default"))
             .andExpect(header("Nav-Consumer-Id", "srvsyfoveileder"))
-            .andRespond(withSuccess()
-                .body(brukereResponseBody)
-                .contentType(MediaType.APPLICATION_JSON))
+            .andRespond(
+                withSuccess()
+                    .body(brukereResponseBody)
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
     }
 }

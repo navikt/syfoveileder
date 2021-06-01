@@ -22,32 +22,52 @@ class VeilederNavnExceptionHandler @Inject constructor(
     protected fun handleRuntimeException(e: RuntimeException, request: WebRequest): ResponseEntity<Any> {
         val bodyOfResponse = "Uventet feil internt i syfoveileder"
         LOG.error(bodyOfResponse, e)
-        return countHandleExceptionInternal(e, bodyOfResponse,
-            HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request)
+        return countHandleExceptionInternal(
+            e,
+            bodyOfResponse,
+            HttpHeaders(),
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            request
+        )
     }
 
     @ExceptionHandler(JwtTokenUnauthorizedException::class)
     protected fun handleUnauthorized(e: RuntimeException, request: WebRequest): ResponseEntity<Any> {
         val bodyOfResponse = "Bruker er ikke logget inn"
         LOG.debug(bodyOfResponse, e)
-        return countHandleExceptionInternal(e, bodyOfResponse,
-            HttpHeaders(), HttpStatus.UNAUTHORIZED, request)
+        return countHandleExceptionInternal(
+            e,
+            bodyOfResponse,
+            HttpHeaders(),
+            HttpStatus.UNAUTHORIZED,
+            request
+        )
     }
 
     @ExceptionHandler(ServiceUnavailableException::class, InternalServerErrorException::class)
     protected fun handleServiceUnavailable(e: RuntimeException, request: WebRequest): ResponseEntity<Any> {
         val bodyOfResponse = "Feil i tjenester som syfoVeileder bruker"
         LOG.error(bodyOfResponse, e)
-        return countHandleExceptionInternal(e, bodyOfResponse,
-            HttpHeaders(), HttpStatus.FAILED_DEPENDENCY, request)
+        return countHandleExceptionInternal(
+            e,
+            bodyOfResponse,
+            HttpHeaders(),
+            HttpStatus.FAILED_DEPENDENCY,
+            request
+        )
     }
 
     @ExceptionHandler(BadRequestException::class)
     protected fun handleBadRequest(e: RuntimeException, request: WebRequest): ResponseEntity<Any> {
         LOG.warn("Feil i request til GraphApI", e)
         val bodyOfResponse = e.message
-        return countHandleExceptionInternal(e, bodyOfResponse,
-            HttpHeaders(), HttpStatus.BAD_REQUEST, request)
+        return countHandleExceptionInternal(
+            e,
+            bodyOfResponse,
+            HttpHeaders(),
+            HttpStatus.BAD_REQUEST,
+            request
+        )
     }
 
     private fun countHandleExceptionInternal(

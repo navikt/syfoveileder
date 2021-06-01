@@ -35,7 +35,9 @@ fun mockGetUsersResponse(
     mockRestServiceServer.expect(ExpectedCount.manyTimes(), MockRestRequestMatchers.anything())
         .andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
         .andExpect(MockRestRequestMatchers.header(HttpHeaders.AUTHORIZATION, "Bearer ${aadToken.accessToken}"))
-        .andRespond(MockRestResponseCreators.withSuccess()
-            .body(responseBody)
-            .contentType(MediaType.APPLICATION_JSON))
+        .andRespond(
+            MockRestResponseCreators.withSuccess()
+                .body(responseBody)
+                .contentType(MediaType.APPLICATION_JSON)
+        )
 }

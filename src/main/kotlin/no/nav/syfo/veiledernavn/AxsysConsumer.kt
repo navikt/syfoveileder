@@ -11,7 +11,6 @@ import org.springframework.web.client.*
 import javax.ws.rs.*
 import org.springframework.core.ParameterizedTypeReference
 
-
 @Component
 class AxsysConsumer(
     private val metric: Metric,
@@ -20,7 +19,7 @@ class AxsysConsumer(
 ) {
 
     fun getAxsysVeiledere(
-            enhetNr: String
+        enhetNr: String
     ): List<AxsysVeileder> {
         val headers = HttpHeaders()
 
@@ -28,19 +27,18 @@ class AxsysConsumer(
         headers.set("Nav-Consumer-Id", "srvsyfoveileder")
         headers.contentType = MediaType.APPLICATION_JSON
 
-        val url = "${axsysUrl}/v1/enhet/$enhetNr/brukere"
+        val url = "$axsysUrl/v1/enhet/$enhetNr/brukere"
         try {
             val responseEntity = restTemplate.exchange(
-                    url,
-                    GET,
-                    HttpEntity<Any>(headers),
-                    typeReference<List<AxsysVeileder>>()
+                url,
+                GET,
+                HttpEntity<Any>(headers),
+                typeReference<List<AxsysVeileder>>()
             )
-            responseEntity.body?.let{
+            responseEntity.body?.let {
                 metric.countEvent(CALL_AXSYS_VEILEDERE_SUCCESS)
                 return it
             } ?: throw RuntimeException("Svar fra Axsys API har ikke forventet format.")
-
         } catch (e: HttpClientErrorException) {
             LOG.warn("Oppslag i Axsys feiler med respons ${e.responseBodyAsString}", e)
             metric.countEvent(CALL_AXSYS_VEILEDERE_FAIL)
