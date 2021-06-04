@@ -24,7 +24,7 @@ plugins {
     id("org.springframework.boot") version "2.4.6"
     id("io.spring.dependency-management") version "1.0.10.RELEASE"
     id("com.diffplug.gradle.spotless") version "3.18.0"
-    id("com.github.johnrengelman.shadow") version "6.1.0"
+    id("com.github.johnrengelman.shadow") version "7.0.0"
     id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
 }
 
