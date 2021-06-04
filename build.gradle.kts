@@ -19,8 +19,8 @@ val slf4jVersion = "1.7.30"
 val tokenValidationSpringSupportVersion = "1.3.7"
 
 plugins {
-    kotlin("jvm") version "1.4.30"
-    id("org.jetbrains.kotlin.plugin.allopen") version "1.4.21"
+    kotlin("jvm") version "1.5.10"
+    id("org.jetbrains.kotlin.plugin.allopen") version "1.5.10"
     id("org.springframework.boot") version "2.4.6"
     id("io.spring.dependency-management") version "1.0.10.RELEASE"
     id("com.diffplug.gradle.spotless") version "3.18.0"
@@ -87,6 +87,9 @@ tasks {
     }
 
     withType<ShadowJar> {
+        archiveBaseName.set("app")
+        archiveClassifier.set("")
+        archiveVersion.set("")
         transform(PropertiesFileTransformer::class.java) {
             paths = listOf("META-INF/spring.factories")
             mergeStrategy = "append"
