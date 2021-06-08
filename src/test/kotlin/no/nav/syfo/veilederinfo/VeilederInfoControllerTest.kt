@@ -4,6 +4,7 @@ import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.syfo.LocalApplication
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.UserConstants.VEILEDER_IDENT
+import no.nav.syfo.testhelper.UserConstants.VEILEDER_IDENT_2
 import no.nav.syfo.util.NAV_CALL_ID_HEADER
 import no.nav.syfo.util.TestUtils.loggInnSomVeileder
 import no.nav.syfo.util.TestUtils.loggUt
@@ -85,6 +86,45 @@ class VeilederInfoControllerTest {
 
         Assertions.assertThrows(RuntimeException::class.java) {
             veilederInfoController.getVeilederInfo(
+                headers = headers,
+            )
+        }
+    }
+
+    @Test
+    fun `Get VeilederInfo for NAVIdent`() {
+        loggUt(tokenValidationContextHolder)
+        loggInnSomVeileder(tokenValidationContextHolder, VEILEDER_IDENT_2)
+
+        mockAADTokenConsumer(aadTokenService)
+        mockGetUsersResponse(mockRestServiceServer)
+
+        val headers: MultiValueMap<String, String> = LinkedMultiValueMap()
+        headers.add(NAV_CALL_ID_HEADER, createCallId())
+        val response = veilederInfoController.getVeilederInfo(
+            navident = VEILEDER_IDENT,
+            headers = headers,
+        )
+        assertThat(response).isEqualTo(veilederInfo)
+    }
+
+    @Test
+    fun `Get VeilederInfo for NAVIdent wihout info in Graph throws exception`() {
+        loggUt(tokenValidationContextHolder)
+        loggInnSomVeileder(tokenValidationContextHolder, VEILEDER_IDENT_2)
+
+        mockAADTokenConsumer(aadTokenService)
+        mockGetUsersResponse(
+            mockRestServiceServer = mockRestServiceServer,
+            response = null,
+        )
+
+        val headers: MultiValueMap<String, String> = LinkedMultiValueMap()
+        headers.add(NAV_CALL_ID_HEADER, createCallId())
+
+        Assertions.assertThrows(RuntimeException::class.java) {
+            veilederInfoController.getVeilederInfo(
+                navident = "",
                 headers = headers,
             )
         }

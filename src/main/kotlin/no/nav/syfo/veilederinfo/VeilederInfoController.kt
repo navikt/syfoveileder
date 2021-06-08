@@ -38,6 +38,24 @@ class VeilederInfoController @Inject constructor(
         ).toVeilederDTO()
     }
 
+    @ProtectedWithClaims(issuer = AZURE)
+    @GetMapping(
+        value = ["/{navident}"],
+        produces = [MediaType.APPLICATION_JSON_VALUE]
+    )
+    fun getVeilederInfo(
+        @PathVariable navident: String,
+        @RequestHeader headers: MultiValueMap<String, String>,
+    ): VeilederInfoDTO {
+        val callId = getOrCreateCallId(headers)
+
+        metric.countIncomingRequests("veileder_navident")
+        return veilederService.veilederInfo(
+            callId = callId,
+            veilederIdent = navident
+        ).toVeilederDTO()
+    }
+
     companion object {
         const val API_VEILEDER_BASE_PATH = "/api/v1/veileder"
         const val API_VEILEDER_SELF_PATH = "/self"
