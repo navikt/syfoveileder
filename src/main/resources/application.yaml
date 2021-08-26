@@ -1,9 +1,5 @@
 no.nav.security.jwt:
   issuer:
-    veileder:
-      discoveryurl: <SETTES FRA NAISERATOR>
-      accepted_audience: <SETTES FRA NAISERATOR>
-      cookie_name: isso-idtoken
     veilederaad:
       discoveryurl: ${azure.app.well.known.url}
       accepted_audience: ${azure.app.client.id}

@@ -51,10 +51,6 @@ spec:
       value: "https://login.microsoftonline.com/navno.onmicrosoft.com/v2.0/.well-known/openid-configuration"
     - name: NO_NAV_SECURITY_JWT_ISSUER_VEILEDERAAD_ACCEPTEDAUDIENCE
       value: "920f92f5-987a-4cc0-b619-bed1697889a8"
-    - name: NO_NAV_SECURITY_JWT_ISSUER_VEILEDER_DISCOVERYURL
-      value: https://login.microsoftonline.com/navno.onmicrosoft.com/.well-known/openid-configuration
-    - name: NO_NAV_SECURITY_JWT_ISSUER_VEILEDER_ACCEPTEDAUDIENCE
-      value: 9b4e07a3-4f4c-4bab-b866-87f62dff480d
     - name: AXSYS_URL
       value: https://axsys.nais.adeo.no/api
     - name: GRAPHAPI_URL
