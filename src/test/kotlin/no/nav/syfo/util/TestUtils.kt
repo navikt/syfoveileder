@@ -22,20 +22,6 @@ object TestUtils {
         tokenValidationContextHolder.tokenValidationContext = tokenValidationContext
     }
 
-    fun loggInnSomVeileder(
-        tokenValidationContextHolder: TokenValidationContextHolder,
-        veilederIdent: String,
-    ) {
-        val claimsSet = JWTClaimsSet.parse("{\"NAVident\":\"$veilederIdent\"}")
-        val jwt = JwtTokenGenerator.createSignedJWT(claimsSet)
-
-        val jwtToken = JwtToken(jwt.serialize())
-        val issuerTokenMap: MutableMap<String, JwtToken> = HashMap()
-        issuerTokenMap[OIDCIssuer.AZURE] = jwtToken
-        val tokenValidationContext = TokenValidationContext(issuerTokenMap)
-        tokenValidationContextHolder.tokenValidationContext = tokenValidationContext
-    }
-
     fun loggUt(tokenValidationContextHolder: TokenValidationContextHolder) {
         tokenValidationContextHolder.tokenValidationContext = null
     }
