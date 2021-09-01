@@ -36,6 +36,25 @@ spec:
   ingresses:
     - "https://syfoveileder.dev.intern.nav.no"
     - "https://syfoveileder.nais.preprod.local"
+  accessPolicy:
+    inbound:
+      rules:
+        - application: syfomodiaperson
+          namespace: teamsykefravr
+          cluster: dev-fss
+        - application: syfomoteoversikt
+          namespace: teamsykefravr
+          cluster: dev-fss
+        - application: syfooversikt
+          namespace: teamsykefravr
+          cluster: dev-fss
+  azure:
+    application:
+      enabled: true
+      tenant: trygdeetaten.no
+      claims:
+        extra:
+          - "NAVident"
   vault:
     enabled: true
   env:
@@ -47,9 +66,7 @@ spec:
       value: "443"
     - name: APPDYNAMICS_CONTROLLER_SSL_ENABLED
       value: "true"
-    - name: NO_NAV_SECURITY_JWT_ISSUER_VEILEDERAAD_DISCOVERYURL
-      value: "https://login.microsoftonline.com/966ac572-f5b7-4bbe-aa88-c76419c0f851/v2.0/.well-known/openid-configuration"
-    - name: NO_NAV_SECURITY_JWT_ISSUER_VEILEDERAAD_ACCEPTEDAUDIENCE
+    - name: SYFOVEILEDER_CLIENT_ID_DEPRECATED
       value: "bdde0d4f-4ced-4aa0-9168-9cfe9044ac10"
     - name: AXSYS_URL
       value: https://axsys.nais.preprod.local/api
