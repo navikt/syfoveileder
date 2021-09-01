@@ -66,8 +66,6 @@ spec:
       value: "443"
     - name: APPDYNAMICS_CONTROLLER_SSL_ENABLED
       value: "true"
-    - name: SYFOVEILEDER_CLIENT_ID_DEPRECATED
-      value: "920f92f5-987a-4cc0-b619-bed1697889a8"
     - name: AXSYS_URL
       value: https://axsys.nais.adeo.no/api
     - name: GRAPHAPI_URL
