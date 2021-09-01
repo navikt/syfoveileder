@@ -2,7 +2,7 @@ no.nav.security.jwt:
   issuer:
     veilederaad:
       discoveryurl: ${azure.app.well.known.url}
-      accepted_audience: ${azure.app.client.id}
+      accepted_audience: ${azure.app.client.id},${syfoveileder.client.id.deprecated}
       cookiename: ID_token
 
 aad.syfoveileder.clientid:
