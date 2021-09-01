@@ -1,6 +1,7 @@
 package no.nav.syfo.veiledernavn
 
 import no.nav.syfo.*
+import no.nav.syfo.consumer.azuread.AzureAdV2TokenConsumer
 import no.nav.syfo.metric.Metric
 import no.nav.syfo.util.callIdArgument
 import no.nav.syfo.veilederinfo.GraphApiGetUserResponse
@@ -14,7 +15,7 @@ import javax.ws.rs.*
 
 @Component
 class GraphApiConsumer(
-    private val aadTokenConsumer: AADTokenConsumer,
+    private val azureAdV2TokenConsumer: AzureAdV2TokenConsumer,
     private val metric: Metric,
     private val restTemplate: RestTemplate,
     @Value("\${graphapi.url}") val graphApiUrl: String
@@ -23,10 +24,10 @@ class GraphApiConsumer(
         callId: String,
         veilederIdent: String
     ): GraphApiGetUserResponse {
-        val token: AADToken = aadTokenConsumer.getAADToken()
+        val token = azureAdV2TokenConsumer.getToken(scopeClientId = graphApiUrl)
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
-        headers.setBearerAuth(aadTokenConsumer.renewTokenIfExpired(token).accessToken)
+        headers.setBearerAuth(token.accessToken)
 
         try {
             val queryFilter = "startsWith(mailNickname, '$veilederIdent')"
@@ -55,11 +56,11 @@ class GraphApiConsumer(
     fun getVeiledere(
         axysVeileders: List<AxsysVeileder>
     ): List<Veileder> {
-        val token: AADToken = aadTokenConsumer.getAADToken()
+        val token = azureAdV2TokenConsumer.getToken(scopeClientId = graphApiUrl)
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
         // Todo: Cache token i aadTokenConsumer, og la den fornye seg selv
-        headers.set("Authorization", "Bearer " + aadTokenConsumer.renewTokenIfExpired(token).accessToken)
+        headers.setBearerAuth(token.accessToken)
 
         val identChunks = axysVeileders.chunked(15)
 

@@ -66,10 +66,7 @@ spec:
       value: "443"
     - name: APPDYNAMICS_CONTROLLER_SSL_ENABLED
       value: "true"
-    - name: AXSYS_URL
-      value: https://axsys.nais.adeo.no/api
     - name: GRAPHAPI_URL
       value: https://graph.microsoft.com
-    # Miljøvariabler som hentes fra vault:
-    # AAD_SYFOVEILEDER_CLIENTID_USERNAME
-    # AAD_SYFOVEILEDER_CLIENTID_PASSWORD
+    - name: AXSYS_URL
+      value: https://axsys.nais.adeo.no/api

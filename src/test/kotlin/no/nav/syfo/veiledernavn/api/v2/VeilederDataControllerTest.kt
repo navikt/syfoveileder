@@ -2,15 +2,17 @@ package no.nav.syfo.veiledernavn.api.v2
 
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.syfo.*
+import no.nav.syfo.consumer.azuread.AzureAdV2Token
 import no.nav.syfo.util.TestData.brukereResponseBody
 import no.nav.syfo.util.TestData.errorResponseBodyGraphApi
 import no.nav.syfo.util.TestData.userListResponseBodyGraphApi
 import no.nav.syfo.util.TestUtils
 import no.nav.syfo.util.TestUtils.loggInnSomVeilederV2
-import no.nav.syfo.veiledernavn.AADTokenConsumer
+import no.nav.syfo.consumer.azuread.AzureAdV2TokenConsumer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.BDDMockito
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
@@ -41,7 +43,7 @@ class VeilederDataControllerTest {
     lateinit var restTemplate: RestTemplate
 
     @MockBean
-    lateinit var aadTokenService: AADTokenConsumer
+    lateinit var azureAdV2TokenService: AzureAdV2TokenConsumer
 
     @Inject
     private lateinit var tokenValidationContextHolder: TokenValidationContextHolder
@@ -53,10 +55,9 @@ class VeilederDataControllerTest {
 
     private val ident = "Z999999"
     private val enhet = "0123"
-    private val token = AADToken(
+    private val token = AzureAdV2Token(
         "token",
-        "refreshtoken",
-        LocalDateTime.parse("2019-01-01T10:00:00")
+        LocalDateTime.parse("2019-01-01T10:00:00"),
     )
 
     private val veilederListe: List<Veileder> = listOf(
@@ -118,14 +119,7 @@ class VeilederDataControllerTest {
     }
 
     private fun mockAADToken() {
-        BDDMockito.given(aadTokenService.getAADToken()).willReturn(token)
-        BDDMockito.given(aadTokenService.renewTokenIfExpired(token)).willReturn(
-            AADToken(
-                "token",
-                "refreshtoken",
-                LocalDateTime.parse("2019-01-01T10:00:00")
-            )
-        )
+        BDDMockito.given(azureAdV2TokenService.getToken(anyString())).willReturn(token)
     }
 
     private fun mockGetUsersResponse() {

@@ -1,7 +1,5 @@
 package no.nav.syfo
 
-import java.time.LocalDateTime
-
 data class Veileder(
     val ident: String,
     val fornavn: String?,
@@ -43,9 +41,3 @@ data class AxsysVeileder(
 
 fun AxsysVeileder.toVeileder(): Veileder =
     Veileder(fornavn = "", etternavn = "", ident = appIdent)
-
-data class AADToken(
-    val accessToken: String,
-    val refreshToken: String?,
-    val expires: LocalDateTime
-)

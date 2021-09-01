@@ -5,10 +5,6 @@ no.nav.security.jwt:
       accepted_audience: ${azure.app.client.id}
       cookiename: ID_token
 
-aad.syfoveileder.clientid:
-  username: <SETTES FRA NAISERATOR>
-  password: <SETTES FRA NAISERATOR>
-
 logging.config: 'classpath:logback-spring.xml'
 
 management:
