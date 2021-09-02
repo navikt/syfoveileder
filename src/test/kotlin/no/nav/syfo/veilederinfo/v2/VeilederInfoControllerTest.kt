@@ -11,7 +11,7 @@ import no.nav.syfo.util.TestUtils.loggUt
 import no.nav.syfo.util.createCallId
 import no.nav.syfo.veilederinfo.toVeilederDTO
 import no.nav.syfo.veilederinfo.toVeilederInfo
-import no.nav.syfo.veiledernavn.AADTokenConsumer
+import no.nav.syfo.consumer.azuread.AzureAdV2TokenConsumer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 import org.springframework.boot.test.context.SpringBootTest
@@ -34,7 +34,7 @@ class VeilederInfoControllerTest {
     lateinit var restTemplate: RestTemplate
 
     @MockBean
-    lateinit var aadTokenService: AADTokenConsumer
+    lateinit var azureAdV2TokenService: AzureAdV2TokenConsumer
 
     @Inject
     private lateinit var tokenValidationContextHolder: TokenValidationContextHolder
@@ -64,7 +64,7 @@ class VeilederInfoControllerTest {
 
     @Test
     fun `Get VeilederInfo for Self`() {
-        mockAADTokenConsumer(aadTokenService)
+        mockAADTokenConsumer(azureAdV2TokenService)
         mockGetUsersResponse(mockRestServiceServer)
 
         val headers: MultiValueMap<String, String> = LinkedMultiValueMap()
@@ -77,7 +77,7 @@ class VeilederInfoControllerTest {
 
     @Test
     fun `Get VeilederInfo for Self wihout info in Graph throws exception`() {
-        mockAADTokenConsumer(aadTokenService)
+        mockAADTokenConsumer(azureAdV2TokenService)
         mockGetUsersResponse(
             mockRestServiceServer = mockRestServiceServer,
             response = null,
@@ -98,7 +98,7 @@ class VeilederInfoControllerTest {
         loggUt(tokenValidationContextHolder)
         loggInnSomVeilederV2(tokenValidationContextHolder, VEILEDER_IDENT_2)
 
-        mockAADTokenConsumer(aadTokenService)
+        mockAADTokenConsumer(azureAdV2TokenService)
         mockGetUsersResponse(mockRestServiceServer)
 
         val headers: MultiValueMap<String, String> = LinkedMultiValueMap()
@@ -115,7 +115,7 @@ class VeilederInfoControllerTest {
         loggUt(tokenValidationContextHolder)
         loggInnSomVeilederV2(tokenValidationContextHolder, VEILEDER_IDENT_2)
 
-        mockAADTokenConsumer(aadTokenService)
+        mockAADTokenConsumer(azureAdV2TokenService)
         mockGetUsersResponse(
             mockRestServiceServer = mockRestServiceServer,
             response = null,

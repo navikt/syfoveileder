@@ -1,21 +1,18 @@
 package no.nav.syfo.testhelper
 
-import no.nav.syfo.AADToken
-import no.nav.syfo.veiledernavn.AADTokenConsumer
+import no.nav.syfo.consumer.azuread.AzureAdV2Token
+import no.nav.syfo.consumer.azuread.AzureAdV2TokenConsumer
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.BDDMockito
 import java.time.LocalDateTime
 
-val aadToken = AADToken(
+val aadToken = AzureAdV2Token(
     accessToken = "token",
-    refreshToken = "refreshtoken",
     expires = LocalDateTime.parse("2019-01-01T10:00:00"),
 )
 
 fun mockAADTokenConsumer(
-    aadTokenService: AADTokenConsumer,
+    azureAdV2TokenService: AzureAdV2TokenConsumer,
 ) {
-    BDDMockito.given(aadTokenService.getAADToken()).willReturn(aadToken)
-    BDDMockito.given(aadTokenService.renewTokenIfExpired(aadToken)).willReturn(
-        aadToken,
-    )
+    BDDMockito.given(azureAdV2TokenService.getToken(anyString())).willReturn(aadToken)
 }

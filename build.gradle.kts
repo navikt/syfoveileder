@@ -6,7 +6,7 @@ group = "no.nav.syfo"
 version = "1.0.0-SNAPSHOT"
 description = "syfoveileder"
 
-val adal4jVersion = "1.6.7"
+val apacheHttpClientVersion = "4.5.13"
 val javaxActivationVersion = "1.2.0"
 val jaxRiVersion = "2.3.3"
 val kotlinJacksonVersion = "2.11.3"
@@ -55,7 +55,8 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
 
-    implementation("com.microsoft.azure:adal4j:$adal4jVersion")
+    implementation("org.apache.httpcomponents:httpclient:$apacheHttpClientVersion")
+
     implementation("com.nimbusds:oauth2-oidc-sdk:$nimbusSDKVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$kotlinJacksonVersion")
 

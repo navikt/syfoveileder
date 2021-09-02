@@ -12,3 +12,7 @@ fun getSubjectInternAzureV2(contextHolder: TokenValidationContextHolder): String
         throw RuntimeException("Klarte ikke hente veileder-ident ut av OIDC-token (Azure)")
     }
 }
+
+fun getOIDCToken(contextHolder: TokenValidationContextHolder, issuer: String): String {
+    return contextHolder.tokenValidationContext.getJwtToken(issuer).tokenAsString
+}
