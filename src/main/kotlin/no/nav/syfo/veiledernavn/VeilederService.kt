@@ -30,14 +30,19 @@ class VeilederService(
         val axsysVeiledere = axsysConsumer.getAxsysVeiledere(enhetNr)
         val graphApiVeiledere = graphApiConsumer.getVeiledere(axsysVeiledere)
 
-        return axsysVeiledere.map { axsysVeileder ->
-            graphApiVeiledere.find { it.ident == axsysVeileder.appIdent } ?: noGraphApiVeileder(axsysVeileder)
+        val missingInGraphAPI = mutableListOf<String>()
+        val returnList = axsysVeiledere.map { axsysVeileder ->
+            graphApiVeiledere.find { it.ident == axsysVeileder.appIdent } ?: noGraphApiVeileder(axsysVeileder, missingInGraphAPI)
         }
+        if (missingInGraphAPI.isNotEmpty()) {
+            LOG.warn("Fant ikke navn for ${missingInGraphAPI.size} av ${axsysVeiledere.size} veiledere i graphApi! Feilende identer: ${missingInGraphAPI.joinToString()}")
+        }
+        return returnList
     }
 
-    fun noGraphApiVeileder(axsysVeileder: AxsysVeileder): Veileder {
-        LOG.warn("Fant ikke navn for veileder i graphApi! Feillederident: ${axsysVeileder.appIdent}")
+    fun noGraphApiVeileder(axsysVeileder: AxsysVeileder, missingInGraphAPI: MutableList<String>): Veileder {
         metric.countEvent("veileder_name_missing")
+        missingInGraphAPI.add(axsysVeileder.appIdent)
         return axsysVeileder.toVeileder()
     }
 
