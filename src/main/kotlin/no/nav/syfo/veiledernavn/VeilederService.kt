@@ -1,24 +1,23 @@
 package no.nav.syfo.veiledernavn
 
-import no.nav.syfo.*
-import no.nav.syfo.metric.Metric
-import no.nav.syfo.veilederinfo.VeilederInfo
-import no.nav.syfo.veilederinfo.toVeilederInfo
+import no.nav.syfo.client.axsys.*
+import no.nav.syfo.client.graphapi.GraphApiClient
+import no.nav.syfo.client.graphapi.toVeilederInfo
+import no.nav.syfo.veileder.*
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Component
 
-@Component
 class VeilederService(
-    private val graphApiConsumer: GraphApiConsumer,
-    private val metric: Metric,
-    private val axsysConsumer: AxsysConsumer
+    private val axsysClient: AxsysClient,
+    private val graphApiClient: GraphApiClient,
 ) {
-    fun veilederInfo(
+    suspend fun veilederInfo(
         callId: String,
-        veilederIdent: String
+        token: String,
+        veilederIdent: String,
     ): VeilederInfo {
-        val graphApiUser = graphApiConsumer.veileder(
+        val graphApiUser = graphApiClient.veileder(
             callId = callId,
+            token = token,
             veilederIdent = veilederIdent,
         ).value.firstOrNull()
         graphApiUser?.let {
@@ -26,27 +25,43 @@ class VeilederService(
         } ?: throw RuntimeException("User was not found in Microsoft Graph for ident$veilederIdent")
     }
 
-    fun getVeiledere(enhetNr: String): List<Veileder> {
-        val axsysVeiledere = axsysConsumer.getAxsysVeiledere(enhetNr)
-        val graphApiVeiledere = graphApiConsumer.getVeiledere(axsysVeiledere)
+    suspend fun getVeiledere(
+        callId: String,
+        enhetNr: String,
+        token: String,
+    ): List<Veileder> {
+        val axsysVeilederList = axsysClient.veilederList(
+            callId = callId,
+            enhetNr = enhetNr,
+        )
+        val graphApiVeiledere = graphApiClient.veilederList(
+            axsysVeilederlist = axsysVeilederList,
+            callId = callId,
+            token = token,
+        )
 
         val missingInGraphAPI = mutableListOf<String>()
-        val returnList = axsysVeiledere.map { axsysVeileder ->
-            graphApiVeiledere.find { it.ident == axsysVeileder.appIdent } ?: noGraphApiVeileder(axsysVeileder, missingInGraphAPI)
+        val returnList = axsysVeilederList.map { axsysVeileder ->
+            graphApiVeiledere.find { it.ident == axsysVeileder.appIdent } ?: noGraphApiVeileder(
+                axsysVeileder,
+                missingInGraphAPI
+            )
         }
         if (missingInGraphAPI.isNotEmpty()) {
-            LOG.warn("Fant ikke navn for ${missingInGraphAPI.size} av ${axsysVeiledere.size} veiledere i graphApi! Feilende identer: ${missingInGraphAPI.joinToString()}")
+            log.warn("Fant ikke navn for ${missingInGraphAPI.size} av ${axsysVeilederList.size} veiledere i graphApi! Feilende identer: ${missingInGraphAPI.joinToString()}")
         }
         return returnList
     }
 
-    fun noGraphApiVeileder(axsysVeileder: AxsysVeileder, missingInGraphAPI: MutableList<String>): Veileder {
-        metric.countEvent("veileder_name_missing")
+    fun noGraphApiVeileder(
+        axsysVeileder: AxsysVeileder,
+        missingInGraphAPI: MutableList<String>,
+    ): Veileder {
         missingInGraphAPI.add(axsysVeileder.appIdent)
         return axsysVeileder.toVeileder()
     }
 
     companion object {
-        private val LOG = LoggerFactory.getLogger(VeilederService::class.java.name)
+        private val log = LoggerFactory.getLogger(VeilederService::class.java.name)
     }
 }
