@@ -10,15 +10,15 @@ spec:
   port: 8080
   team: teamsykefravr
   liveness:
-    path: /syfoveileder/internal/isAlive
-    initialDelay: 30
-    timeout: 1
-    periodSeconds: 10
-    failureThreshold: 5
+    path: /is_alive
+    periodSeconds: 5
+    timeout: 5
+    failureThreshold: 3
   readiness:
-    path: /syfoveileder/internal/isReady
-    initialDelay: 30
-    timeout: 1
+    path: /is_ready
+    periodSeconds: 5
+    timeout: 5
+    failureThreshold: 3
   resources:
     limits:
       cpu: 1000m
@@ -55,17 +55,8 @@ spec:
       claims:
         extra:
           - "NAVident"
-  vault:
-    enabled: true
+  webproxy: true
   env:
-    - name: APP_NAME
-      value: "syfoveileder"
-    - name: APPDYNAMICS_CONTROLLER_HOST_NAME
-      value: appdynamics.adeo.no
-    - name: APPDYNAMICS_CONTROLLER_PORT
-      value: "443"
-    - name: APPDYNAMICS_CONTROLLER_SSL_ENABLED
-      value: "true"
     - name: GRAPHAPI_URL
       value: https://graph.microsoft.com
     - name: AXSYS_URL

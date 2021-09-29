@@ -1,7 +1,7 @@
 # Syfoveileder
 
 ## About Syfoveileder
-Syfoveileder is a Spring Boot application written in Kotlin. Its main job is to be a microservice offering data relating
+Syfoveileder is a Ktor application written in Kotlin. Its main job is to be a microservice offering data relating
 to veiledere. So far this means a list of veileder names with access to an enhet.
 
 
@@ -16,6 +16,22 @@ name of the enhet, needed to fetch veileder names from Azure AD, from Axsys.
 Sometimes we can't find the given veilederident in Azure AD, this can be because the veileder has quit, or because data has been entered incorrectly.
 In these instances, we log the ident, then we can send it to a grown up, or ask for help in #tech-windows.  
 <img src="https://upload.wikimedia.org/wikipedia/commons/9/9c/Clint_Eastwood1.png" alt="noname" width="200" height="88">
+
+## Technologies used
+
+* Gradle
+* Kotlin
+* Ktor
+
+#### Test Libraries:
+
+* Kluent
+* Mockk
+* Spek
+
+### Requirements
+
+* JDK 11
 
 ### Lint (Ktlint)
 ##### Command line
