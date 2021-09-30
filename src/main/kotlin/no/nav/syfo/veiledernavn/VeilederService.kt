@@ -33,6 +33,7 @@ class VeilederService(
         val axsysVeilederList = axsysClient.veilederList(
             callId = callId,
             enhetNr = enhetNr,
+            token = token,
         )
         val graphApiVeiledere = graphApiClient.veilederList(
             axsysVeilederlist = axsysVeilederList,

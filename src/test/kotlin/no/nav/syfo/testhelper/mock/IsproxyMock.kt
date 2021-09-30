@@ -6,6 +6,7 @@ import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import no.nav.syfo.application.api.installContentNegotiation
+import no.nav.syfo.client.axsys.AxsysClient.Companion.ISPROXY_AXSYS_VEILEDERE_BASE_PATH
 import no.nav.syfo.client.axsys.AxsysVeileder
 import no.nav.syfo.testhelper.UserConstants.ENHET_NR
 import no.nav.syfo.testhelper.UserConstants.VEILEDER_IDENT
@@ -23,23 +24,23 @@ fun generateAxsysResponse() = listOf(
     ),
 )
 
-class AxsysMock {
+class IsproxyMock {
     private val port = getRandomPort()
     val url = "http://localhost:$port"
 
     val axsysResponse = generateAxsysResponse()
 
     val name = "axsys"
-    val server = mockAxsysServer()
+    val server = mockServer()
 
-    private fun mockAxsysServer(): NettyApplicationEngine {
+    private fun mockServer(): NettyApplicationEngine {
         return embeddedServer(
             factory = Netty,
             port = port
         ) {
             installContentNegotiation()
             routing {
-                get("/v1/enhet/$ENHET_NR/brukere") {
+                get("$ISPROXY_AXSYS_VEILEDERE_BASE_PATH/$ENHET_NR") {
                     call.respond(axsysResponse)
                 }
             }

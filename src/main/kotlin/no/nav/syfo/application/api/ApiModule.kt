@@ -40,7 +40,9 @@ fun Application.apiModule(
         graphApiUrl = environment.graphapiUrl,
     )
     val axsysClient = AxsysClient(
-        baseUrl = environment.axsysUrl,
+        azureAdClient = azureAdClient,
+        baseUrl = environment.isproxyUrl,
+        isproxyClientId = environment.isproxyClientId,
     )
     val graphApiClient = GraphApiClient(
         azureAdClient = azureAdClient,
