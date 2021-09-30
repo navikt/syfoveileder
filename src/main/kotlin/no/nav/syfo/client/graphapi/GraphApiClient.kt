@@ -31,7 +31,7 @@ class GraphApiClient(
         return try {
             val queryFilter = "startsWith(mailNickname, '$veilederIdent')"
             val url =
-                "$baseUrl/v1.0//users/?\$filter=$queryFilter&\$select=mailNickname,givenName,surname,mail,businessPhones"
+                "$baseUrl/v1.0/users/?\$filter=$queryFilter&\$select=mailNickname,givenName,surname,mail,businessPhones"
 
             val response: GraphApiGetUserResponse = httpClient.get(url) {
                 header(HttpHeaders.Authorization, bearerHeader(oboToken))
