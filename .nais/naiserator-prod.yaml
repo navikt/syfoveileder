@@ -57,6 +57,7 @@ spec:
       claims:
         extra:
           - "NAVident"
+  webproxy: true
   env:
     - name: GRAPHAPI_URL
       value: https://graph.microsoft.com
