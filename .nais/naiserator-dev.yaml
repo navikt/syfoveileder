@@ -34,7 +34,7 @@ spec:
     cpuThresholdPercentage: 90
   prometheus:
     enabled: true
-    path: /syfoveileder/internal/prometheus
+    path: /prometheus
   ingresses:
     - "https://syfoveileder.dev.intern.nav.no"
     - "https://syfoveileder.nais.preprod.local"
