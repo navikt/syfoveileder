@@ -8,7 +8,6 @@ metadata:
 spec:
   image: {{ image }}
   port: 8080
-  team: teamsykefravr
   liveness:
     path: /is_alive
     initialDelay: 20
@@ -37,7 +36,6 @@ spec:
     path: /prometheus
   ingresses:
     - "https://syfoveileder.intern.nav.no"
-    - "https://syfoveileder.nais.adeo.no"
   accessPolicy:
     inbound:
       rules:
@@ -50,6 +48,9 @@ spec:
         - application: syfooversikt
           namespace: teamsykefravr
           cluster: prod-fss
+    outbound:
+      external:
+        - host: "isproxy.prod-fss-pub.nais.io"
   azure:
     application:
       enabled: true
@@ -57,11 +58,10 @@ spec:
       claims:
         extra:
           - "NAVident"
-  webproxy: true
   env:
     - name: GRAPHAPI_URL
       value: https://graph.microsoft.com
     - name: ISPROXY_CLIENT_ID
       value: "prod-fss.teamsykefravr.isproxy"
     - name: ISPROXY_URL
-      value: "https://isproxy.intern.nav.no"
+      value: "https://isproxy.prod-fss-pub.nais.io"
