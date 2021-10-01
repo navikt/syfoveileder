@@ -6,14 +6,15 @@ import java.net.ServerSocket
 
 fun testEnvironment(
     azureOpenIdTokenEndpoint: String = "azureTokenEndpoint",
-    axsysUrl: String,
+    isproxyUrl: String,
     graphapiUrl: String,
 ) = Environment(
     azureAppClientId = "isdialogmote-client-id",
     azureAppClientSecret = "isdialogmote-secret",
     azureAppWellKnownUrl = "wellknown",
     azureOpenidConfigTokenEndpoint = azureOpenIdTokenEndpoint,
-    axsysUrl = axsysUrl,
+    isproxyClientId = "dev-fss.teamsykefravr.isproxy",
+    isproxyUrl = isproxyUrl,
     graphapiUrl = graphapiUrl,
 )
 
