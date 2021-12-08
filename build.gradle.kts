@@ -6,7 +6,7 @@ version = "1.0.0-SNAPSHOT"
 
 object Versions {
     const val jackson = "2.13.0"
-    const val ktor = "1.6.5"
+    const val ktor = "1.6.6"
     const val kluent = "1.68"
     const val logback = "1.2.7"
     const val logstashEncoder = "7.0.1"
