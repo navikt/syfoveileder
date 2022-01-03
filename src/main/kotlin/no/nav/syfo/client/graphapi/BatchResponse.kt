@@ -29,12 +29,12 @@ data class GetUsersResponse(
 data class AADVeileder(
     val givenName: String,
     val surname: String,
-    val mailNickname: String,
+    val onPremisesSamAccountName: String,
 )
 
 fun AADVeileder.toVeileder() =
     Veileder(
         fornavn = givenName,
         etternavn = surname,
-        ident = mailNickname,
+        ident = onPremisesSamAccountName,
     )

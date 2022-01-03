@@ -16,7 +16,7 @@ fun generateGraphapiUserResponse() =
             GraphApiUser(
                 givenName = "Given",
                 surname = "Surname",
-                mailNickname = VEILEDER_IDENT,
+                onPremisesSamAccountName = VEILEDER_IDENT,
                 mail = "give.surname@nav.no",
                 businessPhones = emptyList(),
             )
@@ -33,7 +33,7 @@ fun generateGraphapiUserListResponse() =
                         AADVeileder(
                             givenName = "Given",
                             surname = "Surname",
-                            mailNickname = VEILEDER_IDENT,
+                            onPremisesSamAccountName = VEILEDER_IDENT,
                         ),
                     ),
                 ),

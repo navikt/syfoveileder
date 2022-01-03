@@ -5,7 +5,7 @@ import no.nav.syfo.veileder.VeilederInfo
 data class GraphApiUser(
     val givenName: String,
     val surname: String,
-    val mailNickname: String,
+    val onPremisesSamAccountName: String,
     val mail: String,
     val businessPhones: List<String>?,
 )
