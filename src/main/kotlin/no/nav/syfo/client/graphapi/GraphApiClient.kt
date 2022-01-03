@@ -29,12 +29,13 @@ class GraphApiClient(
         )?.accessToken ?: throw RuntimeException("Failed to request access to Enhet: Failed to get OBO token")
 
         return try {
-            val queryFilter = "startsWith(mailNickname, '$veilederIdent')"
+            val queryFilter = "startsWith(onPremisesSamAccountName, '$veilederIdent')"
             val url =
-                "$baseUrl/v1.0//users?\$filter=$queryFilter&\$select=mailNickname,givenName,surname,mail,businessPhones"
+                "$baseUrl/v1.0/users?\$filter=$queryFilter&\$select=onPremisesSamAccountName,givenName,surname,mail,businessPhones&\$count=true"
 
             val response: GraphApiGetUserResponse = httpClient.get(url) {
                 header(HttpHeaders.Authorization, bearerHeader(oboToken))
+                header("ConsistencyLevel", "eventual")
                 accept(ContentType.Application.Json)
             }
             COUNT_CALL_GRAPHAPI_VEILEDER_SUCCESS.increment()
@@ -65,12 +66,12 @@ class GraphApiClient(
         val url = "$baseUrl/v1.0/\$batch"
 
         val requests = identChunks.mapIndexed { index, idents ->
-            val query = idents.joinToString(separator = " or ") { "startsWith(mailNickname, '${it.appIdent}')" }
+            val query = idents.joinToString(separator = " or ") { "startsWith(onPremisesSamAccountName, '${it.appIdent}')" }
             RequestEntry(
                 id = (index + 1).toString(),
                 method = "GET",
-                url = "/users/?\$filter=$query&\$select=mailNickname,givenName,surname",
-                headers = mapOf("Content-Type" to "application/json")
+                url = "/users?\$filter=$query&\$select=onPremisesSamAccountName,givenName,surname&\$count=true",
+                headers = mapOf("ConsistencyLevel" to "eventual", "Content-Type" to "application/json")
             )
         }
 
