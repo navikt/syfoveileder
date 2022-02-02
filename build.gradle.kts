@@ -11,8 +11,8 @@ object Versions {
     const val logback = "1.2.10"
     const val logstashEncoder = "7.0.1"
     const val mockk = "1.12.2"
-    const val nimbusJoseJwt = "9.15.2"
-    const val micrometerRegistry = "1.8.1"
+    const val nimbusJoseJwt = "9.18"
+    const val micrometerRegistry = "1.8.2"
     const val spek = "2.0.17"
 }
 
