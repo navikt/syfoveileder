@@ -1,6 +1,7 @@
 package no.nav.syfo.client.graphapi
 
-import io.ktor.client.features.*
+import io.ktor.client.call.*
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import net.logstash.logback.argument.StructuredArguments
@@ -30,14 +31,15 @@ class GraphApiClient(
 
         return try {
             val queryFilter = "startsWith(onPremisesSamAccountName, '$veilederIdent')"
+            val queryFilterWhitespaceEncoded = queryFilter.replace(" ", "%20")
             val url =
-                "$baseUrl/v1.0/users?\$filter=$queryFilter&\$select=onPremisesSamAccountName,givenName,surname,mail,businessPhones&\$count=true"
+                "$baseUrl/v1.0/users?\$filter=$queryFilterWhitespaceEncoded&\$select=onPremisesSamAccountName,givenName,surname,mail,businessPhones&\$count=true"
 
             val response: GraphApiGetUserResponse = httpClient.get(url) {
                 header(HttpHeaders.Authorization, bearerHeader(oboToken))
                 header("ConsistencyLevel", "eventual")
                 accept(ContentType.Application.Json)
-            }
+            }.body()
             COUNT_CALL_GRAPHAPI_VEILEDER_SUCCESS.increment()
             response
         } catch (e: ResponseException) {
@@ -66,7 +68,8 @@ class GraphApiClient(
         val url = "$baseUrl/v1.0/\$batch"
 
         val requests = identChunks.mapIndexed { index, idents ->
-            val query = idents.joinToString(separator = " or ") { "startsWith(onPremisesSamAccountName, '${it.appIdent}')" }
+            val query =
+                idents.joinToString(separator = " or ") { "startsWith(onPremisesSamAccountName, '${it.appIdent}')" }
             RequestEntry(
                 id = (index + 1).toString(),
                 method = "GET",
@@ -83,8 +86,8 @@ class GraphApiClient(
                     accept(ContentType.Application.Json)
                     header(HttpHeaders.Authorization, bearerHeader(oboToken))
                     contentType(ContentType.Application.Json)
-                    body = requestBody
-                }
+                    setBody(requestBody)
+                }.body()
                 response.responses
                     .flatMap { batchBody ->
                         batchBody.body.value.map { aadVeileder ->
