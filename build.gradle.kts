@@ -9,15 +9,15 @@ object Versions {
     const val ktor = "1.6.8"
     const val kluent = "1.68"
     const val logback = "1.2.11"
-    const val logstashEncoder = "7.0.1"
+    const val logstashEncoder = "7.1"
     const val mockk = "1.12.3"
     const val nimbusJoseJwt = "9.21"
-    const val micrometerRegistry = "1.8.3"
+    const val micrometerRegistry = "1.8.4"
     const val spek = "2.0.18"
 }
 
 plugins {
-    kotlin("jvm") version "1.6.10"
+    kotlin("jvm") version "1.6.20"
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
 }
