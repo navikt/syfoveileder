@@ -1,6 +1,7 @@
 package no.nav.syfo.client.axsys
 
-import io.ktor.client.features.*
+import io.ktor.client.call.*
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import net.logstash.logback.argument.StructuredArguments
@@ -35,7 +36,7 @@ class AxsysClient(
                 header(NAV_CALL_ID_HEADER, callId)
                 header(NAV_CONSUMER_ID_HEADER, NAV_CONSUMER_APP_ID)
                 accept(ContentType.Application.Json)
-            }
+            }.body()
             COUNT_CALL_AXSYS_VEILEDER_LIST_SUCCESS.increment()
             response
         } catch (e: ResponseException) {
