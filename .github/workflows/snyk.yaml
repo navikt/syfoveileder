@@ -1,5 +1,5 @@
-name: Security 
-on: 
+name: Security
+on:
   push:
     branches:
       - master
