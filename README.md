@@ -31,7 +31,7 @@ In these instances, we log the ident, then we can send it to a grown up, or ask 
 
 ### Requirements
 
-* JDK 11
+* JDK 17
 
 ### Lint (Ktlint)
 ##### Command line
