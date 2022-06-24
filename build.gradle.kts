@@ -5,14 +5,14 @@ group = "no.nav.syfo"
 version = "1.0.0-SNAPSHOT"
 
 object Versions {
-    const val jackson = "2.13.2"
+    const val jackson = "2.13.3"
     const val ktor = "2.0.2"
     const val kluent = "1.68"
     const val logback = "1.2.11"
     const val logstashEncoder = "7.2"
     const val mockk = "1.12.4"
-    const val nimbusJoseJwt = "9.22"
-    const val micrometerRegistry = "1.9.0"
+    const val nimbusJoseJwt = "9.23"
+    const val micrometerRegistry = "1.9.1"
     const val spek = "2.0.18"
 }
 
