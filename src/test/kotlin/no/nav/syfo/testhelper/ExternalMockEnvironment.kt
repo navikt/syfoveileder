@@ -7,18 +7,18 @@ import no.nav.syfo.testhelper.mock.*
 class ExternalMockEnvironment() {
     val applicationState: ApplicationState = testAppState()
     val azureAdMock = AzureAdMock()
-    val isproxyMock = IsproxyMock()
+    val axsysMock = AxsysMock()
     val graphApiMock = GraphApiMock()
 
     val externalApplicationMockMap = hashMapOf(
         azureAdMock.name to azureAdMock.server,
-        isproxyMock.name to isproxyMock.server,
+        axsysMock.name to axsysMock.server,
         graphApiMock.name to graphApiMock.server,
     )
 
     val environment = testEnvironment(
         azureOpenIdTokenEndpoint = azureAdMock.url,
-        isproxyUrl = isproxyMock.url,
+        axsysUrl = axsysMock.url,
         graphapiUrl = graphApiMock.url,
     )
 
