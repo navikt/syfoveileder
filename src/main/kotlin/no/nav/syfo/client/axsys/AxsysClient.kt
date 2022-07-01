@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory
 
 class AxsysClient(
     private val azureAdClient: AzureAdClient,
-    private val baseUrl: String,
+    baseUrl: String,
     private val clientId: String,
 ) {
     private val httpClient = httpClientProxy()
