@@ -50,7 +50,7 @@ spec:
           cluster: prod-fss
     outbound:
       external:
-        - host: "isproxy.prod-fss-pub.nais.io"
+        - host: "axsys.prod-fss-pub.nais.io"
   azure:
     application:
       enabled: true
@@ -61,7 +61,7 @@ spec:
   env:
     - name: GRAPHAPI_URL
       value: https://graph.microsoft.com
-    - name: ISPROXY_CLIENT_ID
-      value: "prod-fss.teamsykefravr.isproxy"
-    - name: ISPROXY_URL
-      value: "https://isproxy.prod-fss-pub.nais.io"
+    - name: AXSYS_CLIENT_ID
+      value: "prod-fss.org.axsys"
+    - name: AXSYS_URL
+      value: "https://axsys.prod-fss-pub.nais.io"

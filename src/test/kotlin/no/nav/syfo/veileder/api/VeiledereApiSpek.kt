@@ -47,7 +47,7 @@ class VeiledereApiSpek : Spek({
 
                 describe("Happy path") {
 
-                    val axsysResponse = externalMockEnvironment.isproxyMock.axsysResponse
+                    val axsysResponse = externalMockEnvironment.axsysMock.axsysResponse
 
                     val graphapiUserResponse = externalMockEnvironment.graphApiMock.graphapiUserResponse.value.first()
 

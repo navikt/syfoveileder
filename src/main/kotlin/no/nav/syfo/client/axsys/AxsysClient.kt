@@ -13,9 +13,11 @@ import org.slf4j.LoggerFactory
 class AxsysClient(
     private val azureAdClient: AzureAdClient,
     private val baseUrl: String,
-    private val isproxyClientId: String,
+    private val clientId: String,
 ) {
     private val httpClient = httpClientProxy()
+
+    private val axsysEnhetUrl: String = "$baseUrl$AXSYS_ENHET_BASE_PATH"
 
     suspend fun veilederList(
         callId: String,
@@ -23,13 +25,13 @@ class AxsysClient(
         token: String,
     ): List<AxsysVeileder> {
         val oboToken = azureAdClient.getOnBehalfOfToken(
-            scopeClientId = isproxyClientId,
+            scopeClientId = clientId,
             token = token,
         )?.accessToken
-            ?: throw RuntimeException("Failed to request list of Veiledere from Isproxy-Axsys: Failed to get system token from AzureAD")
+            ?: throw RuntimeException("Failed to request list of Veiledere from Axsys: Failed to get system token from AzureAD")
 
         return try {
-            val url = "$baseUrl$ISPROXY_AXSYS_VEILEDERE_BASE_PATH/$enhetNr"
+            val url = "$axsysEnhetUrl/$enhetNr$AXSYS_BRUKERE_PATH"
 
             val response: List<AxsysVeileder> = httpClient.get(url) {
                 header(HttpHeaders.Authorization, bearerHeader(oboToken))
@@ -42,7 +44,7 @@ class AxsysClient(
         } catch (e: ResponseException) {
             COUNT_CALL_AXSYS_VEILEDER_LIST_FAIL.increment()
             log.error(
-                "Error while requesting VeilederList from Isproxy-Axsys {}, {}, {}",
+                "Error while requesting VeilederList from Axsys {}, {}, {}",
                 StructuredArguments.keyValue("statusCode", e.response.status.value.toString()),
                 StructuredArguments.keyValue("message", e.message),
                 callIdArgument(callId),
@@ -52,7 +54,8 @@ class AxsysClient(
     }
 
     companion object {
-        const val ISPROXY_AXSYS_VEILEDERE_BASE_PATH = "/api/v1/axsys/veiledere/enhet"
+        const val AXSYS_ENHET_BASE_PATH = "/api/v1/enhet"
+        const val AXSYS_BRUKERE_PATH = "/brukere"
 
         private val log = LoggerFactory.getLogger(AxsysClient::class.java)
     }

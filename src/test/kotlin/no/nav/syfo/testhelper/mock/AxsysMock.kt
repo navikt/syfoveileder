@@ -1,12 +1,13 @@
 package no.nav.syfo.testhelper.mock
 
 import io.ktor.server.application.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import no.nav.syfo.application.api.installContentNegotiation
-import no.nav.syfo.client.axsys.AxsysClient.Companion.ISPROXY_AXSYS_VEILEDERE_BASE_PATH
+import no.nav.syfo.client.axsys.AxsysClient.Companion.AXSYS_BRUKERE_PATH
+import no.nav.syfo.client.axsys.AxsysClient.Companion.AXSYS_ENHET_BASE_PATH
 import no.nav.syfo.client.axsys.AxsysVeileder
 import no.nav.syfo.testhelper.UserConstants.ENHET_NR
 import no.nav.syfo.testhelper.UserConstants.VEILEDER_IDENT
@@ -24,7 +25,7 @@ fun generateAxsysResponse() = listOf(
     ),
 )
 
-class IsproxyMock {
+class AxsysMock {
     private val port = getRandomPort()
     val url = "http://localhost:$port"
 
@@ -40,7 +41,7 @@ class IsproxyMock {
         ) {
             installContentNegotiation()
             routing {
-                get("$ISPROXY_AXSYS_VEILEDERE_BASE_PATH/$ENHET_NR") {
+                get("$AXSYS_ENHET_BASE_PATH/$ENHET_NR$AXSYS_BRUKERE_PATH") {
                     call.respond(axsysResponse)
                 }
             }
