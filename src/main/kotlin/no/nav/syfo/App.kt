@@ -18,29 +18,40 @@ fun main() {
     val applicationState = ApplicationState()
     val environment = Environment()
 
-    val server = embeddedServer(
-        Netty,
-        applicationEngineEnvironment {
-            log = LoggerFactory.getLogger("ktor.application")
-            config = HoconApplicationConfig(ConfigFactory.load())
+    val applicationEngineEnvironment = applicationEngineEnvironment {
+        log = LoggerFactory.getLogger("ktor.application")
+        config = HoconApplicationConfig(ConfigFactory.load())
 
-            connector {
-                port = applicationPort
-            }
-
-            val wellKnownInternalAzureAD = getWellKnown(
-                wellKnownUrl = environment.azureAppWellKnownUrl
-            )
-
-            module {
-                apiModule(
-                    applicationState = applicationState,
-                    environment = environment,
-                    wellKnownInternalAzureAD = wellKnownInternalAzureAD,
-                )
-            }
+        connector {
+            port = applicationPort
         }
-    )
+
+        val wellKnownInternalAzureAD = getWellKnown(
+            wellKnownUrl = environment.azureAppWellKnownUrl
+        )
+
+        module {
+            apiModule(
+                applicationState = applicationState,
+                environment = environment,
+                wellKnownInternalAzureAD = wellKnownInternalAzureAD,
+            )
+        }
+    }
+
+    applicationEngineEnvironment.monitor.subscribe(ApplicationStarted) { application ->
+        applicationState.ready = true
+        application.environment.log.info("Application is ready, running Java VM ${Runtime.version()}")
+    }
+
+    val server = embeddedServer(
+        factory = Netty,
+        environment = applicationEngineEnvironment,
+    ) {
+        connectionGroupSize = 8
+        workerGroupSize = 8
+        callGroupSize = 16
+    }
 
     Runtime.getRuntime().addShutdownHook(
         Thread {
@@ -48,9 +59,5 @@ fun main() {
         }
     )
 
-    server.environment.monitor.subscribe(ApplicationStarted) { application ->
-        applicationState.ready = true
-        application.environment.log.info("Application is ready, running Java VM ${Runtime.version()}")
-    }
     server.start(wait = true)
 }

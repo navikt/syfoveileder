@@ -20,9 +20,8 @@ class VeilederService(
             token = token,
             veilederIdent = veilederIdent,
         ).value.firstOrNull()
-        graphApiUser?.let {
-            return it.toVeilederInfo(veilederIdent)
-        } ?: throw RuntimeException("User was not found in Microsoft Graph for ident$veilederIdent")
+        return graphApiUser?.toVeilederInfo(veilederIdent)
+            ?: throw RuntimeException("User was not found in Microsoft Graph for ident $veilederIdent")
     }
 
     suspend fun getVeiledere(
