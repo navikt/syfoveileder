@@ -35,7 +35,6 @@ spec:
     enabled: true
     path: /prometheus
   ingresses:
-    - "https://syfoveileder.dev.intern.nav.no"
     - "https://syfoveileder.intern.dev.nav.no"
   accessPolicy:
     inbound:
