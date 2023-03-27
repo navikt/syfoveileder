@@ -50,6 +50,7 @@ spec:
           cluster: dev-fss
     outbound:
       external:
+        - host: "graph.microsoft.com"
         - host: "axsys.dev-fss-pub.nais.io"
   azure:
     application:
@@ -61,7 +62,7 @@ spec:
           - "NAVident"
   env:
     - name: GRAPHAPI_URL
-      value: https://graph.microsoft.com
+      value: "https://graph.microsoft.com"
     - name: AXSYS_CLIENT_ID
       value: "dev-fss.org.axsys"
     - name: AXSYS_URL
