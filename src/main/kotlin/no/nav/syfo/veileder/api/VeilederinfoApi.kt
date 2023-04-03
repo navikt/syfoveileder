@@ -7,6 +7,7 @@ import io.ktor.server.routing.*
 import no.nav.syfo.application.api.authentication.getNAVIdentFromToken
 import no.nav.syfo.util.getBearerHeader
 import no.nav.syfo.util.getCallId
+import no.nav.syfo.veileder.GraphApiException
 import no.nav.syfo.veileder.toVeilederinfoDTO
 import no.nav.syfo.veiledernavn.VeilederService
 import org.slf4j.Logger
@@ -40,6 +41,10 @@ fun Route.registrerVeilederinfoApi(
                 val illegalArgumentMessage = "Could not retrieve Veilederinfo for self"
                 log.warn("$illegalArgumentMessage: {}, {}", e.message, callId)
                 call.respond(HttpStatusCode.BadRequest, e.message ?: illegalArgumentMessage)
+            } catch (e: GraphApiException) {
+                val warningMessage = "Could not retrieve Veilederinfo for self"
+                log.warn("$warningMessage: {}, {}", e.message, callId)
+                call.respond(HttpStatusCode.InternalServerError, e.message ?: warningMessage)
             }
         }
 
@@ -62,6 +67,10 @@ fun Route.registrerVeilederinfoApi(
                 val illegalArgumentMessage = "Could not retrieve Veilederinfo for NavIdent"
                 log.warn("$illegalArgumentMessage: {}, {}", e.message, callId)
                 call.respond(HttpStatusCode.BadRequest, e.message ?: illegalArgumentMessage)
+            } catch (e: GraphApiException) {
+                val warningMessage = "Could not retrieve Veilederinfo for NavIdent"
+                log.warn("$warningMessage: {}, {}", e.message, callId)
+                call.respond(HttpStatusCode.InternalServerError, e.message ?: warningMessage)
             }
         }
     }
