@@ -21,7 +21,7 @@ class VeilederService(
             veilederIdent = veilederIdent,
         ).value.firstOrNull()
         return graphApiUser?.toVeilederInfo(veilederIdent)
-            ?: throw RuntimeException("User was not found in Microsoft Graph for ident $veilederIdent")
+            ?: throw GraphApiException("User was not found in Microsoft Graph for ident $veilederIdent")
     }
 
     suspend fun getVeiledere(
