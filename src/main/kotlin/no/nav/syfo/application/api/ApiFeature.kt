@@ -8,6 +8,7 @@ import io.ktor.server.plugins.callid.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
+import io.ktor.util.cio.*
 import io.micrometer.core.instrument.distribution.DistributionStatisticConfig
 import no.nav.syfo.metric.METRICS_REGISTRY
 import no.nav.syfo.util.*
@@ -47,7 +48,11 @@ fun Application.installStatusPages() {
             call.respond(HttpStatusCode.InternalServerError, cause.message ?: "Unknown error")
             val callId = call.getCallId()
             val consumerId = call.getConsumerId()
-            call.application.log.error("Caught exception, callId=$callId, consumerId=$consumerId", cause)
+            if (cause is ChannelWriteException) {
+                call.application.log.warn("Caught exception, callId=$callId, consumerId=$consumerId", cause)
+            } else {
+                call.application.log.error("Caught exception, callId=$callId, consumerId=$consumerId", cause)
+            }
             throw cause
         }
     }
