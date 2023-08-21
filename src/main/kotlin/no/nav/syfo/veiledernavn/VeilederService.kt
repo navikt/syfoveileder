@@ -19,7 +19,7 @@ class VeilederService(
             callId = callId,
             token = token,
             veilederIdent = veilederIdent,
-        ).value.firstOrNull()
+        )
         return graphApiUser?.toVeilederInfo(veilederIdent)
             ?: throw GraphApiException("User was not found in Microsoft Graph for ident $veilederIdent")
     }

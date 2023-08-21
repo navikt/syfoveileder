@@ -25,9 +25,9 @@ class GraphApiClient(
         callId: String,
         veilederIdent: String,
         token: String,
-    ): GraphApiGetUserResponse {
+    ): GraphApiUser? {
         val cacheKey = "graphapi-$veilederIdent"
-        val cachedObject: GraphApiGetUserResponse? = cache.getObject(cacheKey)
+        val cachedObject: GraphApiUser? = cache.getObject(cacheKey)
         return if (cachedObject != null) {
             COUNT_CALL_GRAPHAPI_VEILEDER_CACHE_HIT.increment()
             cachedObject
@@ -49,13 +49,16 @@ class GraphApiClient(
                     accept(ContentType.Application.Json)
                 }.body()
                 COUNT_CALL_GRAPHAPI_VEILEDER_SUCCESS.increment()
-                cache.setObject(
-                    expireSeconds = 3600,
-                    key = cacheKey,
-                    value = response,
-                )
+                val graphAPIUser = response.value.firstOrNull()
+                if (graphAPIUser != null) {
+                    cache.setObject(
+                        expireSeconds = 3600,
+                        key = cacheKey,
+                        value = graphAPIUser,
+                    )
+                }
                 COUNT_CALL_GRAPHAPI_VEILEDER_CACHE_MISS.increment()
-                response
+                graphAPIUser
             } catch (e: ResponseException) {
                 COUNT_CALL_GRAPHAPI_VEILEDER_FAIL.increment()
                 log.error(
@@ -74,7 +77,7 @@ class GraphApiClient(
         callId: String,
         token: String,
     ): List<Veileder> =
-        axsysVeilederlist.map { Pair(it.appIdent, veileder(callId, it.appIdent, token)) }.mapNotNull { it.second.value.firstOrNull()?.toVeileder(it.first) }
+        axsysVeilederlist.map { Pair(it.appIdent, veileder(callId, it.appIdent, token)) }.mapNotNull { it.second?.toVeileder(it.first) }
 
     companion object {
         private val log = LoggerFactory.getLogger(GraphApiClient::class.java)

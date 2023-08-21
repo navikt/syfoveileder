@@ -27,7 +27,7 @@ class AxsysClient(
         token: String,
     ): List<AxsysVeileder> {
         val cacheKey = "veilederlist-$enhetNr"
-        val cachedValue: List<AxsysVeileder>? = cache.getObject(cacheKey)
+        val cachedValue: List<AxsysVeileder>? = cache.getListObject(cacheKey)
         return if (cachedValue != null) {
             COUNT_CALL_AXSYS_VEILEDER_CACHE_HIT.increment()
             cachedValue
