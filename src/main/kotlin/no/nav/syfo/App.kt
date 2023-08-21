@@ -8,8 +8,10 @@ import io.ktor.server.netty.*
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.Environment
 import no.nav.syfo.application.api.apiModule
+import no.nav.syfo.application.cache.RedisStore
 import no.nav.syfo.client.wellknown.getWellKnown
 import org.slf4j.LoggerFactory
+import redis.clients.jedis.*
 import java.util.concurrent.TimeUnit
 
 const val applicationPort = 8080
@@ -17,6 +19,19 @@ const val applicationPort = 8080
 fun main() {
     val applicationState = ApplicationState()
     val environment = Environment()
+
+    val redisConfig = environment.redisConfig
+    val cache = RedisStore(
+        JedisPool(
+            JedisPoolConfig(),
+            HostAndPort(redisConfig.host, redisConfig.port),
+            DefaultJedisClientConfig.builder()
+                .ssl(redisConfig.ssl)
+                .user(redisConfig.redisUsername)
+                .password(redisConfig.redisPassword)
+                .build()
+        )
+    )
 
     val applicationEngineEnvironment = applicationEngineEnvironment {
         log = LoggerFactory.getLogger("ktor.application")
@@ -35,6 +50,7 @@ fun main() {
                 applicationState = applicationState,
                 environment = environment,
                 wellKnownInternalAzureAD = wellKnownInternalAzureAD,
+                cache = cache,
             )
         }
     }

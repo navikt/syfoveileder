@@ -21,16 +21,19 @@ class ExternalMockEnvironment() {
         axsysUrl = axsysMock.url,
         graphapiUrl = graphApiMock.url,
     )
+    val redisServer = testRedis(environment)
 
     val wellKnownInternalAzureAD = wellKnownInternalAzureAD()
 }
 
 fun ExternalMockEnvironment.startExternalMocks() {
     this.externalApplicationMockMap.start()
+    this.redisServer.start()
 }
 
 fun ExternalMockEnvironment.stopExternalMocks() {
     this.externalApplicationMockMap.stop()
+    this.redisServer.stop()
 }
 
 fun HashMap<String, NettyApplicationEngine>.start() {

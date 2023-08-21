@@ -6,6 +6,7 @@ import io.ktor.server.routing.*
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.Environment
 import no.nav.syfo.application.api.authentication.*
+import no.nav.syfo.application.cache.RedisStore
 import no.nav.syfo.client.axsys.AxsysClient
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.graphapi.GraphApiClient
@@ -18,6 +19,7 @@ fun Application.apiModule(
     applicationState: ApplicationState,
     environment: Environment,
     wellKnownInternalAzureAD: WellKnown,
+    cache: RedisStore,
 ) {
     installMetrics()
     installCallId()
@@ -38,15 +40,18 @@ fun Application.apiModule(
         azureAppClientSecret = environment.azureAppClientSecret,
         azureOpenidConfigTokenEndpoint = environment.azureOpenidConfigTokenEndpoint,
         graphApiUrl = environment.graphapiUrl,
+        cache = cache,
     )
     val axsysClient = AxsysClient(
         azureAdClient = azureAdClient,
         baseUrl = environment.axsysUrl,
         clientId = environment.axsysClientId,
+        cache = cache,
     )
     val graphApiClient = GraphApiClient(
         azureAdClient = azureAdClient,
         baseUrl = environment.graphapiUrl,
+        cache = cache,
     )
 
     val veilederService = VeilederService(

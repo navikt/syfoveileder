@@ -1,5 +1,6 @@
 package no.nav.syfo.client.graphapi
 
+import no.nav.syfo.veileder.Veileder
 import no.nav.syfo.veileder.VeilederInfo
 
 data class GraphApiUser(
@@ -21,4 +22,11 @@ fun GraphApiUser.toVeilederInfo(veilederIdent: String) =
         etternavn = this.surname,
         epost = this.mail,
         telefonnummer = this.businessPhones?.firstOrNull(),
+    )
+
+fun GraphApiUser.toVeileder(veilederIdent: String) =
+    Veileder(
+        ident = veilederIdent,
+        fornavn = this.givenName,
+        etternavn = this.surname,
     )

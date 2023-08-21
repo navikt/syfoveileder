@@ -36,7 +36,7 @@ class VeiledereApiSpek : Spek({
                 externalMockEnvironment = externalMockEnvironment,
             )
 
-            describe("Get list of Veiledre for enhetNr=$ENHET_NR") {
+            describe("Get list of Veiledere for enhetNr=$ENHET_NR") {
                 val urlVeiledereEnhetNr = "$apiVeiledereBasePath$apiVeiledereEnhetPath/$ENHET_NR"
 
                 val validTokenVeileder = generateJWT(

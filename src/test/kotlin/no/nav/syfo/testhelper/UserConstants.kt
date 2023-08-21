@@ -5,4 +5,5 @@ object UserConstants {
 
     const val VEILEDER_IDENT = "Z999999"
     const val VEILEDER_IDENT_2 = "Z111111"
+    const val JWT_AZP = "syfomodiaperson"
 }

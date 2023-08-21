@@ -1,6 +1,8 @@
 package no.nav.syfo.application
 
 import io.ktor.server.application.*
+import no.nav.syfo.application.cache.RedisConfig
+import java.net.URI
 
 data class Environment(
     val azureAppClientId: String = getEnvVar("AZURE_APP_CLIENT_ID"),
@@ -11,6 +13,11 @@ data class Environment(
     val axsysClientId: String = getEnvVar("AXSYS_CLIENT_ID"),
     val axsysUrl: String = getEnvVar("AXSYS_URL"),
     val graphapiUrl: String = getEnvVar("GRAPHAPI_URL"),
+    val redisConfig: RedisConfig = RedisConfig(
+        redisUri = URI(getEnvVar("REDIS_URI_SYFOVEILEDER")),
+        redisUsername = getEnvVar("REDIS_USERNAME_SYFOVEILEDER"),
+        redisPassword = getEnvVar("REDIS_PASSWORD_SYFOVEILEDER"),
+    ),
 )
 
 fun getEnvVar(varName: String, defaultValue: String? = null) =

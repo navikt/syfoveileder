@@ -33,6 +33,9 @@ spec:
   prometheus:
     enabled: true
     path: /prometheus
+  redis:
+    - instance: syfoveileder
+      access: readwrite
   ingresses:
     - "https://syfoveileder.intern.nav.no"
   accessPolicy:

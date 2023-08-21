@@ -23,22 +23,9 @@ fun generateGraphapiUserResponse() =
         )
     )
 
-fun generateGraphapiUserListResponse() =
-    BatchResponse(
-        responses = listOf(
-            BatchBody(
-                id = "1",
-                body = GetUsersResponse(
-                    value = listOf(
-                        AADVeileder(
-                            givenName = "Given",
-                            surname = "Surname",
-                            onPremisesSamAccountName = VEILEDER_IDENT,
-                        ),
-                    ),
-                ),
-            ),
-        ),
+fun generateGraphapiUserResponseEmpty() =
+    GraphApiGetUserResponse(
+        value = emptyList()
     )
 
 class GraphApiMock {
@@ -46,7 +33,7 @@ class GraphApiMock {
     val url = "http://localhost:$port"
 
     val graphapiUserResponse = generateGraphapiUserResponse()
-    val graphapiUserListResponse = generateGraphapiUserListResponse()
+    val graphapiUserResponseEmpty = generateGraphapiUserResponseEmpty()
 
     val name = "graphapi"
     val server = mockEregServer()
@@ -59,10 +46,10 @@ class GraphApiMock {
             installContentNegotiation()
             routing {
                 get("/v1.0/*") {
-                    call.respond(graphapiUserResponse)
-                }
-                post("/v1.0/*") {
-                    call.respond(graphapiUserListResponse)
+                    val filter = this.call.request.queryParameters.get("\$filter")
+                    call.respond(
+                        if (filter!!.contains(VEILEDER_IDENT)) graphapiUserResponse else graphapiUserResponseEmpty
+                    )
                 }
             }
         }
