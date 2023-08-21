@@ -77,7 +77,7 @@ class GraphApiClient(
         callId: String,
         token: String,
     ): List<Veileder> =
-        axsysVeilederlist.map { Pair(it.appIdent, veileder(callId, it.appIdent, token)) }.mapNotNull { it.second?.toVeileder(it.first) }
+        axsysVeilederlist.mapNotNull { veileder(callId, it.appIdent, token)?.toVeileder(it.appIdent) }
 
     companion object {
         private val log = LoggerFactory.getLogger(GraphApiClient::class.java)
