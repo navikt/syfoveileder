@@ -7,7 +7,7 @@ data class GraphApiUser(
     val givenName: String,
     val surname: String,
     val onPremisesSamAccountName: String,
-    val mail: String,
+    val mail: String?,
     val businessPhones: List<String>?,
 )
 
@@ -20,7 +20,7 @@ fun GraphApiUser.toVeilederInfo(veilederIdent: String) =
         ident = veilederIdent,
         fornavn = this.givenName,
         etternavn = this.surname,
-        epost = this.mail,
+        epost = this.mail ?: "",
         telefonnummer = this.businessPhones?.firstOrNull(),
     )
 
