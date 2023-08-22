@@ -28,12 +28,31 @@ fun generateGraphapiUserResponseEmpty() =
         value = emptyList()
     )
 
+fun generateGraphapiUserListResponse() =
+    BatchResponse(
+        responses = listOf(
+            BatchBody(
+                id = "1",
+                body = GetUsersResponse(
+                    value = listOf(
+                        AADVeileder(
+                            givenName = "Given",
+                            surname = "Surname",
+                            onPremisesSamAccountName = VEILEDER_IDENT,
+                        ),
+                    ),
+                ),
+            ),
+        ),
+    )
+
 class GraphApiMock {
     private val port = getRandomPort()
     val url = "http://localhost:$port"
 
     val graphapiUserResponse = generateGraphapiUserResponse()
     val graphapiUserResponseEmpty = generateGraphapiUserResponseEmpty()
+    val graphapiUserListResponse = generateGraphapiUserListResponse()
 
     val name = "graphapi"
     val server = mockEregServer()
@@ -50,6 +69,9 @@ class GraphApiMock {
                     call.respond(
                         if (filter!!.contains(VEILEDER_IDENT)) graphapiUserResponse else graphapiUserResponseEmpty
                     )
+                }
+                post("/v1.0/*") {
+                    call.respond(graphapiUserListResponse)
                 }
             }
         }

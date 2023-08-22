@@ -52,7 +52,7 @@ class VeilederinfoApiSpek : Spek({
 
                     val graphapiUserResponse = externalMockEnvironment.graphApiMock.graphapiUserResponse.value[0]
                     val redisCache = externalMockEnvironment.redisCache
-                    val cacheKey = "${GraphApiClient.GRAPH_API_CACHE_PREFIX}$VEILEDER_IDENT"
+                    val cacheKey = "${GraphApiClient.GRAPH_API_CACHE_VEILEDER_PREFIX}$VEILEDER_IDENT"
 
                     it("should return OK if request is successful and graphapi response should be cached") {
                         redisCache.getObject<GraphApiUser>(cacheKey) shouldBeEqualTo null

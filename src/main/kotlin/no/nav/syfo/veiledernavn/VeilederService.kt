@@ -1,5 +1,6 @@
 package no.nav.syfo.veiledernavn
 
+import no.nav.syfo.application.cache.RedisStore
 import no.nav.syfo.client.axsys.*
 import no.nav.syfo.client.graphapi.GraphApiClient
 import no.nav.syfo.client.graphapi.toVeilederInfo
@@ -9,6 +10,7 @@ import org.slf4j.LoggerFactory
 class VeilederService(
     private val axsysClient: AxsysClient,
     private val graphApiClient: GraphApiClient,
+    private val cache: RedisStore,
 ) {
     suspend fun veilederInfo(
         callId: String,
@@ -35,6 +37,7 @@ class VeilederService(
             token = token,
         )
         val graphApiVeiledere = graphApiClient.veilederList(
+            enhetNr = enhetNr,
             axsysVeilederlist = axsysVeilederList,
             callId = callId,
             token = token,

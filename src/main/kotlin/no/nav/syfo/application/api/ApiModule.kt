@@ -57,6 +57,7 @@ fun Application.apiModule(
     val veilederService = VeilederService(
         axsysClient = axsysClient,
         graphApiClient = graphApiClient,
+        cache = cache,
     )
 
     routing {

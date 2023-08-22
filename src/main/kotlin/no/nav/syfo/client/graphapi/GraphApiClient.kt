@@ -26,7 +26,7 @@ class GraphApiClient(
         veilederIdent: String,
         token: String,
     ): GraphApiUser? {
-        val cacheKey = "$GRAPH_API_CACHE_PREFIX$veilederIdent"
+        val cacheKey = "$GRAPH_API_CACHE_VEILEDER_PREFIX$veilederIdent"
         val cachedObject: GraphApiUser? = cache.getObject(cacheKey)
         return if (cachedObject != null) {
             COUNT_CALL_GRAPHAPI_VEILEDER_CACHE_HIT.increment()
@@ -73,14 +73,77 @@ class GraphApiClient(
     }
 
     suspend fun veilederList(
+        enhetNr: String,
         axsysVeilederlist: List<AxsysVeileder>,
         callId: String,
         token: String,
-    ): List<Veileder> =
-        axsysVeilederlist.mapNotNull { veileder(callId, it.appIdent, token)?.toVeileder(it.appIdent) }
+    ): List<Veileder> {
+        val cacheKey = "$GRAPH_API_CACHE_VEILEDER_LISTE_PREFIX$enhetNr"
+        val cachedObject: List<Veileder>? = cache.getListObject(cacheKey)
+        return if (cachedObject != null) {
+            COUNT_CALL_GRAPHAPI_VEILEDER_LIST_CACHE_HIT.increment()
+            cachedObject
+        } else {
+            val oboToken = azureAdClient.getOnBehalfOfToken(
+                scopeClientId = baseUrl,
+                token = token,
+            )?.accessToken ?: throw RuntimeException("Failed to request access to Enhet: Failed to get OBO token")
+
+            val identChunks = axsysVeilederlist.chunked(15)
+            val url = "$baseUrl/v1.0/\$batch"
+
+            val requests = identChunks.mapIndexed { index, idents ->
+                val query =
+                    idents.joinToString(separator = " or ") { "startsWith(onPremisesSamAccountName, '${it.appIdent}')" }
+                RequestEntry(
+                    id = (index + 1).toString(),
+                    method = "GET",
+                    url = "/users?\$filter=$query&\$select=onPremisesSamAccountName,givenName,surname&\$count=true",
+                    headers = mapOf("ConsistencyLevel" to "eventual", "Content-Type" to "application/json")
+                )
+            }
+
+            try {
+                val responseData = requests.chunked(20).flatMap { requestList ->
+                    val requestBody = GraphBatchRequest(requestList)
+
+                    val response: BatchResponse = httpClient.post(url) {
+                        accept(ContentType.Application.Json)
+                        header(HttpHeaders.Authorization, bearerHeader(oboToken))
+                        contentType(ContentType.Application.Json)
+                        setBody(requestBody)
+                    }.body()
+                    response.responses
+                        .flatMap { batchBody ->
+                            batchBody.body.value.map { aadVeileder ->
+                                aadVeileder.toVeileder()
+                            }
+                        }
+                }
+                COUNT_CALL_GRAPHAPI_VEILEDER_LIST_SUCCESS.increment()
+                cache.setObject(
+                    expireSeconds = 3600,
+                    key = cacheKey,
+                    value = responseData,
+                )
+                COUNT_CALL_GRAPHAPI_VEILEDER_LIST_CACHE_MISS.increment()
+                return responseData
+            } catch (e: ResponseException) {
+                log.error(
+                    "Error while requesting VeilederList from GraphApi {}, {}, {}",
+                    StructuredArguments.keyValue("statusCode", e.response.status.value.toString()),
+                    StructuredArguments.keyValue("message", e.message),
+                    callIdArgument(callId),
+                )
+                COUNT_CALL_GRAPHAPI_VEILEDER_LIST_FAIL.increment()
+                throw e
+            }
+        }
+    }
 
     companion object {
-        const val GRAPH_API_CACHE_PREFIX = "graphapiPrefix-"
+        const val GRAPH_API_CACHE_VEILEDER_PREFIX = "graphapiVeileder-"
+        const val GRAPH_API_CACHE_VEILEDER_LISTE_PREFIX = "graphapiVeilederListe-"
         private val log = LoggerFactory.getLogger(GraphApiClient::class.java)
     }
 }
