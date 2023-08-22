@@ -80,7 +80,7 @@ class GraphApiClient(
         axsysVeilederlist.mapNotNull { veileder(callId, it.appIdent, token)?.toVeileder(it.appIdent) }
 
     companion object {
-        const val GRAPH_API_CACHE_PREFIX = "graphapi-"
+        const val GRAPH_API_CACHE_PREFIX = "graphapiPrefix-"
         private val log = LoggerFactory.getLogger(GraphApiClient::class.java)
     }
 }
