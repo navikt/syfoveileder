@@ -1,6 +1,5 @@
 package no.nav.syfo.client.graphapi
 
-import no.nav.syfo.veileder.Veileder
 import no.nav.syfo.veileder.VeilederInfo
 
 data class GraphApiUser(

@@ -1,6 +1,5 @@
 package no.nav.syfo.veiledernavn
 
-import no.nav.syfo.application.cache.RedisStore
 import no.nav.syfo.client.axsys.*
 import no.nav.syfo.client.graphapi.GraphApiClient
 import no.nav.syfo.client.graphapi.toVeilederInfo
