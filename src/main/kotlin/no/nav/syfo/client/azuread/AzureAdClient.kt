@@ -6,6 +6,9 @@ import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import no.nav.syfo.application.api.authentication.getConsumerClientId
+import no.nav.syfo.application.api.authentication.getNAVIdentFromToken
+import no.nav.syfo.application.cache.RedisStore
 import no.nav.syfo.client.httpClientProxy
 import org.slf4j.LoggerFactory
 
@@ -14,6 +17,7 @@ class AzureAdClient(
     private val azureAppClientSecret: String,
     private val azureOpenidConfigTokenEndpoint: String,
     private val graphApiUrl: String,
+    private val cache: RedisStore,
 ) {
     private val httpClient = httpClientProxy()
 
@@ -21,22 +25,41 @@ class AzureAdClient(
         scopeClientId: String,
         token: String,
     ): AzureAdToken? {
-        val scope = if (scopeClientId == graphApiUrl) {
-            "$scopeClientId/.default"
+        val azp = getConsumerClientId(token)
+        val veilederIdent = getNAVIdentFromToken(token)
+        val cacheKey = "$veilederIdent-$azp-$scopeClientId"
+        val cachedOnBehalfOfToken: AzureAdToken? = cache.getObject(cacheKey)
+        return if (cachedOnBehalfOfToken?.isExpired() == false) {
+            COUNT_CALL_AZUREAD_TOKEN_OBO_CACHE_HIT.increment()
+            cachedOnBehalfOfToken
         } else {
-            "api://$scopeClientId/.default"
-        }
-        return getAccessToken(
-            Parameters.build {
-                append("client_id", azureAppClientId)
-                append("client_secret", azureAppClientSecret)
-                append("client_assertion_type", "urn:ietf:params:oauth:grant-type:jwt-bearer")
-                append("grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer")
-                append("assertion", token)
-                append("scope", scope)
-                append("requested_token_use", "on_behalf_of")
+            val scope = if (scopeClientId == graphApiUrl) {
+                "$scopeClientId/.default"
+            } else {
+                "api://$scopeClientId/.default"
             }
-        )?.toAzureAdToken()
+            val azureAdTokenResponse = getAccessToken(
+                Parameters.build {
+                    append("client_id", azureAppClientId)
+                    append("client_secret", azureAppClientSecret)
+                    append("client_assertion_type", "urn:ietf:params:oauth:grant-type:jwt-bearer")
+                    append("grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer")
+                    append("assertion", token)
+                    append("scope", scope)
+                    append("requested_token_use", "on_behalf_of")
+                }
+            )
+            azureAdTokenResponse?.let {
+                it.toAzureAdToken().also { azureAdToken ->
+                    cache.setObject(
+                        expireSeconds = 3600,
+                        key = cacheKey,
+                        value = azureAdToken,
+                    )
+                    COUNT_CALL_AZUREAD_TOKEN_OBO_CACHE_MISS.increment()
+                }
+            }
+        }
     }
 
     private suspend fun getAccessToken(

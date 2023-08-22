@@ -5,12 +5,15 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.http.*
 import io.ktor.http.HttpHeaders.Authorization
 import io.ktor.server.testing.*
+import no.nav.syfo.client.graphapi.GraphApiClient
+import no.nav.syfo.client.graphapi.GraphApiUser
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.UserConstants.VEILEDER_IDENT
 import no.nav.syfo.testhelper.UserConstants.VEILEDER_IDENT_2
 import no.nav.syfo.util.bearerHeader
 import no.nav.syfo.util.configuredJacksonMapper
 import org.amshove.kluent.shouldBeEqualTo
+import org.amshove.kluent.shouldNotBeEqualTo
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 
@@ -48,8 +51,11 @@ class VeilederinfoApiSpek : Spek({
                 describe("Happy path") {
 
                     val graphapiUserResponse = externalMockEnvironment.graphApiMock.graphapiUserResponse.value[0]
+                    val redisCache = externalMockEnvironment.redisCache
+                    val cacheKey = "${GraphApiClient.GRAPH_API_CACHE_VEILEDER_PREFIX}$VEILEDER_IDENT"
 
-                    it("should return OK if request is successful") {
+                    it("should return OK if request is successful and graphapi response should be cached") {
+                        redisCache.getObject<GraphApiUser>(cacheKey) shouldBeEqualTo null
                         with(
                             handleRequest(HttpMethod.Get, urlVeilederinfoSelf) {
                                 addHeader(Authorization, bearerHeader(validTokenVeileder1))
@@ -62,6 +68,7 @@ class VeilederinfoApiSpek : Spek({
                             veilederInfoDTO.fornavn shouldBeEqualTo graphapiUserResponse.givenName
                             veilederInfoDTO.etternavn shouldBeEqualTo graphapiUserResponse.surname
                             veilederInfoDTO.epost shouldBeEqualTo graphapiUserResponse.mail
+                            redisCache.getObject<GraphApiUser>(cacheKey) shouldNotBeEqualTo null
                         }
                     }
                 }

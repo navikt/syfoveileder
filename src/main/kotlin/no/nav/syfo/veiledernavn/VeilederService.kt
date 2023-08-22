@@ -19,7 +19,7 @@ class VeilederService(
             callId = callId,
             token = token,
             veilederIdent = veilederIdent,
-        ).value.firstOrNull()
+        )
         return graphApiUser?.toVeilederInfo(veilederIdent)
             ?: throw GraphApiException("User was not found in Microsoft Graph for ident $veilederIdent")
     }
@@ -35,6 +35,7 @@ class VeilederService(
             token = token,
         )
         val graphApiVeiledere = graphApiClient.veilederList(
+            enhetNr = enhetNr,
             axsysVeilederlist = axsysVeilederList,
             callId = callId,
             token = token,

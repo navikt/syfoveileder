@@ -5,6 +5,7 @@ version = "1.0.0-SNAPSHOT"
 
 object Versions {
     const val jacksonDataType = "2.15.2"
+    const val jedis = "4.4.3"
     const val ktor = "2.3.2"
     const val kluent = "1.73"
     const val logback = "1.4.7"
@@ -12,6 +13,7 @@ object Versions {
     const val mockk = "1.13.5"
     const val nimbusJoseJwt = "9.31"
     const val micrometerRegistry = "1.11.1"
+    const val redisEmbedded = "0.7.3"
     const val spek = "2.0.19"
 }
 
@@ -49,6 +51,10 @@ dependencies {
 
     // (De-)serialization
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${Versions.jacksonDataType}")
+
+    // Cache
+    implementation("redis.clients:jedis:${Versions.jedis}")
+    testImplementation("it.ozimov:embedded-redis:${Versions.redisEmbedded}")
 
     testImplementation("com.nimbusds:nimbus-jose-jwt:${Versions.nimbusJoseJwt}")
     testImplementation("io.ktor:ktor-server-test-host:${Versions.ktor}")
