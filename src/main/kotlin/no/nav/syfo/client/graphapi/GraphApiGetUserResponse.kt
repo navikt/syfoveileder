@@ -23,10 +23,3 @@ fun GraphApiUser.toVeilederInfo(veilederIdent: String) =
         epost = this.mail ?: "",
         telefonnummer = this.businessPhones?.firstOrNull(),
     )
-
-fun GraphApiUser.toVeileder(veilederIdent: String) =
-    Veileder(
-        ident = veilederIdent,
-        fornavn = this.givenName,
-        etternavn = this.surname,
-    )
