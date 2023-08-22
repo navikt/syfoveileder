@@ -14,17 +14,17 @@ const val CALL_AXSYS_VEILEDER_LIST_CACHE_MISS = "${CALL_AXSYS_VEILEDER_LIST_BASE
 
 val COUNT_CALL_AXSYS_VEILEDER_LIST_SUCCESS: Counter = Counter
     .builder(CALL_AXSYS_VEILEDER_LIST_SUCCESS)
-    .description("Counts the number of successful calls to GraphAPI - VeilederList")
+    .description("Counts the number of successful calls to Axsys - VeilederList")
     .register(METRICS_REGISTRY)
 val COUNT_CALL_AXSYS_VEILEDER_LIST_FAIL: Counter = Counter
     .builder(CALL_AXSYS_VEILEDER_LIST_FAIL)
-    .description("Counts the number of failed calls to GraphAPI - VeilederList")
+    .description("Counts the number of failed calls to Axsys - VeilederList")
     .register(METRICS_REGISTRY)
 val COUNT_CALL_AXSYS_VEILEDER_CACHE_HIT: Counter = Counter
     .builder(CALL_AXSYS_VEILEDER_LIST_CACHE_HIT)
-    .description("Counts the number of cache hits GraphAPI - VeilederList")
+    .description("Counts the number of cache hits Axsys - VeilederList")
     .register(METRICS_REGISTRY)
 val COUNT_CALL_AXSYS_VEILEDER_CACHE_MISS: Counter = Counter
     .builder(CALL_AXSYS_VEILEDER_LIST_CACHE_MISS)
-    .description("Counts the number of cache miss GraphAPI - VeilederList")
+    .description("Counts the number of cache miss Axsys - VeilederList")
     .register(METRICS_REGISTRY)

@@ -26,7 +26,7 @@ class AxsysClient(
         enhetNr: String,
         token: String,
     ): List<AxsysVeileder> {
-        val cacheKey = "veilederlist-$enhetNr"
+        val cacheKey = "$AXSYS_CACHE_KEY_PREFIX$enhetNr"
         val cachedValue: List<AxsysVeileder>? = cache.getListObject(cacheKey)
         return if (cachedValue != null) {
             COUNT_CALL_AXSYS_VEILEDER_CACHE_HIT.increment()
@@ -71,6 +71,7 @@ class AxsysClient(
     companion object {
         const val AXSYS_ENHET_BASE_PATH = "/api/v1/enhet"
         const val AXSYS_BRUKERE_PATH = "/brukere"
+        const val AXSYS_CACHE_KEY_PREFIX = "veilederlist-"
 
         private val log = LoggerFactory.getLogger(AxsysClient::class.java)
     }

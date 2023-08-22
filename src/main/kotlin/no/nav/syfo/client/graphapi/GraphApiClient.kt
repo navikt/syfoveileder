@@ -26,7 +26,7 @@ class GraphApiClient(
         veilederIdent: String,
         token: String,
     ): GraphApiUser? {
-        val cacheKey = "graphapi-$veilederIdent"
+        val cacheKey = "$GRAPH_API_CACHE_PREFIX$veilederIdent"
         val cachedObject: GraphApiUser? = cache.getObject(cacheKey)
         return if (cachedObject != null) {
             COUNT_CALL_GRAPHAPI_VEILEDER_CACHE_HIT.increment()
@@ -80,6 +80,7 @@ class GraphApiClient(
         axsysVeilederlist.mapNotNull { veileder(callId, it.appIdent, token)?.toVeileder(it.appIdent) }
 
     companion object {
+        const val GRAPH_API_CACHE_PREFIX = "graphapi-"
         private val log = LoggerFactory.getLogger(GraphApiClient::class.java)
     }
 }

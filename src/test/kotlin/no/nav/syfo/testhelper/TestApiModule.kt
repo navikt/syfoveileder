@@ -20,6 +20,8 @@ fun Application.testApiModule(
         )
     )
 
+    externalMockEnvironment.redisCache = cache
+
     this.apiModule(
         applicationState = externalMockEnvironment.applicationState,
         environment = externalMockEnvironment.environment,

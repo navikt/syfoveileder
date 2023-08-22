@@ -5,12 +5,15 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.http.*
 import io.ktor.http.HttpHeaders.Authorization
 import io.ktor.server.testing.*
+import no.nav.syfo.client.axsys.AxsysClient
+import no.nav.syfo.client.axsys.AxsysVeileder
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.UserConstants.ENHET_NR
 import no.nav.syfo.testhelper.UserConstants.VEILEDER_IDENT
 import no.nav.syfo.util.bearerHeader
 import no.nav.syfo.util.configuredJacksonMapper
 import org.amshove.kluent.shouldBeEqualTo
+import org.amshove.kluent.shouldNotBeEqualTo
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 
@@ -50,8 +53,11 @@ class VeiledereApiSpek : Spek({
                     val axsysResponse = externalMockEnvironment.axsysMock.axsysResponse
 
                     val graphapiUserResponse = externalMockEnvironment.graphApiMock.graphapiUserResponse.value.first()
+                    val redisCache = externalMockEnvironment.redisCache
+                    val cacheKey = "${AxsysClient.AXSYS_CACHE_KEY_PREFIX}$ENHET_NR"
 
-                    it("should return OK if request is successful") {
+                    it("should return OK if request is successful and veilederlist should be cached") {
+                        redisCache.getListObject<AxsysVeileder>(cacheKey) shouldBeEqualTo null
                         with(
                             handleRequest(HttpMethod.Get, urlVeiledereEnhetNr) {
                                 addHeader(Authorization, bearerHeader(validTokenVeileder))
@@ -69,6 +75,7 @@ class VeiledereApiSpek : Spek({
                             veilederDTOList.last().ident shouldBeEqualTo axsysResponse.last().appIdent
                             veilederDTOList.last().fornavn shouldBeEqualTo ""
                             veilederDTOList.last().etternavn shouldBeEqualTo ""
+                            redisCache.getListObject<AxsysVeileder>(cacheKey) shouldNotBeEqualTo null
                         }
                     }
                 }
