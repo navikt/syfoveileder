@@ -11,7 +11,6 @@ import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.httpClientProxy
 import no.nav.syfo.util.bearerHeader
 import no.nav.syfo.util.callIdArgument
-import no.nav.syfo.veileder.Veileder
 import org.slf4j.LoggerFactory
 
 class GraphApiClient(
@@ -77,9 +76,9 @@ class GraphApiClient(
         axsysVeilederlist: List<AxsysVeileder>,
         callId: String,
         token: String,
-    ): List<Veileder> {
+    ): List<GraphApiUser> {
         val cacheKey = "$GRAPH_API_CACHE_VEILEDER_LISTE_PREFIX$enhetNr"
-        val cachedObject: List<Veileder>? = cache.getListObject(cacheKey)
+        val cachedObject: List<GraphApiUser>? = cache.getListObject(cacheKey)
         return if (cachedObject != null) {
             COUNT_CALL_GRAPHAPI_VEILEDER_LIST_CACHE_HIT.increment()
             cachedObject
@@ -98,7 +97,7 @@ class GraphApiClient(
                 RequestEntry(
                     id = (index + 1).toString(),
                     method = "GET",
-                    url = "/users?\$filter=$query&\$select=onPremisesSamAccountName,givenName,surname&\$count=true",
+                    url = "/users?\$filter=$query&\$select=onPremisesSamAccountName,givenName,surname,mail,businessPhones&\$count=true",
                     headers = mapOf("ConsistencyLevel" to "eventual", "Content-Type" to "application/json")
                 )
             }
@@ -113,12 +112,7 @@ class GraphApiClient(
                         contentType(ContentType.Application.Json)
                         setBody(requestBody)
                     }.body()
-                    response.responses
-                        .flatMap { batchBody ->
-                            batchBody.body.value.map { aadVeileder ->
-                                aadVeileder.toVeileder()
-                            }
-                        }
+                    response.responses.flatMap { it.body.value }
                 }
                 COUNT_CALL_GRAPHAPI_VEILEDER_LIST_SUCCESS.increment()
                 cache.setObject(

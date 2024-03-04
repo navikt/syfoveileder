@@ -28,24 +28,24 @@ class VeilederService(
         callId: String,
         enhetNr: String,
         token: String,
-    ): List<Veileder> {
+    ): List<VeilederInfo> {
         val axsysVeilederList = axsysClient.veilederList(
             callId = callId,
             enhetNr = enhetNr,
             token = token,
         )
-        val graphApiVeiledere = graphApiClient.veilederList(
+        val veiledere = graphApiClient.veilederList(
             enhetNr = enhetNr,
             axsysVeilederlist = axsysVeilederList,
             callId = callId,
             token = token,
-        )
+        ).map { it.toVeilederInfo(it.onPremisesSamAccountName) }
 
         val missingInGraphAPI = mutableListOf<String>()
-        val returnList = axsysVeilederList.map { axsysVeileder ->
-            graphApiVeiledere.find { it.ident == axsysVeileder.appIdent } ?: noGraphApiVeileder(
+        val returnList: List<VeilederInfo> = axsysVeilederList.map { axsysVeileder ->
+            veiledere.find { it.ident == axsysVeileder.appIdent } ?: noGraphApiVeileder(
                 axsysVeileder,
-                missingInGraphAPI
+                missingInGraphAPI,
             )
         }
         if (missingInGraphAPI.isNotEmpty()) {
@@ -57,9 +57,9 @@ class VeilederService(
     fun noGraphApiVeileder(
         axsysVeileder: AxsysVeileder,
         missingInGraphAPI: MutableList<String>,
-    ): Veileder {
+    ): VeilederInfo {
         missingInGraphAPI.add(axsysVeileder.appIdent)
-        return axsysVeileder.toVeileder()
+        return axsysVeileder.toVeilederInfo()
     }
 
     companion object {
