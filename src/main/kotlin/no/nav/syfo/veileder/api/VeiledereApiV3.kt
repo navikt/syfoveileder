@@ -4,6 +4,7 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import no.nav.syfo.application.api.authentication.getNAVIdentFromToken
 import no.nav.syfo.util.getBearerHeader
 import no.nav.syfo.util.getCallId
 import no.nav.syfo.veileder.*
@@ -37,6 +38,31 @@ fun Route.registrerVeiledereApiV3(
                 val illegalArgumentMessage = "Could not retrieve VeilederList for enhetNr:"
                 log.warn("$illegalArgumentMessage: {}, {}", e.message, callId)
                 call.respond(HttpStatusCode.BadRequest, e.message ?: illegalArgumentMessage)
+            }
+        }
+
+        get("/veiledere/self") {
+            val callId = getCallId()
+            try {
+                val token = getBearerHeader()
+                    ?: throw IllegalArgumentException("No Authorization header supplied")
+
+                val veilederIdent: String = getNAVIdentFromToken(token = token)
+
+                val veilederinfo = veilederService.veilederInfo(
+                    callId = callId,
+                    token = token,
+                    veilederIdent = veilederIdent,
+                )
+                call.respond<VeilederInfo>(veilederinfo)
+            } catch (e: IllegalArgumentException) {
+                val illegalArgumentMessage = "Could not retrieve Veilederinfo for self"
+                log.warn("$illegalArgumentMessage: {}, {}", e.message, callId)
+                call.respond(HttpStatusCode.BadRequest, e.message ?: illegalArgumentMessage)
+            } catch (e: GraphApiException) {
+                val warningMessage = "Could not retrieve Veilederinfo for self"
+                log.warn("$warningMessage: {}, {}", e.message, callId)
+                call.respond(HttpStatusCode.InternalServerError, e.message ?: warningMessage)
             }
         }
 
