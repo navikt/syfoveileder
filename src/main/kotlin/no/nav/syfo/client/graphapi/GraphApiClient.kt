@@ -137,7 +137,7 @@ class GraphApiClient(
 
     companion object {
         const val GRAPH_API_CACHE_VEILEDER_PREFIX = "graphapiVeileder-"
-        const val GRAPH_API_CACHE_VEILEDER_LISTE_PREFIX = "graphapiVeilederListe-"
+        const val GRAPH_API_CACHE_VEILEDER_LISTE_PREFIX = "graphapiVeiledereFraEnhet-"
         private val log = LoggerFactory.getLogger(GraphApiClient::class.java)
     }
 }
