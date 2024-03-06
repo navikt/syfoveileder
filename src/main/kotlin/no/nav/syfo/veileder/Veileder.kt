@@ -6,16 +6,7 @@ data class Veileder(
     val ident: String,
     val fornavn: String?,
     val etternavn: String?,
-) {
-    companion object {
-        fun fromVeilederInfo(veilederInfo: VeilederInfo): Veileder =
-            Veileder(
-                ident = veilederInfo.ident,
-                fornavn = veilederInfo.fornavn,
-                etternavn = veilederInfo.etternavn,
-            )
-    }
-}
+)
 
 fun List<Veileder>.toVeilederDTOList() = this.map {
     it.toVeilederDTO()

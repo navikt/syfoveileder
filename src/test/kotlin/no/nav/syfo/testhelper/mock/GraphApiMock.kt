@@ -35,12 +35,10 @@ fun generateGraphapiUserListResponse() =
                 id = "1",
                 body = GetUsersResponse(
                     value = listOf(
-                        GraphApiUser(
+                        AADVeileder(
                             givenName = "Given",
                             surname = "Surname",
                             onPremisesSamAccountName = VEILEDER_IDENT,
-                            mail = "give.surname@nav.no",
-                            businessPhones = emptyList(),
                         ),
                     ),
                 ),
