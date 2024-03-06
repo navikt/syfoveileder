@@ -1,15 +1,17 @@
 package no.nav.syfo.client.axsys
 
-import no.nav.syfo.veileder.Veileder
+import no.nav.syfo.veileder.VeilederInfo
 
 data class AxsysVeileder(
     val appIdent: String,
     val historiskIdent: Number,
 )
 
-fun AxsysVeileder.toVeileder() =
-    Veileder(
+fun AxsysVeileder.toVeilederInfo() =
+    VeilederInfo(
+        ident = appIdent,
         fornavn = "",
         etternavn = "",
-        ident = appIdent,
+        epost = "",
+        telefonnummer = "",
     )
