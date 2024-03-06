@@ -1,5 +1,7 @@
 package no.nav.syfo.client.graphapi
 
+import no.nav.syfo.veileder.Veileder
+
 data class GraphBatchRequest(
     val requests: List<RequestEntry>,
 )
@@ -21,5 +23,18 @@ data class BatchBody(
 )
 
 data class GetUsersResponse(
-    val value: List<GraphApiUser>,
+    val value: List<AADVeileder>,
 )
+
+data class AADVeileder(
+    val givenName: String,
+    val surname: String,
+    val onPremisesSamAccountName: String,
+)
+
+fun AADVeileder.toVeileder() =
+    Veileder(
+        fornavn = givenName,
+        etternavn = surname,
+        ident = onPremisesSamAccountName,
+    )

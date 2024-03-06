@@ -12,7 +12,6 @@ import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.graphapi.GraphApiClient
 import no.nav.syfo.client.wellknown.WellKnown
 import no.nav.syfo.veileder.api.registrerVeiledereApi
-import no.nav.syfo.veileder.api.registrerVeiledereApiV3
 import no.nav.syfo.veileder.api.registrerVeilederinfoApi
 import no.nav.syfo.veiledernavn.VeilederService
 
@@ -72,7 +71,6 @@ fun Application.apiModule(
             registrerVeiledereApi(
                 veilederService = veilederService,
             )
-            registrerVeiledereApiV3(veilederService = veilederService)
         }
     }
 }
