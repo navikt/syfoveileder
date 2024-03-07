@@ -1,10 +1,12 @@
 package no.nav.syfo.application.cache
 
+import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import no.nav.syfo.util.configuredJacksonMapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import redis.clients.jedis.JedisPool
 import redis.clients.jedis.exceptions.JedisConnectionException
+import java.lang.Exception
 
 class RedisStore(private val jedisPool: JedisPool) {
 
@@ -35,6 +37,12 @@ class RedisStore(private val jedisPool: JedisPool) {
             jedisPool.resource.use { jedis -> return jedis.get(key) }
         } catch (e: JedisConnectionException) {
             log.warn("Got connection error when fetching from redis! Continuing without cached value", e)
+            return null
+        } catch (e: MismatchedInputException) {
+            log.error("Got deserialization error when fetching from redis! Continuing without cached value", e)
+            return null
+        } catch (e: Exception) {
+            log.error("Got error when fetching from redis! Continuing without cached value", e)
             return null
         }
     }

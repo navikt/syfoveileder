@@ -77,7 +77,7 @@ class GraphApiClient(
         callId: String,
         token: String,
     ): List<GraphApiUser> {
-        val cacheKey = "$GRAPH_API_CACHE_VEILEDER_LISTE_PREFIX$enhetNr"
+        val cacheKey = "$GRAPH_API_CACHE_VEILEDERE_FRA_ENHET_PREFIX$enhetNr"
         val cachedObject: List<GraphApiUser>? = cache.getListObject(cacheKey)
         return if (cachedObject != null) {
             COUNT_CALL_GRAPHAPI_VEILEDER_LIST_CACHE_HIT.increment()
@@ -137,7 +137,7 @@ class GraphApiClient(
 
     companion object {
         const val GRAPH_API_CACHE_VEILEDER_PREFIX = "graphapiVeileder-"
-        const val GRAPH_API_CACHE_VEILEDER_LISTE_PREFIX = "graphapiVeiledereFraEnhet-"
+        const val GRAPH_API_CACHE_VEILEDERE_FRA_ENHET_PREFIX = "graphapiVeiledereFraEnhet-"
         private val log = LoggerFactory.getLogger(GraphApiClient::class.java)
     }
 }
