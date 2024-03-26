@@ -62,6 +62,10 @@ spec:
       claims:
         extra:
           - "NAVident"
+  observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
   env:
     - name: GRAPHAPI_URL
       value: "https://graph.microsoft.com"
