@@ -54,7 +54,7 @@ class VeilederService(
         return returnList
     }
 
-    fun noGraphApiVeileder(
+    private fun noGraphApiVeileder(
         axsysVeileder: AxsysVeileder,
         missingInGraphAPI: MutableList<String>,
     ): VeilederInfo {
