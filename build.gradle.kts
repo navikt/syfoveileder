@@ -11,7 +11,7 @@ object Versions {
     const val kluent = "1.73"
     const val logback = "1.4.14"
     const val logstashEncoder = "7.4"
-    const val mockk = "1.13.8"
+    const val mockk = "1.13.12"
     const val nimbusJoseJwt = "9.37.2"
     const val micrometerRegistry = "1.12.0"
     const val redisEmbedded = "0.7.3"
@@ -19,7 +19,7 @@ object Versions {
 }
 
 plugins {
-    kotlin("jvm") version "1.9.22"
+    kotlin("jvm") version "2.0.10"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("org.jlleitschuh.gradle.ktlint") version "11.4.2"
 }
@@ -71,7 +71,7 @@ dependencies {
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
 }
 
 tasks {
