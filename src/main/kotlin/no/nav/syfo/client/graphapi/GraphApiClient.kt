@@ -51,7 +51,7 @@ class GraphApiClient(
                 val graphAPIUser = response.value.firstOrNull()
                 if (graphAPIUser != null) {
                     cache.setObject(
-                        expireSeconds = 3600,
+                        expireSeconds = CACHE_EXPIRATION_SECONDS,
                         key = cacheKey,
                         value = graphAPIUser,
                     )
@@ -116,7 +116,7 @@ class GraphApiClient(
                 }
                 COUNT_CALL_GRAPHAPI_VEILEDER_LIST_SUCCESS.increment()
                 cache.setObject(
-                    expireSeconds = 3600,
+                    expireSeconds = CACHE_EXPIRATION_SECONDS,
                     key = cacheKey,
                     value = responseData,
                 )
@@ -138,6 +138,8 @@ class GraphApiClient(
     companion object {
         const val GRAPH_API_CACHE_VEILEDER_PREFIX = "graphapiVeileder-"
         const val GRAPH_API_CACHE_VEILEDERE_FRA_ENHET_PREFIX = "graphapiVeiledereFraEnhet-"
+
+        private const val CACHE_EXPIRATION_SECONDS = (60 * 60 * 12).toLong()
         private val log = LoggerFactory.getLogger(GraphApiClient::class.java)
     }
 }
