@@ -14,9 +14,10 @@ data class Environment(
     val axsysUrl: String = getEnvVar("AXSYS_URL"),
     val graphapiUrl: String = getEnvVar("GRAPHAPI_URL"),
     val redisConfig: RedisConfig = RedisConfig(
-        redisUri = URI(getEnvVar("REDIS_URI_SYFOVEILEDER")),
-        redisUsername = getEnvVar("REDIS_USERNAME_SYFOVEILEDER"),
-        redisPassword = getEnvVar("REDIS_PASSWORD_SYFOVEILEDER"),
+        redisUri = URI(getEnvVar("REDIS_URI_CACHE")),
+        redisDB = 24, // se https://github.com/navikt/istilgangskontroll/blob/master/README.md
+        redisUsername = getEnvVar("REDIS_USERNAME_CACHE"),
+        redisPassword = getEnvVar("REDIS_PASSWORD_CACHE"),
     ),
 )
 

@@ -34,7 +34,7 @@ spec:
     enabled: true
     path: /prometheus
   redis:
-    - instance: syfoveileder
+    - instance: cache
       access: readwrite
   ingresses:
     - "https://syfoveileder.intern.nav.no"
