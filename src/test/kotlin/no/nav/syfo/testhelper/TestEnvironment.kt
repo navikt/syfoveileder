@@ -20,6 +20,7 @@ fun testEnvironment(
     graphapiUrl = graphapiUrl,
     redisConfig = RedisConfig(
         redisUri = URI("http://localhost:6379"),
+        redisDB = 0,
         redisUsername = "redisUser",
         redisPassword = "redisPassword",
         ssl = false,

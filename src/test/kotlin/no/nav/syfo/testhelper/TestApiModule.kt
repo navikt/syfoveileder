@@ -16,6 +16,7 @@ fun Application.testApiModule(
             DefaultJedisClientConfig.builder()
                 .ssl(redisConfig.ssl)
                 .password(redisConfig.redisPassword)
+                .database(redisConfig.redisDB)
                 .build()
         )
     )

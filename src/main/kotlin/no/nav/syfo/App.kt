@@ -29,6 +29,7 @@ fun main() {
                 .ssl(redisConfig.ssl)
                 .user(redisConfig.redisUsername)
                 .password(redisConfig.redisPassword)
+                .database(redisConfig.redisDB)
                 .build()
         )
     )
