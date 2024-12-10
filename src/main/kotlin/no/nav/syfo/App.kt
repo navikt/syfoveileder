@@ -9,7 +9,11 @@ import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.Environment
 import no.nav.syfo.application.api.apiModule
 import no.nav.syfo.application.cache.RedisStore
+import no.nav.syfo.client.axsys.AxsysClient
+import no.nav.syfo.client.azuread.AzureAdClient
+import no.nav.syfo.client.graphapi.GraphApiClient
 import no.nav.syfo.client.wellknown.getWellKnown
+import no.nav.syfo.veiledernavn.VeilederService
 import org.slf4j.LoggerFactory
 import redis.clients.jedis.*
 import java.util.concurrent.TimeUnit
@@ -33,6 +37,29 @@ fun main() {
                 .build()
         )
     )
+    val azureAdClient = AzureAdClient(
+        azureAppClientId = environment.azureAppClientId,
+        azureAppClientSecret = environment.azureAppClientSecret,
+        azureOpenidConfigTokenEndpoint = environment.azureOpenidConfigTokenEndpoint,
+        graphApiUrl = environment.graphapiUrl,
+        cache = cache,
+    )
+    val axsysClient = AxsysClient(
+        azureAdClient = azureAdClient,
+        baseUrl = environment.axsysUrl,
+        clientId = environment.axsysClientId,
+        cache = cache,
+    )
+    val graphApiClient = GraphApiClient(
+        azureAdClient = azureAdClient,
+        baseUrl = environment.graphapiUrl,
+        cache = cache,
+    )
+
+    val veilederService = VeilederService(
+        axsysClient = axsysClient,
+        graphApiClient = graphApiClient,
+    )
 
     val applicationEngineEnvironment = applicationEngineEnvironment {
         log = LoggerFactory.getLogger("ktor.application")
@@ -51,7 +78,7 @@ fun main() {
                 applicationState = applicationState,
                 environment = environment,
                 wellKnownInternalAzureAD = wellKnownInternalAzureAD,
-                cache = cache,
+                veilederService = veilederService,
             )
         }
     }

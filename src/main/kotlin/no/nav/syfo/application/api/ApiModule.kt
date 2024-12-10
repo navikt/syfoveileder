@@ -5,11 +5,9 @@ import io.ktor.server.auth.*
 import io.ktor.server.routing.*
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.Environment
-import no.nav.syfo.application.api.authentication.*
-import no.nav.syfo.application.cache.RedisStore
-import no.nav.syfo.client.axsys.AxsysClient
-import no.nav.syfo.client.azuread.AzureAdClient
-import no.nav.syfo.client.graphapi.GraphApiClient
+import no.nav.syfo.application.api.authentication.JwtIssuer
+import no.nav.syfo.application.api.authentication.JwtIssuerType
+import no.nav.syfo.application.api.authentication.installJwtAuthentication
 import no.nav.syfo.client.wellknown.WellKnown
 import no.nav.syfo.veileder.api.registrerVeiledereApi
 import no.nav.syfo.veiledernavn.VeilederService
@@ -18,7 +16,7 @@ fun Application.apiModule(
     applicationState: ApplicationState,
     environment: Environment,
     wellKnownInternalAzureAD: WellKnown,
-    cache: RedisStore,
+    veilederService: VeilederService,
 ) {
     installMetrics()
     installCallId()
@@ -33,30 +31,6 @@ fun Application.apiModule(
         ),
     )
     installStatusPages()
-
-    val azureAdClient = AzureAdClient(
-        azureAppClientId = environment.azureAppClientId,
-        azureAppClientSecret = environment.azureAppClientSecret,
-        azureOpenidConfigTokenEndpoint = environment.azureOpenidConfigTokenEndpoint,
-        graphApiUrl = environment.graphapiUrl,
-        cache = cache,
-    )
-    val axsysClient = AxsysClient(
-        azureAdClient = azureAdClient,
-        baseUrl = environment.axsysUrl,
-        clientId = environment.axsysClientId,
-        cache = cache,
-    )
-    val graphApiClient = GraphApiClient(
-        azureAdClient = azureAdClient,
-        baseUrl = environment.graphapiUrl,
-        cache = cache,
-    )
-
-    val veilederService = VeilederService(
-        axsysClient = axsysClient,
-        graphApiClient = graphApiClient,
-    )
 
     routing {
         registerPodApi(

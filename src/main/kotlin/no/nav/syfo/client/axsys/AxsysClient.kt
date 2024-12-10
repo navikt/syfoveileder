@@ -1,5 +1,6 @@
 package no.nav.syfo.client.axsys
 
+import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
@@ -16,8 +17,8 @@ class AxsysClient(
     baseUrl: String,
     private val clientId: String,
     private val cache: RedisStore,
+    private val httpClient: HttpClient = httpClientProxy(),
 ) {
-    private val httpClient = httpClientProxy()
 
     private val axsysEnhetUrl: String = "$baseUrl$AXSYS_ENHET_BASE_PATH"
 

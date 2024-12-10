@@ -9,6 +9,8 @@ import no.nav.syfo.client.axsys.AxsysVeileder
 import no.nav.syfo.client.graphapi.GraphApiClient
 import no.nav.syfo.client.graphapi.GraphApiUser
 import no.nav.syfo.testhelper.*
+import no.nav.syfo.testhelper.mock.generateAxsysResponse
+import no.nav.syfo.testhelper.mock.graphapiUserResponse
 import no.nav.syfo.util.bearerHeader
 import no.nav.syfo.util.configuredJacksonMapper
 import no.nav.syfo.veileder.VeilederInfo
@@ -52,7 +54,7 @@ class VeiledereApiSpek : Spek({
 
                 describe("Happy path") {
 
-                    val graphapiUserResponse = externalMockEnvironment.graphApiMock.graphapiUserResponse.value[0]
+                    val graphapiUserResponse = graphapiUserResponse.value[0]
                     val redisCache = externalMockEnvironment.redisCache
                     val cacheKey = "${GraphApiClient.GRAPH_API_CACHE_VEILEDER_PREFIX}${UserConstants.VEILEDER_IDENT}"
 
@@ -96,7 +98,7 @@ class VeiledereApiSpek : Spek({
 
                 describe("Happy path") {
 
-                    val graphapiUserResponse = externalMockEnvironment.graphApiMock.graphapiUserResponse.value[0]
+                    val graphapiUserResponse = graphapiUserResponse.value[0]
 
                     it("should return OK if request is successful") {
                         with(
@@ -136,9 +138,9 @@ class VeiledereApiSpek : Spek({
 
                 describe("Happy path") {
 
-                    val axsysResponse = externalMockEnvironment.axsysMock.axsysResponse
+                    val axsysResponse = generateAxsysResponse()
 
-                    val graphapiUserResponse = externalMockEnvironment.graphApiMock.graphapiUserResponse.value.first()
+                    val graphapiUserResponse = graphapiUserResponse.value.first()
                     val redisCache = externalMockEnvironment.redisCache
                     val cacheKey = "${AxsysClient.AXSYS_CACHE_KEY_PREFIX}${UserConstants.ENHET_NR}"
 
