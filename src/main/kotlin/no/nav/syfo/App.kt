@@ -61,41 +61,37 @@ fun main() {
         graphApiClient = graphApiClient,
     )
 
-    val applicationEngineEnvironment = applicationEngineEnvironment {
+    val applicationEngineEnvironment = applicationEnvironment {
         log = LoggerFactory.getLogger("ktor.application")
         config = HoconApplicationConfig(ConfigFactory.load())
-
-        connector {
-            port = applicationPort
-        }
-
-        val wellKnownInternalAzureAD = getWellKnown(
-            wellKnownUrl = environment.azureAppWellKnownUrl
-        )
-
-        module {
+    }
+    val server = embeddedServer(
+        factory = Netty,
+        environment = applicationEngineEnvironment,
+        configure = {
+            connector {
+                port = applicationPort
+            }
+            connectionGroupSize = 8
+            workerGroupSize = 8
+            callGroupSize = 16
+        },
+        module = {
+            val wellKnownInternalAzureAD = getWellKnown(
+                wellKnownUrl = environment.azureAppWellKnownUrl
+            )
             apiModule(
                 applicationState = applicationState,
                 environment = environment,
                 wellKnownInternalAzureAD = wellKnownInternalAzureAD,
                 veilederService = veilederService,
             )
+            monitor.subscribe(ApplicationStarted) { application ->
+                applicationState.ready = true
+                application.environment.log.info("Application is ready, running Java VM ${Runtime.version()}")
+            }
         }
-    }
-
-    applicationEngineEnvironment.monitor.subscribe(ApplicationStarted) { application ->
-        applicationState.ready = true
-        application.environment.log.info("Application is ready, running Java VM ${Runtime.version()}")
-    }
-
-    val server = embeddedServer(
-        factory = Netty,
-        environment = applicationEngineEnvironment,
-    ) {
-        connectionGroupSize = 8
-        workerGroupSize = 8
-        callGroupSize = 16
-    }
+    )
 
     Runtime.getRuntime().addShutdownHook(
         Thread {
