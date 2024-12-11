@@ -1,5 +1,6 @@
 package no.nav.syfo.client.graphapi
 
+import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
@@ -17,8 +18,8 @@ class GraphApiClient(
     private val azureAdClient: AzureAdClient,
     private val baseUrl: String,
     private val cache: RedisStore,
+    private val httpClient: HttpClient = httpClientProxy(),
 ) {
-    private val httpClient = httpClientProxy()
 
     suspend fun veileder(
         callId: String,

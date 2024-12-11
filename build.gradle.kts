@@ -4,7 +4,7 @@ version = "1.0.0-SNAPSHOT"
 val jacksonDataTypeVersion = "2.17.2"
 val jedisVersion = "5.1.0"
 val jsonVersion = "20231013"
-val ktorVersion = "2.3.12"
+val ktorVersion = "3.0.2"
 val kluentVersion = "1.73"
 val logbackVersion = "1.5.7"
 val logstashEncoderVersion = "7.4"
@@ -57,6 +57,7 @@ dependencies {
     testImplementation("com.nimbusds:nimbus-jose-jwt:$nimbusJoseJwtVersion")
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
+    testImplementation("io.ktor:ktor-client-mock:$ktorVersion")
     testImplementation("org.amshove.kluent:kluent:$kluentVersion")
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spekVersion") {
         exclude(group = "org.jetbrains.kotlin")
