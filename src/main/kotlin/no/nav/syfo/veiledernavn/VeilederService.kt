@@ -20,6 +20,9 @@ class VeilederService(
             token = token,
             veilederIdent = veilederIdent,
         )
+        if (graphApiUser?.accountEnabled == false) {
+            log.warn("Veileder with ident $veilederIdent is not enabled in Microsoft Graph")
+        }
         return graphApiUser?.toVeilederInfo(veilederIdent)
             ?: throw GraphApiException("User was not found in Microsoft Graph for ident $veilederIdent")
     }
@@ -34,12 +37,17 @@ class VeilederService(
             enhetNr = enhetNr,
             token = token,
         )
-        val veiledere = graphApiClient.veilederList(
+        val graphApiUsers = graphApiClient.veilederList(
             enhetNr = enhetNr,
             axsysVeilederlist = axsysVeilederList,
             callId = callId,
             token = token,
-        ).map { it.toVeilederInfo(it.onPremisesSamAccountName) }
+        )
+        val usersNotEnabled = graphApiUsers.filter { it.accountEnabled == false }.map { it.onPremisesSamAccountName }
+        if (usersNotEnabled.isNotEmpty()) {
+            log.warn("Fant ${usersNotEnabled.size} veiledere i Microsoft Graph som er disabled. Identer: ${usersNotEnabled.joinToString()}")
+        }
+        val veiledere = graphApiUsers.map { it.toVeilederInfo(it.onPremisesSamAccountName) }
 
         val missingInGraphAPI = mutableListOf<String>()
         val returnList: List<VeilederInfo> = axsysVeilederList.map { axsysVeileder ->

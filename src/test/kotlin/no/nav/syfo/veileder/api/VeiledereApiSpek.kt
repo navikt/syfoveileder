@@ -126,6 +126,23 @@ class VeiledereApiSpek : Spek({
                         veilederInfoDTO.epost shouldBeEqualTo graphapiUserResponse.mail
                     }
                 }
+
+                it("should return OK for veileder not enabled in graph api") {
+                    testApplication {
+                        val client = setupApiAndClient()
+                        val response = client.get("$basePath/${UserConstants.VEILEDER_IDENT_2}") {
+                            bearerAuth(validTokenVeileder2)
+                        }
+
+                        response.status shouldBeEqualTo HttpStatusCode.OK
+                        val veilederInfoDTO = response.body<VeilederInfo>()
+
+                        veilederInfoDTO.ident shouldBeEqualTo UserConstants.VEILEDER_IDENT_2
+                        veilederInfoDTO.fornavn shouldBeEqualTo graphapiUserResponse.givenName
+                        veilederInfoDTO.etternavn shouldBeEqualTo graphapiUserResponse.surname
+                        veilederInfoDTO.epost shouldBeEqualTo graphapiUserResponse.mail
+                    }
+                }
             }
             describe("Unhappy paths") {
                 it("should return status Unauthorized if no token is supplied") {

@@ -41,7 +41,7 @@ class GraphApiClient(
                 val queryFilter = "startsWith(onPremisesSamAccountName, '$veilederIdent')"
                 val queryFilterWhitespaceEncoded = queryFilter.replace(" ", "%20")
                 val url =
-                    "$baseUrl/v1.0/users?\$filter=$queryFilterWhitespaceEncoded&\$select=onPremisesSamAccountName,givenName,surname,mail,businessPhones&\$count=true"
+                    "$baseUrl/v1.0/users?\$filter=$queryFilterWhitespaceEncoded&\$select=onPremisesSamAccountName,givenName,surname,mail,businessPhones,accountEnabled&\$count=true"
 
                 val response: GraphApiGetUserResponse = httpClient.get(url) {
                     header(HttpHeaders.Authorization, bearerHeader(oboToken))
@@ -98,7 +98,7 @@ class GraphApiClient(
                 RequestEntry(
                     id = (index + 1).toString(),
                     method = "GET",
-                    url = "/users?\$filter=$query&\$select=onPremisesSamAccountName,givenName,surname,mail,businessPhones&\$count=true",
+                    url = "/users?\$filter=$query&\$select=onPremisesSamAccountName,givenName,surname,mail,businessPhones,accountEnabled&\$count=true",
                     headers = mapOf("ConsistencyLevel" to "eventual", "Content-Type" to "application/json")
                 )
             }
