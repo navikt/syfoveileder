@@ -1,7 +1,6 @@
 package no.nav.syfo.veileder.api
 
 import io.ktor.http.*
-import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import no.nav.syfo.application.api.authentication.getNAVIdentFromToken
@@ -54,15 +53,13 @@ fun Route.registrerVeiledereApi(
                     token = token,
                     veilederIdent = veilederIdent,
                 )
-                call.respond<VeilederInfo>(veilederinfo)
+                veilederinfo?.let {
+                    call.respond<VeilederInfo>(it)
+                } ?: call.respond(HttpStatusCode.NotFound, "User was not found in Microsoft Graph for ident $veilederIdent")
             } catch (e: IllegalArgumentException) {
                 val illegalArgumentMessage = "Could not retrieve Veilederinfo for self"
                 log.warn("$illegalArgumentMessage: {}, {}", e.message, callId)
                 call.respond(HttpStatusCode.BadRequest, e.message ?: illegalArgumentMessage)
-            } catch (e: GraphApiException) {
-                val warningMessage = "Could not retrieve Veilederinfo for self"
-                log.warn("$warningMessage: {}, {}", e.message, callId)
-                call.respond(HttpStatusCode.InternalServerError, e.message ?: warningMessage)
             }
         }
 
@@ -80,15 +77,13 @@ fun Route.registrerVeiledereApi(
                     veilederIdent = veilederIdent,
                     token = token,
                 )
-                call.respond<VeilederInfo>(veilederinfo)
+                veilederinfo?.let {
+                    call.respond<VeilederInfo>(it)
+                } ?: call.respond(HttpStatusCode.NotFound, "User was not found in Microsoft Graph for ident $veilederIdent")
             } catch (e: IllegalArgumentException) {
                 val illegalArgumentMessage = "Could not retrieve Veilederinfo for NavIdent"
                 log.warn("$illegalArgumentMessage: {}, {}", e.message, callId)
                 call.respond(HttpStatusCode.BadRequest, e.message ?: illegalArgumentMessage)
-            } catch (e: GraphApiException) {
-                val warningMessage = "Could not retrieve Veilederinfo for NavIdent"
-                log.warn("$warningMessage: {}, {}", e.message, callId)
-                call.respond(HttpStatusCode.InternalServerError, e.message ?: warningMessage)
             }
         }
     }

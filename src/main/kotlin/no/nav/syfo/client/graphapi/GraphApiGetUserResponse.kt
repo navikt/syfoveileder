@@ -8,7 +8,7 @@ data class GraphApiUser(
     val onPremisesSamAccountName: String,
     val mail: String?,
     val businessPhones: List<String>?,
-    val accountEnabled: Boolean?,
+    val accountEnabled: Boolean,
 )
 
 data class GraphApiGetUserResponse(
@@ -22,4 +22,5 @@ fun GraphApiUser.toVeilederInfo(veilederIdent: String) =
         etternavn = this.surname,
         epost = this.mail ?: "",
         telefonnummer = this.businessPhones?.firstOrNull(),
+        enabled = this.accountEnabled,
     )

@@ -14,7 +14,7 @@ class VeilederService(
         callId: String,
         token: String,
         veilederIdent: String,
-    ): VeilederInfo {
+    ): VeilederInfo? {
         val graphApiUser = graphApiClient.veileder(
             callId = callId,
             token = token,
@@ -24,7 +24,6 @@ class VeilederService(
             log.warn("Veileder with ident $veilederIdent is not enabled in Microsoft Graph")
         }
         return graphApiUser?.toVeilederInfo(veilederIdent)
-            ?: throw GraphApiException("User was not found in Microsoft Graph for ident $veilederIdent")
     }
 
     suspend fun getVeiledere(
@@ -43,7 +42,7 @@ class VeilederService(
             callId = callId,
             token = token,
         )
-        val usersNotEnabled = graphApiUsers.filter { it.accountEnabled == false }.map { it.onPremisesSamAccountName }
+        val usersNotEnabled = graphApiUsers.filter { !it.accountEnabled }.map { it.onPremisesSamAccountName }
         if (usersNotEnabled.isNotEmpty()) {
             log.warn("Fant ${usersNotEnabled.size} veiledere i Microsoft Graph som er disabled. Identer: ${usersNotEnabled.joinToString()}")
         }
