@@ -8,6 +8,7 @@ data class GraphApiUser(
     val onPremisesSamAccountName: String,
     val mail: String?,
     val businessPhones: List<String>?,
+    val accountEnabled: Boolean?,
 )
 
 data class GraphApiGetUserResponse(
