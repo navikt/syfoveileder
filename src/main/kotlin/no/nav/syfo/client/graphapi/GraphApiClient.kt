@@ -29,6 +29,7 @@ class GraphApiClient(
         val systemToken = azureAdClient.getSystemToken(
             scopeClientId = baseUrl,
         )?.accessToken ?: throw RuntimeException("Failed to request access to veileder user in GraphApi: Failed to get system token")
+        log.info("Getting veileder with system token")
 
         try {
             val queryFilter = "startsWith(onPremisesSamAccountName, '$veilederIdent')"
