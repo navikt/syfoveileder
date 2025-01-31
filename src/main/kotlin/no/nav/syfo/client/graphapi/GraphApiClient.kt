@@ -26,8 +26,7 @@ class GraphApiClient(
         veilederIdent: String,
         token: String,
     ): GraphApiUser? {
-        val cacheKey = "$GRAPH_API_CACHE_VEILEDER_PREFIX$veilederIdent"
-        val cachedObject: GraphApiUser? = cache.getObject(cacheKey)
+        val cachedObject: GraphApiUser? = cache.getObject(cacheKey(veilederIdent))
         return if (cachedObject != null) {
             COUNT_CALL_GRAPHAPI_VEILEDER_CACHE_HIT.increment()
             cachedObject
@@ -35,41 +34,66 @@ class GraphApiClient(
             val oboToken = azureAdClient.getOnBehalfOfToken(
                 scopeClientId = baseUrl,
                 token = token,
-            )?.accessToken ?: throw RuntimeException("Failed to request access to Enhet: Failed to get OBO token")
+            )?.accessToken ?: throw RuntimeException("Failed to request access to Veileder in Graph API: Failed to get OBO token")
 
-            try {
-                val queryFilter = "startsWith(onPremisesSamAccountName, '$veilederIdent')"
-                val queryFilterWhitespaceEncoded = queryFilter.replace(" ", "%20")
-                val url =
-                    "$baseUrl/v1.0/users?\$filter=$queryFilterWhitespaceEncoded&\$select=onPremisesSamAccountName,givenName,surname,mail,businessPhones,accountEnabled&\$count=true"
-
-                val response: GraphApiGetUserResponse = httpClient.get(url) {
-                    header(HttpHeaders.Authorization, bearerHeader(oboToken))
-                    header("ConsistencyLevel", "eventual")
-                    accept(ContentType.Application.Json)
-                }.body()
-                COUNT_CALL_GRAPHAPI_VEILEDER_SUCCESS.increment()
-                val graphAPIUser = response.value.firstOrNull()
-                if (graphAPIUser != null) {
-                    cache.setObject(
-                        expireSeconds = CACHE_EXPIRATION_SECONDS,
-                        key = cacheKey,
-                        value = graphAPIUser,
-                    )
-                }
-                COUNT_CALL_GRAPHAPI_VEILEDER_CACHE_MISS.increment()
-                graphAPIUser
-            } catch (e: ResponseException) {
-                COUNT_CALL_GRAPHAPI_VEILEDER_FAIL.increment()
-                log.error(
-                    "Error while requesting Veileder from GraphApi {}, {}, {}",
-                    StructuredArguments.keyValue("statusCode", e.response.status.value.toString()),
-                    StructuredArguments.keyValue("message", e.message),
-                    callIdArgument(callId),
-                )
-                throw e
-            }
+            getVeilederGraphApiUser(veilederIdent = veilederIdent, token = oboToken, callId = callId)
         }
+    }
+
+    suspend fun veilederMedSystemToken(
+        callId: String,
+        token: String,
+        veilederIdent: String,
+    ): GraphApiUser? {
+        val cachedObject: GraphApiUser? = cache.getObject(cacheKey(veilederIdent))
+        return if (cachedObject != null) {
+            COUNT_CALL_GRAPHAPI_VEILEDER_CACHE_HIT.increment()
+            cachedObject
+        } else {
+            val systemToken = azureAdClient.getSystemToken(
+                token = token,
+                scopeClientId = baseUrl,
+            )?.accessToken ?: throw RuntimeException("Failed to request access to Veileder in Graph API: Failed to get system token")
+
+            getVeilederGraphApiUser(veilederIdent = veilederIdent, token = systemToken, callId = callId)
+        }
+    }
+
+    private suspend fun getVeilederGraphApiUser(
+        veilederIdent: String,
+        token: String,
+        callId: String
+    ) = try {
+        val queryFilter = "startsWith(onPremisesSamAccountName, '$veilederIdent')"
+        val queryFilterWhitespaceEncoded = queryFilter.replace(" ", "%20")
+        val url =
+            "$baseUrl/v1.0/users?\$filter=$queryFilterWhitespaceEncoded&\$select=onPremisesSamAccountName,givenName,surname,mail,businessPhones,accountEnabled&\$count=true"
+
+        val response: GraphApiGetUserResponse = httpClient.get(url) {
+            header(HttpHeaders.Authorization, bearerHeader(token))
+            header("ConsistencyLevel", "eventual")
+            accept(ContentType.Application.Json)
+        }.body()
+        COUNT_CALL_GRAPHAPI_VEILEDER_SUCCESS.increment()
+        val graphAPIUser = response.value.firstOrNull()
+        if (graphAPIUser != null) {
+            cache.setObject(
+                expireSeconds = CACHE_EXPIRATION_SECONDS,
+                key = cacheKey(veilederIdent),
+                value = graphAPIUser,
+            )
+        }
+        COUNT_CALL_GRAPHAPI_VEILEDER_CACHE_MISS.increment()
+        graphAPIUser
+    } catch (e: ResponseException) {
+        COUNT_CALL_GRAPHAPI_VEILEDER_FAIL.increment()
+        log.error(
+            "Error while requesting Veileder from GraphApi {}, {}, {}",
+            StructuredArguments.keyValue("statusCode", e.response.status.value.toString()),
+            StructuredArguments.keyValue("message", e.message),
+            callIdArgument(callId),
+        )
+        throw e
     }
 
     suspend fun veilederList(
@@ -142,5 +166,7 @@ class GraphApiClient(
 
         private const val CACHE_EXPIRATION_SECONDS = (60 * 60 * 12).toLong()
         private val log = LoggerFactory.getLogger(GraphApiClient::class.java)
+
+        private fun cacheKey(veilederIdent: String) = "$GRAPH_API_CACHE_VEILEDER_PREFIX$veilederIdent"
     }
 }

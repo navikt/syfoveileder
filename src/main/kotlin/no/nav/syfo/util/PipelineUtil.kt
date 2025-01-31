@@ -3,7 +3,6 @@ package no.nav.syfo.util
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
-import io.ktor.util.pipeline.*
 
 fun RoutingContext.getBearerHeader(): String? {
     return this.call.request.headers[HttpHeaders.Authorization]?.removePrefix("Bearer ")

@@ -1,7 +1,8 @@
 package no.nav.syfo.application
 
-import io.ktor.server.application.*
+import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.syfo.application.cache.RedisConfig
+import no.nav.syfo.util.configuredJacksonMapper
 import java.net.URI
 
 data class Environment(
@@ -9,6 +10,7 @@ data class Environment(
     val azureAppClientSecret: String = getEnvVar("AZURE_APP_CLIENT_SECRET"),
     val azureAppWellKnownUrl: String = getEnvVar("AZURE_APP_WELL_KNOWN_URL"),
     val azureOpenidConfigTokenEndpoint: String = getEnvVar("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"),
+    val preAuthorizedApps: List<PreAuthorizedApp> = configuredJacksonMapper().readValue(getEnvVar("AZURE_APP_PRE_AUTHORIZED_APPS")),
 
     val axsysClientId: String = getEnvVar("AXSYS_CLIENT_ID"),
     val axsysUrl: String = getEnvVar("AXSYS_URL"),
@@ -24,12 +26,12 @@ data class Environment(
 fun getEnvVar(varName: String, defaultValue: String? = null) =
     System.getenv(varName) ?: defaultValue ?: throw RuntimeException("Missing required variable \"$varName\"")
 
-val Application.envKind get() = environment.config.property("ktor.environment").getString()
-
-fun Application.isDev(block: () -> Unit) {
-    if (envKind == "dev") block()
-}
-
-fun Application.isProd(block: () -> Unit) {
-    if (envKind == "production") block()
+data class PreAuthorizedApp(
+    val name: String,
+    val clientId: String
+) {
+    fun getAppnavn(): String {
+        val split = name.split(":")
+        return split[2]
+    }
 }

@@ -34,11 +34,6 @@ class AzureAdClient(
             COUNT_CALL_AZUREAD_TOKEN_OBO_CACHE_HIT.increment()
             cachedOnBehalfOfToken
         } else {
-            val scope = if (scopeClientId == graphApiUrl) {
-                "$scopeClientId/.default"
-            } else {
-                "api://$scopeClientId/.default"
-            }
             val azureAdTokenResponse = getAccessToken(
                 Parameters.build {
                     append("client_id", azureAppClientId)
@@ -46,7 +41,7 @@ class AzureAdClient(
                     append("client_assertion_type", "urn:ietf:params:oauth:grant-type:jwt-bearer")
                     append("grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer")
                     append("assertion", token)
-                    append("scope", scope)
+                    append("scope", scope(scopeClientId))
                     append("requested_token_use", "on_behalf_of")
                 }
             )
@@ -59,6 +54,34 @@ class AzureAdClient(
                     )
                     COUNT_CALL_AZUREAD_TOKEN_OBO_CACHE_MISS.increment()
                 }
+            }
+        }
+    }
+
+    suspend fun getSystemToken(scopeClientId: String, token: String): AzureAdToken? {
+        val azp = getConsumerClientId(token)
+        val cacheKey = "azuread-systemtoken-$azp-$scopeClientId"
+        val cachedSystemToken: AzureAdToken? = cache.getObject(key = cacheKey)
+        return if (cachedSystemToken?.isExpired() == false) {
+            COUNT_CALL_AZUREAD_TOKEN_SYSTEM_CACHE_HIT.increment()
+            cachedSystemToken
+        } else {
+            val azureAdTokenResponse = getAccessToken(
+                formParameters = Parameters.build {
+                    append("client_id", azureAppClientId)
+                    append("client_secret", azureAppClientSecret)
+                    append("grant_type", "client_credentials")
+                    append("scope", scope(scopeClientId))
+                },
+            )
+
+            azureAdTokenResponse?.toAzureAdToken().also { azureAdToken ->
+                cache.setObject(
+                    expireSeconds = 3600,
+                    key = cacheKey,
+                    value = azureAdToken
+                )
+                COUNT_CALL_AZUREAD_TOKEN_SYSTEM_CACHE_MISS.increment()
             }
         }
     }
@@ -88,6 +111,14 @@ class AzureAdClient(
             "Error while requesting AzureAdAccessToken with statusCode=${responseException.response.status.value}",
             responseException
         )
+    }
+
+    private fun scope(scopeClientId: String): String {
+        return if (scopeClientId == graphApiUrl) {
+            "$scopeClientId/.default"
+        } else {
+            "api://$scopeClientId/.default"
+        }
     }
 
     companion object {
