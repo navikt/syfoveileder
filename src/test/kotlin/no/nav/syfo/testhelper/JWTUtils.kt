@@ -24,6 +24,7 @@ fun generateJWT(
     issuer: String,
     navIdent: String? = null,
     subject: String? = null,
+    azp: String? = UserConstants.JWT_AZP,
     expiry: LocalDateTime? = LocalDateTime.now().plusHours(1)
 ): String {
     val now = Date()
@@ -42,7 +43,7 @@ fun generateJWT(
         .withClaim("nbf", now)
         .withClaim("iat", now)
         .withClaim("exp", Date.from(expiry?.atZone(ZoneId.systemDefault())?.toInstant()))
-        .withClaim(JWT_CLAIM_AZP, UserConstants.JWT_AZP)
+        .withClaim(JWT_CLAIM_AZP, azp)
         .withClaim(JWT_CLAIM_NAVIDENT, navIdent)
         .sign(alg)
 }

@@ -9,6 +9,7 @@ import no.nav.syfo.application.api.authentication.JwtIssuer
 import no.nav.syfo.application.api.authentication.JwtIssuerType
 import no.nav.syfo.application.api.authentication.installJwtAuthentication
 import no.nav.syfo.client.wellknown.WellKnown
+import no.nav.syfo.veileder.api.registrerVeilederSystemApi
 import no.nav.syfo.veileder.api.registrerVeiledereApi
 import no.nav.syfo.veiledernavn.VeilederService
 
@@ -39,6 +40,7 @@ fun Application.apiModule(
         registerPrometheusApi()
         authenticate(JwtIssuerType.INTERNAL_AZUREAD.name) {
             registrerVeiledereApi(veilederService = veilederService)
+            registrerVeilederSystemApi(veilederService = veilederService, preAuthorizedApps = environment.preAuthorizedApps)
         }
     }
 }

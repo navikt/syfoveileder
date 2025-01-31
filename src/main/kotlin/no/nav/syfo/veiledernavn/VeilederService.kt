@@ -26,6 +26,16 @@ class VeilederService(
         return graphApiUser?.toVeilederInfo(veilederIdent)
     }
 
+    suspend fun veilederInfoMedSystemToken(
+        callId: String,
+        token: String,
+        veilederIdent: String,
+    ): VeilederInfo? = graphApiClient.veilederMedSystemToken(
+        callId = callId,
+        token = token,
+        veilederIdent = veilederIdent,
+    )?.toVeilederInfo(veilederIdent)
+
     suspend fun getVeiledere(
         callId: String,
         enhetNr: String,

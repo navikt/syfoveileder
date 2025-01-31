@@ -46,14 +46,9 @@ spec:
     inbound:
       rules:
         - application: syfomodiaperson
-          namespace: teamsykefravr
-          cluster: prod-gcp
         - application: syfomoteoversikt
-          namespace: teamsykefravr
-          cluster: prod-gcp
         - application: syfooversikt
-          namespace: teamsykefravr
-          cluster: prod-gcp
+        - application: syfooversiktsrv
     outbound:
       external:
         - host: "graph.microsoft.com"
