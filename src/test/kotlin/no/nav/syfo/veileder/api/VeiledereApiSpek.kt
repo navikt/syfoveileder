@@ -16,8 +16,7 @@ import no.nav.syfo.testhelper.mock.generateAxsysResponse
 import no.nav.syfo.testhelper.mock.graphapiUserResponse
 import no.nav.syfo.util.configure
 import no.nav.syfo.veileder.VeilederInfo
-import org.amshove.kluent.shouldBeEqualTo
-import org.amshove.kluent.shouldNotBeEqualTo
+import org.amshove.kluent.*
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 
@@ -81,6 +80,7 @@ class VeiledereApiSpek : Spek({
                         veilederInfo.fornavn shouldBeEqualTo graphapiUserResponse.givenName
                         veilederInfo.etternavn shouldBeEqualTo graphapiUserResponse.surname
                         veilederInfo.epost shouldBeEqualTo graphapiUserResponse.mail
+                        veilederInfo.enabled shouldBeEqualTo true
                         redisCache.getObject<GraphApiUser>(cacheKey) shouldNotBeEqualTo null
                     }
                 }
@@ -124,6 +124,7 @@ class VeiledereApiSpek : Spek({
                         veilederInfoDTO.fornavn shouldBeEqualTo graphapiUserResponse.givenName
                         veilederInfoDTO.etternavn shouldBeEqualTo graphapiUserResponse.surname
                         veilederInfoDTO.epost shouldBeEqualTo graphapiUserResponse.mail
+                        veilederInfoDTO.enabled shouldBeEqualTo true
                     }
                 }
 
@@ -141,6 +142,7 @@ class VeiledereApiSpek : Spek({
                         veilederInfoDTO.fornavn shouldBeEqualTo graphapiUserResponse.givenName
                         veilederInfoDTO.etternavn shouldBeEqualTo graphapiUserResponse.surname
                         veilederInfoDTO.epost shouldBeEqualTo graphapiUserResponse.mail
+                        veilederInfoDTO.enabled shouldBeEqualTo false
                     }
                 }
             }
@@ -189,10 +191,12 @@ class VeiledereApiSpek : Spek({
                         veilederInfoList.first().ident shouldBeEqualTo axsysResponse.first().appIdent
                         veilederInfoList.first().fornavn shouldBeEqualTo graphapiUserResponse.givenName
                         veilederInfoList.first().etternavn shouldBeEqualTo graphapiUserResponse.surname
+                        veilederInfoList.first().enabled shouldBeEqualTo true
 
                         veilederInfoList.last().ident shouldBeEqualTo axsysResponse.last().appIdent
                         veilederInfoList.last().fornavn shouldBeEqualTo ""
                         veilederInfoList.last().etternavn shouldBeEqualTo ""
+                        veilederInfoList.last().enabled.shouldBeNull()
                         redisCache.getListObject<AxsysVeileder>(cacheKey) shouldNotBeEqualTo null
                     }
                 }

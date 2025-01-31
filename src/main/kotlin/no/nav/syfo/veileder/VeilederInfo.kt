@@ -6,4 +6,5 @@ data class VeilederInfo(
     val etternavn: String,
     val epost: String,
     val telefonnummer: String? = null,
+    val enabled: Boolean? = null,
 )
