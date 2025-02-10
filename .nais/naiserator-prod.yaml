@@ -33,7 +33,7 @@ spec:
   prometheus:
     enabled: true
     path: /prometheus
-  redis:
+  valkey:
     - instance: cache
       access: readwrite
   ingresses:

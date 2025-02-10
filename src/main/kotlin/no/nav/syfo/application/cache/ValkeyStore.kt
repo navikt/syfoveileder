@@ -8,7 +8,7 @@ import redis.clients.jedis.JedisPool
 import redis.clients.jedis.exceptions.JedisConnectionException
 import java.lang.Exception
 
-class RedisStore(private val jedisPool: JedisPool) {
+class ValkeyStore(private val jedisPool: JedisPool) {
 
     private val log: Logger = LoggerFactory.getLogger("no.nav.syfo.application.cache")
     val mapper = configuredJacksonMapper()
@@ -36,13 +36,13 @@ class RedisStore(private val jedisPool: JedisPool) {
         try {
             jedisPool.resource.use { jedis -> return jedis.get(key) }
         } catch (e: JedisConnectionException) {
-            log.warn("Got connection error when fetching from redis! Continuing without cached value", e)
+            log.warn("Got connection error when fetching from valkey! Continuing without cached value", e)
             return null
         } catch (e: MismatchedInputException) {
-            log.error("Got deserialization error when fetching from redis! Continuing without cached value", e)
+            log.error("Got deserialization error when fetching from valkey! Continuing without cached value", e)
             return null
         } catch (e: Exception) {
-            log.error("Got error when fetching from redis! Continuing without cached value", e)
+            log.error("Got error when fetching from valkey! Continuing without cached value", e)
             return null
         }
     }
@@ -61,7 +61,7 @@ class RedisStore(private val jedisPool: JedisPool) {
                 )
             }
         } catch (e: JedisConnectionException) {
-            log.warn("Got connection error when storing in redis! Continue without caching", e)
+            log.warn("Got connection error when storing in valkey! Continue without caching", e)
         }
     }
 }
