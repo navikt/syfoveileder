@@ -6,7 +6,7 @@ import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import net.logstash.logback.argument.StructuredArguments
-import no.nav.syfo.application.cache.RedisStore
+import no.nav.syfo.application.cache.ValkeyStore
 import no.nav.syfo.client.axsys.AxsysVeileder
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.httpClientProxy
@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory
 class GraphApiClient(
     private val azureAdClient: AzureAdClient,
     private val baseUrl: String,
-    private val cache: RedisStore,
+    private val cache: ValkeyStore,
     private val httpClient: HttpClient = httpClientProxy(),
 ) {
 

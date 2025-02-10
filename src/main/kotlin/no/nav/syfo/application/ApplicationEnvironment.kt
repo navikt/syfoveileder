@@ -1,7 +1,7 @@
 package no.nav.syfo.application
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import no.nav.syfo.application.cache.RedisConfig
+import no.nav.syfo.application.cache.ValkeyConfig
 import no.nav.syfo.util.configuredJacksonMapper
 import java.net.URI
 
@@ -15,11 +15,11 @@ data class Environment(
     val axsysClientId: String = getEnvVar("AXSYS_CLIENT_ID"),
     val axsysUrl: String = getEnvVar("AXSYS_URL"),
     val graphapiUrl: String = getEnvVar("GRAPHAPI_URL"),
-    val redisConfig: RedisConfig = RedisConfig(
-        redisUri = URI(getEnvVar("REDIS_URI_CACHE")),
-        redisDB = 24, // se https://github.com/navikt/istilgangskontroll/blob/master/README.md
-        redisUsername = getEnvVar("REDIS_USERNAME_CACHE"),
-        redisPassword = getEnvVar("REDIS_PASSWORD_CACHE"),
+    val valkeyConfig: ValkeyConfig = ValkeyConfig(
+        valkeyUri = URI(getEnvVar("VALKEY_URI_CACHE")),
+        valkeyDB = 24, // se https://github.com/navikt/istilgangskontroll/blob/master/README.md
+        valkeyUsername = getEnvVar("VALKEY_USERNAME_CACHE"),
+        valkeyPassword = getEnvVar("VALKEY_PASSWORD_CACHE"),
     ),
 )
 

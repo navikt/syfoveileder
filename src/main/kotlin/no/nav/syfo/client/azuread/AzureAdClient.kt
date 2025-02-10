@@ -9,7 +9,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import no.nav.syfo.application.api.authentication.getConsumerClientId
 import no.nav.syfo.application.api.authentication.getNAVIdentFromToken
-import no.nav.syfo.application.cache.RedisStore
+import no.nav.syfo.application.cache.ValkeyStore
 import no.nav.syfo.client.httpClientProxy
 import org.slf4j.LoggerFactory
 
@@ -18,7 +18,7 @@ class AzureAdClient(
     private val azureAppClientSecret: String,
     private val azureOpenidConfigTokenEndpoint: String,
     private val graphApiUrl: String,
-    private val cache: RedisStore,
+    private val cache: ValkeyStore,
     private val httpClient: HttpClient = httpClientProxy(),
 ) {
 
