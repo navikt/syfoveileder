@@ -5,6 +5,8 @@ import io.ktor.client.call.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.application.cache.ValkeyStore
 import no.nav.syfo.client.axsys.AxsysVeileder
@@ -13,6 +15,8 @@ import no.nav.syfo.client.httpClientProxy
 import no.nav.syfo.util.bearerHeader
 import no.nav.syfo.util.callIdArgument
 import org.slf4j.LoggerFactory
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 class GraphApiClient(
     private val azureAdClient: AzureAdClient,
@@ -157,6 +161,46 @@ class GraphApiClient(
                 COUNT_CALL_GRAPHAPI_VEILEDER_LIST_FAIL.increment()
                 throw e
             }
+        }
+    }
+
+    suspend fun getVeiledereVedEnhet(
+        enhetNr: String,
+        callId: String,
+        token: String,
+    ): List<User> {
+        val systemToken = azureAdClient.getSystemToken(
+            token = token,
+            scopeClientId = baseUrl,
+        )?.accessToken
+            ?: throw RuntimeException("Failed to request access to Veileder in Graph API: Failed to get system token")
+
+        val filterByEnhetsnavn =
+            withContext(Dispatchers.IO) {
+                URLEncoder.encode("displayName eq '0000-GA-ENHET_$enhetNr'", StandardCharsets.UTF_8.toString())
+            }
+        val base = "/groups?\$count=true"
+        val filter = "\$filter=$filterByEnhetsnavn"
+        val select = "\$select=id,displayName,onPremisesSamAccountName,description"
+        val expand =
+            "\$expand=members(\$select=onPremisesSamAccountName,givenName,surname,mail,businessPhones,accountEnabled)"
+        val url = "$baseUrl/v1.0" + listOf(base, filter, select, expand).joinToString("&")
+
+        return try {
+            val response: UserResponse = httpClient.get(url) {
+                header(HttpHeaders.Authorization, bearerHeader(systemToken))
+                header("ConsistencyLevel", "eventual")
+                accept(ContentType.Application.Json)
+            }.body()
+            response.value.first().members
+        } catch (e: ResponseException) {
+            log.error(
+                "Error while trying to fetch veileder user groups from GraphApi {}, {}, {}",
+                StructuredArguments.keyValue("statusCode", e.response.status.value.toString()),
+                StructuredArguments.keyValue("message", e.message),
+                callIdArgument(callId),
+            )
+            throw e
         }
     }
 
