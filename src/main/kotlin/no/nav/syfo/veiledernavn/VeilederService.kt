@@ -69,12 +69,18 @@ class VeilederService(
             log.warn("Fant ikke navn for ${missingInGraphAPI.size} av ${axsysVeilederList.size} veiledere i graphApi! Feilende identer: ${missingInGraphAPI.joinToString()}")
         }
 
-        // Tiltenkt å erstatte det ovenfor
-        val veilederInfo = graphApiClient.getVeiledereVedEnhet(
+        //TODO: Legge til sammenligning med det ovenfor
+        val veilederInfo = graphApiClient.getGroupsForVeileder(
             enhetNr = enhetNr,
             callId = callId,
             token = token,
-        ).map { it.toVeilederInfo() }
+        ).let { group ->
+            graphApiClient.getVeiledereVedEnhet(
+                group = group,
+                callId = callId,
+                token = token,
+            )
+        }
 
         return returnList
     }

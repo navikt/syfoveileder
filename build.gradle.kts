@@ -39,6 +39,10 @@ dependencies {
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
 
+    implementation("com.microsoft.graph:microsoft-graph:6.42.0")
+    // Include Azure identity for authentication
+    implementation("com.azure:azure-identity:1.+")
+
     // Logging
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
@@ -81,6 +85,7 @@ tasks {
         archiveBaseName.set("app")
         archiveClassifier.set("")
         archiveVersion.set("")
+        isZip64 = true
     }
 
     test {

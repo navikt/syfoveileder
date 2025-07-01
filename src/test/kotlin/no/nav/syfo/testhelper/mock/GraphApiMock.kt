@@ -1,5 +1,9 @@
 package no.nav.syfo.testhelper.mock
 
+import com.microsoft.graph.models.Group
+import com.microsoft.graph.models.GroupCollectionResponse
+import com.microsoft.graph.models.User
+import com.microsoft.graph.models.UserCollectionResponse
 import io.ktor.client.engine.mock.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -54,9 +58,58 @@ fun MockRequestHandleScope.graphApiMockResponse(request: HttpRequestData): HttpR
                 if (filter.contains(VEILEDER_IDENT)) graphapiUserResponse else if (filter.contains(VEILEDER_IDENT_2)) graphapiDisabledUserResponse else generateGraphapiUserResponseEmpty()
             respond(response)
         }
+
         HttpMethod.Post -> {
             respond(generateGraphapiUserListResponse())
         }
+
+        else -> respondBadRequest()
+    }
+}
+
+fun user(): User {
+    val user = User()
+    user.givenName = "Given"
+    user.surname = "Surname"
+    user.onPremisesSamAccountName = VEILEDER_IDENT
+    user.mail = "give.surname@nav.no"
+    // TODO: Add phone
+    user.businessPhones = emptyList()
+    user.accountEnabled = true
+    return user
+}
+
+fun group(): Group {
+    val group = Group()
+    group.id = "123"
+    group.displayName = "Group 123"
+    group.description = "Group 123"
+    group.onPremisesSamAccountName = "GROUP_ID"
+    return group
+}
+
+fun groupCollectionResponse() {
+    val collectionResponse = GroupCollectionResponse()
+    collectionResponse.value = listOf(group())
+    collectionResponse
+}
+
+fun userCollectionResponse() {
+    val collectionResponse = UserCollectionResponse()
+    collectionResponse.value = listOf(user())
+    collectionResponse
+}
+
+fun MockRequestHandleScope.graphApiGrupperMockResponse(request: HttpRequestData): HttpResponseData {
+    return when (request.method) {
+        HttpMethod.Get -> respond(groupCollectionResponse())
+        else -> respondBadRequest()
+    }
+}
+
+fun MockRequestHandleScope.graphApiMeMemberOfMockResponse(request: HttpRequestData): HttpResponseData {
+    return when (request.method) {
+        HttpMethod.Get -> respond(userCollectionResponse())
         else -> respondBadRequest()
     }
 }

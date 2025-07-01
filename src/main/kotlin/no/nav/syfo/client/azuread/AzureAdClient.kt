@@ -1,5 +1,8 @@
 package no.nav.syfo.client.azuread
 
+import com.azure.core.credential.AccessToken
+import com.azure.core.credential.TokenCredential
+import com.microsoft.graph.serviceclient.GraphServiceClient
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
@@ -12,6 +15,8 @@ import no.nav.syfo.application.api.authentication.getNAVIdentFromToken
 import no.nav.syfo.application.cache.ValkeyStore
 import no.nav.syfo.client.httpClientProxy
 import org.slf4j.LoggerFactory
+import reactor.core.publisher.Mono
+import java.time.ZoneOffset
 
 class AzureAdClient(
     private val azureAppClientId: String,
@@ -84,6 +89,19 @@ class AzureAdClient(
                 COUNT_CALL_AZUREAD_TOKEN_SYSTEM_CACHE_MISS.increment()
             }
         }
+    }
+
+    fun createGraphServiceClient(azureAdToken: AzureAdToken): GraphServiceClient {
+        val atOffset = azureAdToken.expires.atOffset(ZoneOffset.UTC)
+        val tokenCredential = TokenCredential(
+            function = {
+                Mono.just(AccessToken(azureAdToken.accessToken, atOffset))
+            }
+        )
+
+        //TODO: Sjekke at scopes blir riktig
+        val scopes = arrayOf("https://graph.microsoft.com/.default")
+        return GraphServiceClient(tokenCredential, scopes.toString())
     }
 
     private suspend fun getAccessToken(

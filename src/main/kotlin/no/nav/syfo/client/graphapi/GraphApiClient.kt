@@ -1,12 +1,14 @@
 package no.nav.syfo.client.graphapi
 
+import com.microsoft.graph.core.tasks.PageIterator
+import com.microsoft.graph.models.DirectoryObjectCollectionResponse
+import com.microsoft.graph.models.Group
+import com.microsoft.graph.models.User
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.application.cache.ValkeyStore
 import no.nav.syfo.client.axsys.AxsysVeileder
@@ -14,9 +16,9 @@ import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.httpClientProxy
 import no.nav.syfo.util.bearerHeader
 import no.nav.syfo.util.callIdArgument
+import no.nav.syfo.veileder.VeilederInfo
 import org.slf4j.LoggerFactory
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
+import java.util.*
 
 class GraphApiClient(
     private val azureAdClient: AzureAdClient,
@@ -38,7 +40,8 @@ class GraphApiClient(
             val oboToken = azureAdClient.getOnBehalfOfToken(
                 scopeClientId = baseUrl,
                 token = token,
-            )?.accessToken ?: throw RuntimeException("Failed to request access to Veileder in Graph API: Failed to get OBO token")
+            )?.accessToken
+                ?: throw RuntimeException("Failed to request access to Veileder in Graph API: Failed to get OBO token")
 
             getVeilederGraphApiUser(veilederIdent = veilederIdent, token = oboToken, callId = callId)
         }
@@ -57,7 +60,8 @@ class GraphApiClient(
             val systemToken = azureAdClient.getSystemToken(
                 token = token,
                 scopeClientId = baseUrl,
-            )?.accessToken ?: throw RuntimeException("Failed to request access to Veileder in Graph API: Failed to get system token")
+            )?.accessToken
+                ?: throw RuntimeException("Failed to request access to Veileder in Graph API: Failed to get system token")
 
             getVeilederGraphApiUser(veilederIdent = veilederIdent, token = systemToken, callId = callId)
         }
@@ -164,38 +168,111 @@ class GraphApiClient(
         }
     }
 
-    suspend fun getVeiledereVedEnhet(
+    suspend fun getGroupsForVeileder(
         enhetNr: String,
         callId: String,
         token: String,
-    ): List<User> {
+    ): Group {
+        val oboToken = azureAdClient.getOnBehalfOfToken(
+            scopeClientId = baseUrl,
+            token = token,
+        )
+            ?: throw RuntimeException("Failed to request list of groups for veileder in Graph API: Failed to get system token from AzureAD")
+
+        val graphServiceClient = azureAdClient.createGraphServiceClient(azureAdToken = oboToken)
+
+        try {
+            val groups = mutableListOf<Group>()
+            // me/memberOf
+            val directoryObjectCollectionResponse = graphServiceClient.me().memberOf().get { requestConfiguration ->
+                requestConfiguration.headers.add("ConsistencyLevel", "eventual")
+                requestConfiguration.queryParameters.select =
+                    arrayOf("id", "displayName", "onPremisesSamAccountName", "description")
+                requestConfiguration.queryParameters.count = true
+            }
+
+            PageIterator.Builder<Group, DirectoryObjectCollectionResponse>()
+                .client(graphServiceClient)
+                .collectionPage(Objects.requireNonNull(directoryObjectCollectionResponse))
+                .collectionPageFactory(DirectoryObjectCollectionResponse::createFromDiscriminatorValue)
+                .processPageItemCallback { group ->
+                    groups.add(group)
+                    true
+                }
+                .build()
+                .iterate()
+
+            if (groups.size != 1) {
+                // TODO: Håndtere feil ved tvetydig eller mangel av gruppe selv om det bør aldri bør skje
+            }
+
+            val gruppenavn = "$ENHETSNAVN_PREFIX$enhetNr"
+            // TODO: Noe håndtering hvis denne ikke finnes? Eller litt verre, om det er to?
+            // TODO: Kan kaste noSuchElementException
+            return groups.first { it.displayName == gruppenavn }
+        } catch (e: ResponseException) {
+            log.error(
+                "Error while requesting VeilederList from GraphApi {}, {}, {}",
+                StructuredArguments.keyValue("statusCode", e.response.status.value.toString()),
+                StructuredArguments.keyValue("message", e.message),
+                callIdArgument(callId),
+            )
+            throw e
+        }
+
+    }
+
+    suspend fun getVeiledereVedEnhet(
+        group: Group,
+        callId: String,
+        token: String,
+    ): List<VeilederInfo> {
         val systemToken = azureAdClient.getSystemToken(
             token = token,
             scopeClientId = baseUrl,
-        )?.accessToken
+        )
             ?: throw RuntimeException("Failed to request access to Veileder in Graph API: Failed to get system token")
 
-        val filterByEnhetsnavn =
-            withContext(Dispatchers.IO) {
-                URLEncoder.encode("displayName eq '0000-GA-ENHET_$enhetNr'", StandardCharsets.UTF_8.toString())
-            }
-        val base = "/groups?\$count=true"
-        val filter = "\$filter=$filterByEnhetsnavn"
-        val select = "\$select=id,displayName,onPremisesSamAccountName,description"
-        val expand =
-            "\$expand=members(\$select=onPremisesSamAccountName,givenName,surname,mail,businessPhones,accountEnabled)"
-        val url = "$baseUrl/v1.0" + listOf(base, filter, select, expand).joinToString("&")
+        val graphServiceClient = azureAdClient.createGraphServiceClient(azureAdToken = systemToken)
 
-        return try {
-            val response: UserResponse = httpClient.get(url) {
-                header(HttpHeaders.Authorization, bearerHeader(systemToken))
-                header("ConsistencyLevel", "eventual")
-                accept(ContentType.Application.Json)
-            }.body()
-            response.value.first().members
+        try {
+            val users = mutableListOf<User>()
+            // /groups/<groupId>/members
+            val directoryObjectCollectionResponse =
+                graphServiceClient.groups().byGroupId(group.id).members().get { requestConfiguration ->
+                    requestConfiguration.headers.add("ConsistencyLevel", "eventual")
+                    requestConfiguration.queryParameters.select =
+                        arrayOf(
+                            "givenName",
+                            "surname",
+                            "mail",
+                            "businessPhones",
+                            "onPremisesSamAccountName",
+                            "accountEnabled"
+                        )
+                    requestConfiguration.queryParameters.count = true
+                    requestConfiguration.queryParameters.filter = "accountEnabled eq true"
+                }
+
+            PageIterator.Builder<User, DirectoryObjectCollectionResponse>()
+                .client(graphServiceClient)
+                .collectionPage(Objects.requireNonNull(directoryObjectCollectionResponse))
+                .collectionPageFactory(DirectoryObjectCollectionResponse::createFromDiscriminatorValue)
+                .processPageItemCallback { user ->
+                    users.add(user)
+                    true
+                }
+                .build()
+                .iterate()
+
+            if (users.size != 1) {
+                // TODO: Håndtere feil ved tvetydig eller mangel av gruppe selv om det bør aldri bør skje
+            }
+
+            return users.map { it.toVeilederInfo() }
         } catch (e: ResponseException) {
             log.error(
-                "Error while trying to fetch veileder user groups from GraphApi {}, {}, {}",
+                "Error while requesting VeilederList from GraphApi {}, {}, {}",
                 StructuredArguments.keyValue("statusCode", e.response.status.value.toString()),
                 StructuredArguments.keyValue("message", e.message),
                 callIdArgument(callId),
@@ -204,9 +281,21 @@ class GraphApiClient(
         }
     }
 
+    fun User.toVeilederInfo() =
+        VeilederInfo(
+            ident = this.onPremisesSamAccountName,
+            fornavn = this.givenName,
+            etternavn = this.surname,
+            epost = this.mail,
+            telefonnummer = this.businessPhones.firstOrNull(),
+            enabled = this.accountEnabled,
+        )
+
     companion object {
         const val GRAPH_API_CACHE_VEILEDER_PREFIX = "graphapiVeileder-"
         const val GRAPH_API_CACHE_VEILEDERE_FRA_ENHET_PREFIX = "graphapiVeiledereFraEnhet-"
+
+        const val ENHETSNAVN_PREFIX = "0000-GA-ENHET_"
 
         private const val CACHE_EXPIRATION_SECONDS = (60 * 60 * 12).toLong()
         private val log = LoggerFactory.getLogger(GraphApiClient::class.java)
