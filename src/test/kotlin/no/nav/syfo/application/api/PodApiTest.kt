@@ -1,0 +1,82 @@
+package no.nav.syfo.application.api
+
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.server.routing.*
+import io.ktor.server.testing.*
+import no.nav.syfo.application.ApplicationState
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
+
+class PodApiTest {
+
+    private fun ApplicationTestBuilder.setupPodApi(applicationState: ApplicationState) {
+        application {
+            routing {
+                registerPodApi(applicationState = applicationState)
+            }
+        }
+    }
+
+    @Nested
+    inner class `Successful liveness and readiness checks` {
+        @Test
+        fun `Returns ok on is_alive`() {
+            testApplication {
+                setupPodApi(
+                    applicationState = ApplicationState(alive = true, ready = true)
+                )
+
+                val response = client.get("/is_alive")
+                assertTrue(response.status.isSuccess())
+                assertNotNull(response.bodyAsText())
+            }
+        }
+
+        @Test
+        fun `Returns ok on is_ready`() {
+            testApplication {
+                setupPodApi(
+                    applicationState = ApplicationState(alive = true, ready = true)
+                )
+
+                val response = client.get("/is_ready")
+                assertTrue(response.status.isSuccess())
+                assertNotNull(response.bodyAsText())
+            }
+        }
+    }
+
+    @Nested
+    inner class `Unsuccessful liveness and readiness checks` {
+        @Test
+        fun `Returns internal server error when liveness check fails`() {
+            testApplication {
+                setupPodApi(
+                    applicationState = ApplicationState(alive = false, ready = false)
+                )
+
+                val response = client.get("/is_alive")
+                assertEquals(HttpStatusCode.InternalServerError, response.status)
+                assertNotNull(response.bodyAsText())
+            }
+        }
+
+        @Test
+        fun `Returns internal server error when readiness check fails`() {
+            testApplication {
+                setupPodApi(
+                    applicationState = ApplicationState(alive = false, ready = false)
+                )
+
+                val response = client.get("/is_ready")
+                assertEquals(HttpStatusCode.InternalServerError, response.status)
+                assertNotNull(response.bodyAsText())
+            }
+        }
+    }
+}
