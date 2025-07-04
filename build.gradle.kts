@@ -13,6 +13,8 @@ val mockkVersion = "1.13.17"
 val nimbusJoseJwtVersion = "10.0.2"
 val micrometerRegistryVersion = "1.12.13"
 val redisEmbeddedVersion = "0.7.3"
+val graphApiVersion = "6.42.0"
+val azureIdVersion = "1.16.2"
 
 plugins {
     kotlin("jvm") version "2.1.10"
@@ -39,9 +41,10 @@ dependencies {
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
 
-    implementation("com.microsoft.graph:microsoft-graph:6.42.0")
+    // Graph API
+    implementation("com.microsoft.graph:microsoft-graph:$graphApiVersion")
     // Include Azure identity for authentication
-    implementation("com.azure:azure-identity:1.+")
+    implementation("com.azure:azure-identity:$azureIdVersion")
 
     // Logging
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
