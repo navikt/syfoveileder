@@ -10,8 +10,12 @@ import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import io.ktor.util.cio.*
 import io.micrometer.core.instrument.distribution.DistributionStatisticConfig
+import no.nav.syfo.application.api.exception.RestException
 import no.nav.syfo.metric.METRICS_REGISTRY
-import no.nav.syfo.util.*
+import no.nav.syfo.util.NAV_CALL_ID_HEADER
+import no.nav.syfo.util.configure
+import no.nav.syfo.util.getCallId
+import no.nav.syfo.util.getConsumerId
 import java.time.Duration
 import java.util.*
 
@@ -48,11 +52,18 @@ fun Application.installStatusPages() {
             call.respond(HttpStatusCode.InternalServerError, cause.message ?: "Unknown error")
             val callId = call.getCallId()
             val consumerId = call.getConsumerId()
-            if (cause is ChannelWriteException) {
-                call.application.log.warn("Caught exception, callId=$callId, consumerId=$consumerId", cause)
-            } else {
-                call.application.log.error("Caught exception, callId=$callId, consumerId=$consumerId", cause)
+            when (cause) {
+                is ChannelWriteException ->
+                    call.application.log.warn("Caught exception, callId=$callId, consumerId=$consumerId", cause)
+
+                is RestException -> call.application.log.error(
+                    "${cause.prefixMessage}: callId=$callId, statusCode=${cause.statusCode}, message=${cause.message}"
+                )
+
+                else ->
+                    call.application.log.error("Caught exception, callId=$callId, consumerId=$consumerId", cause)
             }
+
             throw cause
         }
     }

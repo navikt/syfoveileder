@@ -1,13 +1,12 @@
 package no.nav.syfo.testhelper.mock
 
 import com.microsoft.graph.models.Group
-import com.microsoft.graph.models.GroupCollectionResponse
 import com.microsoft.graph.models.User
-import com.microsoft.graph.models.UserCollectionResponse
 import io.ktor.client.engine.mock.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import no.nav.syfo.client.graphapi.*
+import no.nav.syfo.client.graphapi.GraphApiClient.Companion.ENHETSNAVN_PREFIX
 import no.nav.syfo.testhelper.UserConstants.VEILEDER_IDENT
 import no.nav.syfo.testhelper.UserConstants.VEILEDER_IDENT_2
 
@@ -73,7 +72,17 @@ fun user(): User {
     user.surname = "Surname"
     user.onPremisesSamAccountName = VEILEDER_IDENT
     user.mail = "give.surname@nav.no"
-    // TODO: Add phone
+    user.businessPhones = listOf("00 00 00 00")
+    user.accountEnabled = true
+    return user
+}
+
+fun userWithNullFields(): User {
+    val user = User()
+    user.givenName = ""
+    user.surname = ""
+    user.onPremisesSamAccountName = VEILEDER_IDENT_2
+    user.mail = null
     user.businessPhones = emptyList()
     user.accountEnabled = true
     return user
@@ -82,34 +91,8 @@ fun user(): User {
 fun group(): Group {
     val group = Group()
     group.id = "123"
-    group.displayName = "Group 123"
+    group.displayName = "${ENHETSNAVN_PREFIX}0123"
     group.description = "Group 123"
     group.onPremisesSamAccountName = "GROUP_ID"
     return group
-}
-
-fun groupCollectionResponse() {
-    val collectionResponse = GroupCollectionResponse()
-    collectionResponse.value = listOf(group())
-    collectionResponse
-}
-
-fun userCollectionResponse() {
-    val collectionResponse = UserCollectionResponse()
-    collectionResponse.value = listOf(user())
-    collectionResponse
-}
-
-fun MockRequestHandleScope.graphApiGrupperMockResponse(request: HttpRequestData): HttpResponseData {
-    return when (request.method) {
-        HttpMethod.Get -> respond(groupCollectionResponse())
-        else -> respondBadRequest()
-    }
-}
-
-fun MockRequestHandleScope.graphApiMeMemberOfMockResponse(request: HttpRequestData): HttpResponseData {
-    return when (request.method) {
-        HttpMethod.Get -> respond(userCollectionResponse())
-        else -> respondBadRequest()
-    }
 }

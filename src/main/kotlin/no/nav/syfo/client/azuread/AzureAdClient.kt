@@ -99,7 +99,7 @@ class AzureAdClient(
             }
         )
 
-        //TODO: Sjekke at scopes blir riktig
+        // TODO: Sjekke at scopes blir riktig
         val scopes = arrayOf("https://graph.microsoft.com/.default")
         return GraphServiceClient(tokenCredential, scopes.toString())
     }

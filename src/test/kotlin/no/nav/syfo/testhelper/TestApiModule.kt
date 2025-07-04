@@ -5,10 +5,12 @@ import no.nav.syfo.application.api.apiModule
 import no.nav.syfo.client.axsys.AxsysClient
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.graphapi.GraphApiClient
+import no.nav.syfo.client.graphapi.GraphApiService
 import no.nav.syfo.veiledernavn.VeilederService
 
 fun Application.testApiModule(
     externalMockEnvironment: ExternalMockEnvironment,
+    graphApiService: GraphApiService = externalMockEnvironment.mockGraphApiService
 ) {
     val azureAdClient = AzureAdClient(
         azureAppClientId = externalMockEnvironment.environment.azureAppClientId,
@@ -30,6 +32,7 @@ fun Application.testApiModule(
         baseUrl = externalMockEnvironment.environment.graphapiUrl,
         cache = externalMockEnvironment.redisCache,
         httpClient = externalMockEnvironment.mockHttpClient,
+        graphApiService = graphApiService
     )
 
     val veilederService = VeilederService(

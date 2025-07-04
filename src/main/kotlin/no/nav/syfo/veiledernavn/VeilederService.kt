@@ -1,9 +1,12 @@
 package no.nav.syfo.veiledernavn
 
-import no.nav.syfo.client.axsys.*
+import no.nav.syfo.client.axsys.AxsysClient
+import no.nav.syfo.client.axsys.AxsysVeileder
+import no.nav.syfo.client.axsys.toVeilederInfo
 import no.nav.syfo.client.graphapi.GraphApiClient
 import no.nav.syfo.client.graphapi.toVeilederInfo
-import no.nav.syfo.veileder.*
+import no.nav.syfo.veileder.VeilederInfo
+import no.nav.syfo.veileder.toVeilederInfo
 import org.slf4j.LoggerFactory
 
 class VeilederService(
@@ -69,20 +72,13 @@ class VeilederService(
             log.warn("Fant ikke navn for ${missingInGraphAPI.size} av ${axsysVeilederList.size} veiledere i graphApi! Feilende identer: ${missingInGraphAPI.joinToString()}")
         }
 
-        //TODO: Legge til sammenligning med det ovenfor
-        val veilederInfo = graphApiClient.getGroupsForVeileder(
-            enhetNr = enhetNr,
-            callId = callId,
+        val veilederInfo = graphApiClient.getVeiledereByEnhetNr(
             token = token,
-        ).let { group ->
-            graphApiClient.getVeiledereVedEnhet(
-                group = group,
-                callId = callId,
-                token = token,
-            )
-        }
+            enhetNr = enhetNr,
+        ).map { it.toVeilederInfo() }
 
-        return returnList
+//        return returnList
+        return veilederInfo
     }
 
     private fun noGraphApiVeileder(
