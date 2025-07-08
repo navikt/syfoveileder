@@ -16,28 +16,28 @@ import no.nav.syfo.testhelper.mock.generateAxsysResponse
 import no.nav.syfo.testhelper.mock.graphapiUserResponse
 import no.nav.syfo.util.configure
 import no.nav.syfo.veileder.VeilederInfo
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 
 class VeiledereApiTest {
     private val basePath = "/syfoveileder/api/v3/veiledere"
 
-    companion object {
-        private lateinit var externalMockEnvironment: ExternalMockEnvironment
+    private lateinit var externalMockEnvironment: ExternalMockEnvironment
 
-        @JvmStatic
-        @BeforeAll
-        fun setup() {
-            externalMockEnvironment = ExternalMockEnvironment()
-            externalMockEnvironment.startExternalMocks()
-        }
+    @BeforeEach
+    fun setup() {
+        externalMockEnvironment = ExternalMockEnvironment()
+        externalMockEnvironment.startExternalMocks()
+    }
 
-        @JvmStatic
-        @AfterAll
-        fun tearDown() {
-            externalMockEnvironment.stopExternalMocks()
-        }
+    @AfterEach
+    fun tearDown() {
+        externalMockEnvironment.stopExternalMocks()
     }
 
     private fun ApplicationTestBuilder.setupApiAndClient(): HttpClient {
@@ -59,7 +59,7 @@ class VeiledereApiTest {
     inner class `Get Veilederinfo for self` {
         private val urlVeilederinfoSelf = "$basePath/self"
 
-        private val validTokenVeileder1 = generateJWT(
+        private fun getValidTokenVeileder1() = generateJWT(
             audience = externalMockEnvironment.environment.azureAppClientId,
             issuer = externalMockEnvironment.wellKnownInternalAzureAD.issuer,
             navIdent = UserConstants.VEILEDER_IDENT,
@@ -78,7 +78,7 @@ class VeiledereApiTest {
                 testApplication {
                     val client = setupApiAndClient()
                     val response = client.get(urlVeilederinfoSelf) {
-                        bearerAuth(validTokenVeileder1)
+                        bearerAuth(getValidTokenVeileder1())
                     }
 
                     assertEquals(HttpStatusCode.OK, response.status)
@@ -112,7 +112,7 @@ class VeiledereApiTest {
     inner class `Get Veilederinfo for veileder ident` {
         private val urlVeilederinfoNotSelf = "$basePath/${UserConstants.VEILEDER_IDENT}"
 
-        private val validTokenVeileder2 = generateJWT(
+        private fun getValidTokenVeileder2() = generateJWT(
             audience = externalMockEnvironment.environment.azureAppClientId,
             issuer = externalMockEnvironment.wellKnownInternalAzureAD.issuer,
             navIdent = UserConstants.VEILEDER_IDENT_2,
@@ -128,7 +128,7 @@ class VeiledereApiTest {
                 testApplication {
                     val client = setupApiAndClient()
                     val response = client.get(urlVeilederinfoNotSelf) {
-                        bearerAuth(validTokenVeileder2)
+                        bearerAuth(getValidTokenVeileder2())
                     }
 
                     assertEquals(HttpStatusCode.OK, response.status)
@@ -147,7 +147,7 @@ class VeiledereApiTest {
                 testApplication {
                     val client = setupApiAndClient()
                     val response = client.get("$basePath/${UserConstants.VEILEDER_IDENT_2}") {
-                        bearerAuth(validTokenVeileder2)
+                        bearerAuth(getValidTokenVeileder2())
                     }
 
                     assertEquals(HttpStatusCode.OK, response.status)
@@ -180,7 +180,7 @@ class VeiledereApiTest {
     inner class `Get list of Veiledere for enhetNr` {
         private val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
 
-        private val validTokenVeileder = generateJWT(
+        private fun getValidTokenVeileder() = generateJWT(
             audience = externalMockEnvironment.environment.azureAppClientId,
             issuer = externalMockEnvironment.wellKnownInternalAzureAD.issuer,
             navIdent = UserConstants.VEILEDER_IDENT,
@@ -189,17 +189,18 @@ class VeiledereApiTest {
         @Nested
         inner class `Happy path` {
             val axsysResponse = generateAxsysResponse()
-            val graphapiUserResponse = no.nav.syfo.testhelper.mock.graphapiUserResponse.value.first()
-            val redisCache = externalMockEnvironment.redisCache
-            val cacheKey = "${AxsysClient.AXSYS_CACHE_KEY_PREFIX}${UserConstants.ENHET_NR}"
 
             @Test
             fun `should return OK if request is successful and veilederlist should be cached`() {
+                val graphapiUserResponse = graphapiUserResponse.value.first()
+                val redisCache = externalMockEnvironment.redisCache
+                val cacheKey = "${AxsysClient.AXSYS_CACHE_KEY_PREFIX}${UserConstants.ENHET_NR}"
+
                 assertNull(redisCache.getListObject<AxsysVeileder>(cacheKey))
                 testApplication {
                     val client = setupApiAndClient()
                     val response = client.get(urlVeiledereEnhetNr) {
-                        bearerAuth(validTokenVeileder)
+                        bearerAuth(getValidTokenVeileder())
                     }
 
                     assertEquals(HttpStatusCode.OK, response.status)

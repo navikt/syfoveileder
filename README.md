@@ -25,13 +25,12 @@ In these instances, we log the ident, then we can send it to a grown up, or ask 
 
 #### Test Libraries:
 
-* Kluent
 * Mockk
-* Spek
+* JUnit
 
 ### Requirements
 
-* JDK 17
+* JDK 21
 
 ### Lint (Ktlint)
 ##### Command line

@@ -11,29 +11,25 @@ import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.mock.veilederUser
 import no.nav.syfo.util.configure
 import no.nav.syfo.veileder.VeilederInfo
-import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class VeiledereSystemApiTest {
 
-    companion object {
-        private lateinit var externalMockEnvironment: ExternalMockEnvironment
+    private lateinit var externalMockEnvironment: ExternalMockEnvironment
 
-        @JvmStatic
-        @BeforeAll
-        fun setup() {
-            externalMockEnvironment = ExternalMockEnvironment()
-            externalMockEnvironment.startExternalMocks()
-        }
+    @BeforeEach
+    fun setup() {
+        externalMockEnvironment = ExternalMockEnvironment()
+        externalMockEnvironment.startExternalMocks()
+    }
 
-        @JvmStatic
-        @AfterAll
-        fun tearDown() {
-            externalMockEnvironment.stopExternalMocks()
-        }
+    @AfterEach
+    fun tearDown() {
+        externalMockEnvironment.stopExternalMocks()
     }
 
     private fun ApplicationTestBuilder.setupApiAndClient(): HttpClient {
@@ -54,7 +50,8 @@ class VeiledereSystemApiTest {
     @Nested
     inner class `Get Veilederinfo` {
         private val apiUrl = "$systemApiBasePath/veiledere/${UserConstants.VEILEDER_IDENT}"
-        private val validSystemToken = generateJWT(
+        
+        private fun getValidSystemToken() = generateJWT(
             audience = externalMockEnvironment.environment.azureAppClientId,
             issuer = externalMockEnvironment.wellKnownInternalAzureAD.issuer,
             azp = syfooversiktsrvClientId,
@@ -65,7 +62,7 @@ class VeiledereSystemApiTest {
             testApplication {
                 val client = setupApiAndClient()
                 val response = client.get(apiUrl) {
-                    bearerAuth(validSystemToken)
+                    bearerAuth(getValidSystemToken())
                 }
 
                 assertEquals(HttpStatusCode.OK, response.status)
