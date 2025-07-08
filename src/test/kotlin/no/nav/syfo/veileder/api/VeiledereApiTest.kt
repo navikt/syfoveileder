@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
@@ -56,7 +57,8 @@ class VeiledereApiTest {
     }
 
     @Nested
-    inner class `Get Veilederinfo for self` {
+    @DisplayName("Get Veilederinfo for self")
+    inner class GetVeilederinfoForSelf {
         private val urlVeilederinfoSelf = "$basePath/self"
 
         private fun getValidTokenVeileder1() = generateJWT(
@@ -66,7 +68,8 @@ class VeiledereApiTest {
         )
 
         @Nested
-        inner class `Happy path` {
+        @DisplayName("Happy path")
+        inner class HappyPath {
 
             @Test
             fun `should return OK if request is successful and graphapi response should be cached`() {
@@ -95,7 +98,8 @@ class VeiledereApiTest {
         }
 
         @Nested
-        inner class `Unhappy paths` {
+        @DisplayName("Unhappy paths")
+        inner class UnhappyPaths {
             @Test
             fun `should return status Unauthorized if no token is supplied`() {
                 testApplication {
@@ -109,7 +113,8 @@ class VeiledereApiTest {
     }
 
     @Nested
-    inner class `Get Veilederinfo for veileder ident` {
+    @DisplayName("Get Veilederinfo for veileder ident")
+    inner class GetVeilederinfoForVeilederIdent {
         private val urlVeilederinfoNotSelf = "$basePath/${UserConstants.VEILEDER_IDENT}"
 
         private fun getValidTokenVeileder2() = generateJWT(
@@ -119,7 +124,8 @@ class VeiledereApiTest {
         )
 
         @Nested
-        inner class `Happy path` {
+        @DisplayName("Happy path")
+        inner class HappyPath {
 
             val graphapiUserResponse = no.nav.syfo.testhelper.mock.graphapiUserResponse.value[0]
 
@@ -163,7 +169,8 @@ class VeiledereApiTest {
         }
 
         @Nested
-        inner class `Unhappy paths` {
+        @DisplayName("Unhappy paths")
+        inner class UnhappyPaths {
             @Test
             fun `should return status Unauthorized if no token is supplied`() {
                 testApplication {
@@ -177,7 +184,8 @@ class VeiledereApiTest {
     }
 
     @Nested
-    inner class `Get list of Veiledere for enhetNr` {
+    @DisplayName("Get list of Veiledere for enhetNr")
+    inner class GetListOfVeiledereForEnhetNr {
         private val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
 
         private fun getValidTokenVeileder() = generateJWT(
@@ -187,7 +195,8 @@ class VeiledereApiTest {
         )
 
         @Nested
-        inner class `Happy path` {
+        @DisplayName("Happy path")
+        inner class HappyPath {
             val axsysResponse = generateAxsysResponse()
 
             @Test
@@ -223,7 +232,8 @@ class VeiledereApiTest {
         }
 
         @Nested
-        inner class `Unhappy paths` {
+        @DisplayName("Unhappy paths")
+        inner class UnhappyPaths {
             @Test
             fun `should return status Unauthorized if no token is supplied`() {
                 testApplication {

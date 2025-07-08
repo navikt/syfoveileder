@@ -9,6 +9,7 @@ import no.nav.syfo.application.ApplicationState
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
@@ -23,7 +24,8 @@ class PodApiTest {
     }
 
     @Nested
-    inner class `Successful liveness and readiness checks` {
+    @DisplayName("Successful liveness and readiness checks")
+    inner class SuccessfulLivenessAndReadinessChecks {
         @Test
         fun `Returns ok on is_alive`() {
             testApplication {
@@ -52,7 +54,8 @@ class PodApiTest {
     }
 
     @Nested
-    inner class `Unsuccessful liveness and readiness checks` {
+    @DisplayName("Unsuccessful liveness and readiness checks")
+    inner class UnsuccessfulLivenessAndReadinessChecks {
         @Test
         fun `Returns internal server error when liveness check fails`() {
             testApplication {

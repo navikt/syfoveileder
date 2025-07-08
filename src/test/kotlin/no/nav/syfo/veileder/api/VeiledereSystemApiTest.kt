@@ -14,6 +14,7 @@ import no.nav.syfo.veileder.VeilederInfo
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
@@ -48,7 +49,8 @@ class VeiledereSystemApiTest {
     }
 
     @Nested
-    inner class `Get Veilederinfo` {
+    @DisplayName("Get Veilederinfo")
+    inner class GetVeilederinfo {
         private val apiUrl = "$systemApiBasePath/veiledere/${UserConstants.VEILEDER_IDENT}"
         
         private fun getValidSystemToken() = generateJWT(
