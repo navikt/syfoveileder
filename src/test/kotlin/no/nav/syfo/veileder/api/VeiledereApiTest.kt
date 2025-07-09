@@ -17,7 +17,7 @@ import no.nav.syfo.testhelper.mock.graphapiUserResponse
 import no.nav.syfo.util.configure
 import no.nav.syfo.veileder.VeilederInfo
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
@@ -91,7 +91,7 @@ class VeiledereApiTest {
                     assertEquals(graphapiUserResponse.givenName, veilederInfo.fornavn)
                     assertEquals(graphapiUserResponse.surname, veilederInfo.etternavn)
                     assertEquals(graphapiUserResponse.mail, veilederInfo.epost)
-                    assertEquals(true, veilederInfo.enabled)
+                    assertTrue(veilederInfo.enabled!!)
                     assertNotNull(redisCache.getObject<GraphApiUser>(cacheKey))
                 }
             }
@@ -144,7 +144,7 @@ class VeiledereApiTest {
                     assertEquals(graphapiUserResponse.givenName, veilederInfoDTO.fornavn)
                     assertEquals(graphapiUserResponse.surname, veilederInfoDTO.etternavn)
                     assertEquals(graphapiUserResponse.mail, veilederInfoDTO.epost)
-                    assertEquals(true, veilederInfoDTO.enabled)
+                    assertTrue(veilederInfoDTO.enabled!!)
                 }
             }
 
@@ -163,7 +163,7 @@ class VeiledereApiTest {
                     assertEquals(graphapiUserResponse.givenName, veilederInfoDTO.fornavn)
                     assertEquals(graphapiUserResponse.surname, veilederInfoDTO.etternavn)
                     assertEquals(graphapiUserResponse.mail, veilederInfoDTO.epost)
-                    assertEquals(false, veilederInfoDTO.enabled)
+                    assertFalse(veilederInfoDTO.enabled!!)
                 }
             }
         }
@@ -220,11 +220,11 @@ class VeiledereApiTest {
                     assertEquals(axsysResponse.first().appIdent, veilederInfoList.first().ident)
                     assertEquals(graphapiUserResponse.givenName, veilederInfoList.first().fornavn)
                     assertEquals(graphapiUserResponse.surname, veilederInfoList.first().etternavn)
-                    assertEquals(true, veilederInfoList.first().enabled)
+                    assertTrue(veilederInfoList.first().enabled!!)
 
                     assertEquals(axsysResponse.last().appIdent, veilederInfoList.last().ident)
-                    assertEquals("", veilederInfoList.last().fornavn)
-                    assertEquals("", veilederInfoList.last().etternavn)
+                    assertTrue(veilederInfoList.last().fornavn.isEmpty())
+                    assertTrue(veilederInfoList.last().etternavn.isEmpty())
                     assertNull(veilederInfoList.last().enabled)
                     assertNotNull(redisCache.getListObject<AxsysVeileder>(cacheKey))
                 }

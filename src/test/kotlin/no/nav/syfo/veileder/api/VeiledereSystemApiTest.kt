@@ -11,12 +11,9 @@ import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.mock.veilederUser
 import no.nav.syfo.util.configure
 import no.nav.syfo.veileder.VeilederInfo
-import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Assertions.assertTrue
 
 class VeiledereSystemApiTest {
 
@@ -52,7 +49,7 @@ class VeiledereSystemApiTest {
     @DisplayName("Get Veilederinfo")
     inner class GetVeilederinfo {
         private val apiUrl = "$systemApiBasePath/veiledere/${UserConstants.VEILEDER_IDENT}"
-        
+
         private fun getValidSystemToken() = generateJWT(
             audience = externalMockEnvironment.environment.azureAppClientId,
             issuer = externalMockEnvironment.wellKnownInternalAzureAD.issuer,
@@ -74,7 +71,7 @@ class VeiledereSystemApiTest {
                 assertEquals(veilederUser.givenName, veilederInfo.fornavn)
                 assertEquals(veilederUser.surname, veilederInfo.etternavn)
                 assertEquals(veilederUser.mail, veilederInfo.epost)
-                assertEquals(true, veilederInfo.enabled)
+                assertTrue(veilederInfo.enabled!!)
             }
         }
 
