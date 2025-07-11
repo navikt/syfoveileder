@@ -4,9 +4,9 @@ import no.nav.syfo.client.axsys.AxsysClient
 import no.nav.syfo.client.axsys.AxsysVeileder
 import no.nav.syfo.client.axsys.toVeilederInfo
 import no.nav.syfo.client.graphapi.GraphApiClient
+import no.nav.syfo.veileder.Veileder.Companion.toVeilederInfo
 import no.nav.syfo.client.graphapi.toVeilederInfo
 import no.nav.syfo.veileder.VeilederInfo
-import no.nav.syfo.veileder.toVeilederInfo
 import org.slf4j.LoggerFactory
 
 class VeilederService(

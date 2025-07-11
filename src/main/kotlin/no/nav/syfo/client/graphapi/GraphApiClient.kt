@@ -1,7 +1,5 @@
 package no.nav.syfo.client.graphapi
 
-import com.microsoft.graph.models.Group
-import com.microsoft.graph.models.User
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
@@ -15,6 +13,8 @@ import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.httpClientProxy
 import no.nav.syfo.util.bearerHeader
 import no.nav.syfo.util.callIdArgument
+import no.nav.syfo.veileder.Gruppe
+import no.nav.syfo.veileder.Veileder
 import org.slf4j.LoggerFactory
 
 class GraphApiClient(
@@ -166,7 +166,7 @@ class GraphApiClient(
         }
     }
 
-    suspend fun getVeiledereByEnhetNr(token: String, enhetNr: String): List<User> {
+    suspend fun getVeiledereByEnhetNr(token: String, enhetNr: String): List<Veileder> {
         return getEnhetByEnhetNrForVeileder(
             token = token,
             enhetNr = enhetNr,
@@ -178,10 +178,10 @@ class GraphApiClient(
         } ?: emptyList() // TODO: Kaste exception?
     }
 
-    suspend fun getEnhetByEnhetNrForVeileder(token: String, enhetNr: String): Group? {
+    suspend fun getEnhetByEnhetNrForVeileder(token: String, enhetNr: String): Gruppe? {
         val veilederIdent = getNAVIdentFromToken(token)
         val key = cacheKeyGrupper(veilederIdent)
-        val cachedGroups: List<Group>? = cache.getObject(key)
+        val cachedGroups: List<Gruppe>? = cache.getListObject(key)
 
         val groups = if (cachedGroups != null) {
             COUNT_CALL_GRAPHAPI_GRUPPE_CACHE_HIT.increment()
@@ -202,9 +202,9 @@ class GraphApiClient(
         return groups.find { it.displayName == gruppenavnEnhet(enhetNr) }
     }
 
-    suspend fun getVeiledereVedEnhetByGroupId(token: String, group: Group): List<User> {
+    suspend fun getVeiledereVedEnhetByGroupId(token: String, group: Gruppe): List<Veileder> {
         val key = cacheKeyVeiledereIEnhet(group.id)
-        val cachedUsers: List<User>? = cache.getObject(key)
+        val cachedUsers: List<Veileder>? = cache.getListObject(key)
 
         return if (cachedUsers != null) {
             COUNT_CALL_GRAPHAPI_VEILEDER_LIST_CACHE_HIT.increment()
@@ -217,7 +217,7 @@ class GraphApiClient(
             ) ?: throw RuntimeException("Failed to request access to Veileder in Graph API: Failed to get system token")
 
             val graphServiceClient = azureAdClient.createGraphServiceClient(azureAdToken = systemToken)
-            graphApiService.getMembersByGroupId(graphServiceClient, group).also { cacheFor12Hours(key, it) }
+            graphApiService.getMembersByGroupId(graphServiceClient, group.id).also { cacheFor12Hours(key, it) }
         }
     }
 
@@ -225,7 +225,8 @@ class GraphApiClient(
         cache.setObject(
             key = cacheKey,
             value = value,
-            expireSeconds = CACHE_EXPIRATION_SECONDS,
+//            expireSeconds = CACHE_EXPIRATION_SECONDS,
+            expireSeconds = 60 * 5, // TODO: For testing
         )
     }
 

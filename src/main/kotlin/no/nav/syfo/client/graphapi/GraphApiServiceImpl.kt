@@ -6,12 +6,15 @@ import com.microsoft.graph.models.Group
 import com.microsoft.graph.models.User
 import com.microsoft.graph.serviceclient.GraphServiceClient
 import no.nav.syfo.application.api.exception.toRestException
+import no.nav.syfo.veileder.Gruppe
+import no.nav.syfo.veileder.Veileder
 import java.util.*
 
 open class GraphApiServiceImpl : GraphApiService {
-    override fun getGroupsForVeileder(graphServiceClient: GraphServiceClient): List<Group> {
+    override fun getGroupsForVeileder(graphServiceClient: GraphServiceClient): List<Gruppe> {
         try {
             return getGroupsForVeilederRequest(graphServiceClient)
+                .map { it.toGruppe() }
                 .apply { COUNT_CALL_GRAPHAPI_GRUPPE_SUCCESS.increment() }
         } catch (e: Exception) {
             COUNT_CALL_GRAPHAPI_GRUPPE_FAIL.increment()
@@ -50,9 +53,10 @@ open class GraphApiServiceImpl : GraphApiService {
         return groups
     }
 
-    override fun getMembersByGroupId(graphServiceClient: GraphServiceClient, group: Group): List<User> {
+    override fun getMembersByGroupId(graphServiceClient: GraphServiceClient, groupId: String): List<Veileder> {
         try {
-            return getMembersByGroupIdRequest(graphServiceClient, group)
+            return getMembersByGroupIdRequest(graphServiceClient, groupId)
+                .map { it.toVeileder() }
                 .apply { COUNT_CALL_GRAPHAPI_VEILEDER_LIST_SUCCESS.increment() }
         } catch (e: Exception) {
             COUNT_CALL_GRAPHAPI_VEILEDER_LIST_FAIL.increment()
@@ -64,10 +68,10 @@ open class GraphApiServiceImpl : GraphApiService {
      * @throws com.microsoft.kiota.ApiException
      * @throws Exception
      */
-    protected open fun getMembersByGroupIdRequest(graphServiceClient: GraphServiceClient, group: Group): List<User> {
+    protected open fun getMembersByGroupIdRequest(graphServiceClient: GraphServiceClient, groupId: String): List<User> {
         // /groups/<groupId>/members
         val directoryObjectCollectionResponse =
-            graphServiceClient.groups().byGroupId(group.id).members().get { requestConfiguration ->
+            graphServiceClient.groups().byGroupId(groupId).members().get { requestConfiguration ->
                 requestConfiguration.headers.add("ConsistencyLevel", "eventual")
                 requestConfiguration.queryParameters.select =
                     arrayOf(
@@ -92,5 +96,25 @@ open class GraphApiServiceImpl : GraphApiService {
             .iterate()
 
         return users
+    }
+
+    private fun Group.toGruppe(): Gruppe {
+        return Gruppe(
+            id = this.id,
+            displayName = this.displayName,
+            description = this.description,
+            onPremisesSamAccountName = this.onPremisesSamAccountName,
+        )
+    }
+
+    private fun User.toVeileder(): Veileder {
+        return Veileder(
+            givenName = this.givenName,
+            surname = this.surname,
+            mail = this.mail,
+            businessPhones = this.businessPhones?.firstOrNull(),
+            accountEnabled = this.accountEnabled,
+            onPremisesSamAccountName = this.onPremisesSamAccountName,
+        )
     }
 }

@@ -14,7 +14,6 @@ val nimbusJoseJwtVersion = "10.0.2"
 val micrometerRegistryVersion = "1.12.13"
 val redisEmbeddedVersion = "0.7.3"
 val graphApiVersion = "6.42.0"
-val azureIdVersion = "1.16.2"
 
 plugins {
     kotlin("jvm") version "2.1.10"
@@ -43,8 +42,6 @@ dependencies {
 
     // Graph API
     implementation("com.microsoft.graph:microsoft-graph:$graphApiVersion")
-    // Include Azure identity for authentication
-    implementation("com.azure:azure-identity:$azureIdVersion")
 
     // Logging
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
@@ -88,7 +85,6 @@ tasks {
         archiveBaseName.set("app")
         archiveClassifier.set("")
         archiveVersion.set("")
-        isZip64 = true
     }
 
     test {

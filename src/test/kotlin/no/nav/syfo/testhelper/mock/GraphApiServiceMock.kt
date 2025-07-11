@@ -10,7 +10,7 @@ open class GraphApiServiceMock : GraphApiServiceImpl() {
         return listOf(group())
     }
 
-    override fun getMembersByGroupIdRequest(graphServiceClient: GraphServiceClient, group: Group): List<User> {
+    override fun getMembersByGroupIdRequest(graphServiceClient: GraphServiceClient, groupId: String): List<User> {
         return listOf(user(), userWithNullFields())
     }
 }

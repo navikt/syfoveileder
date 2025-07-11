@@ -99,9 +99,7 @@ class AzureAdClient(
             }
         )
 
-        // TODO: Sjekke at scopes blir riktig
-        val scopes = arrayOf("https://graph.microsoft.com/.default")
-        return GraphServiceClient(tokenCredential, scopes.toString())
+        return GraphServiceClient(tokenCredential, scope(graphApiUrl))
     }
 
     private suspend fun getAccessToken(

@@ -225,7 +225,7 @@ class VeiledereApiTest {
                     assertEquals(axsysResponse.last().appIdent, veilederInfoList.last().ident)
                     assertTrue(veilederInfoList.last().fornavn.isEmpty())
                     assertTrue(veilederInfoList.last().etternavn.isEmpty())
-                    assertNull(veilederInfoList.last().enabled)
+                    assertTrue(veilederInfoList.last().enabled!!)
                     assertNotNull(redisCache.getListObject<AxsysVeileder>(cacheKey))
                 }
             }
