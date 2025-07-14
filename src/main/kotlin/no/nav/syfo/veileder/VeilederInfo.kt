@@ -9,14 +9,14 @@ data class VeilederInfo(
     val enabled: Boolean? = null,
 )
 
-// TODO: Erstatte med modifisert VeilederInfo?
+// TODO: Erstatte med modifisert VeilederInfo? Kan også f.eks. filtrere bort de som ikke har navn og andre ting vi trenger
 data class Veileder(
+    val onPremisesSamAccountName: String?,
     val givenName: String?,
     val surname: String?,
     val mail: String?,
     val businessPhones: String?, // FRom list (should only ever contain one) to string
     val accountEnabled: Boolean,
-    val onPremisesSamAccountName: String?,
 ) {
     companion object {
         fun Veileder.toVeilederInfo() =
@@ -31,6 +31,7 @@ data class Veileder(
     }
 }
 
+// TODO: Fjerne overflødige properties. Tror bare id + displayNAme er relevant.
 data class Gruppe(
     val id: String, // UUID
     val displayName: String,

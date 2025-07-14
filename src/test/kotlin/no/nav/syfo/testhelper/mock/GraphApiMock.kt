@@ -7,6 +7,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import no.nav.syfo.client.graphapi.*
 import no.nav.syfo.client.graphapi.GraphApiClient.Companion.ENHETSNAVN_PREFIX
+import no.nav.syfo.testhelper.UserConstants
 import no.nav.syfo.testhelper.UserConstants.VEILEDER_IDENT
 import no.nav.syfo.testhelper.UserConstants.VEILEDER_IDENT_2
 
@@ -71,7 +72,7 @@ fun user(): User {
     user.givenName = "Given"
     user.surname = "Surname"
     user.onPremisesSamAccountName = VEILEDER_IDENT
-    user.mail = "give.surname@nav.no"
+    user.mail = "given.surname@nav.no"
     user.businessPhones = listOf("00 00 00 00")
     user.accountEnabled = true
     return user
@@ -88,10 +89,10 @@ fun userWithNullFields(): User {
     return user
 }
 
-fun group(): Group {
+fun group(groupId: String = "UUID", enhetNr: String = UserConstants.ENHET_NR): Group {
     val group = Group()
-    group.id = "123"
-    group.displayName = "${ENHETSNAVN_PREFIX}0123"
+    group.id = groupId
+    group.displayName = "${ENHETSNAVN_PREFIX}$enhetNr"
     group.description = "Group 123"
     group.onPremisesSamAccountName = "GROUP_ID"
     return group

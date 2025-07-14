@@ -242,8 +242,8 @@ class GraphApiClient(
         private val log = LoggerFactory.getLogger(GraphApiClient::class.java)
 
         private fun cacheKey(veilederIdent: String) = "$GRAPH_API_CACHE_VEILEDER_PREFIX$veilederIdent"
-        private fun cacheKeyGrupper(veilederIdent: String) = "$GRAPH_API_CACHE_VEILEDER_GRUPPER_PREFIX$veilederIdent"
-        private fun cacheKeyVeiledereIEnhet(groupId: String) = "$GRAPH_API_CACHE_VEILEDERE_I_ENHET_PREFIX$groupId"
+        fun cacheKeyGrupper(veilederIdent: String) = "$GRAPH_API_CACHE_VEILEDER_GRUPPER_PREFIX$veilederIdent"
+        fun cacheKeyVeiledereIEnhet(groupId: String) = "$GRAPH_API_CACHE_VEILEDERE_I_ENHET_PREFIX$groupId"
 
         fun gruppenavnEnhet(enhetNr: String) = "$ENHETSNAVN_PREFIX$enhetNr"
     }

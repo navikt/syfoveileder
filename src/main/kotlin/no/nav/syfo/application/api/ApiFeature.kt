@@ -57,7 +57,7 @@ fun Application.installStatusPages() {
                     call.application.log.warn("Caught exception, callId=$callId, consumerId=$consumerId", cause)
 
                 is RestException -> call.application.log.error(
-                    "${cause.prefixMessage}: callId=$callId, statusCode=${cause.statusCode}, message=${cause.message}",
+                    "${cause.prefixMessage}: callId=$callId, consumerId=$consumerId, statusCode=${cause.statusCode}, message=${cause.message}",
                     cause
                 )
 
