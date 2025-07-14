@@ -12,14 +12,11 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
 import io.ktor.server.testing.*
-import no.nav.syfo.client.axsys.AxsysClient
-import no.nav.syfo.client.axsys.AxsysVeileder
 import no.nav.syfo.client.graphapi.GraphApiClient
 import no.nav.syfo.client.graphapi.GraphApiService
 import no.nav.syfo.client.graphapi.GraphApiServiceImpl
 import no.nav.syfo.client.graphapi.GraphApiUser
 import no.nav.syfo.testhelper.*
-import no.nav.syfo.testhelper.mock.generateAxsysResponse
 import no.nav.syfo.testhelper.mock.graphapiUserResponse
 import no.nav.syfo.testhelper.mock.group
 import no.nav.syfo.testhelper.mock.user
@@ -195,66 +192,15 @@ class VeiledereApiTest {
         }
     }
 
-    @Nested
-    @DisplayName("Get list of Veiledere for enhetNr")
-    inner class GetListOfVeiledereForEnhetNr {
-        private val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
+    @Test
+    fun `should return status Unauthorized if no token is supplied`() {
+        val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
 
-        private fun getValidTokenVeileder() = generateJWT(
-            audience = externalMockEnvironment.environment.azureAppClientId,
-            issuer = externalMockEnvironment.wellKnownInternalAzureAD.issuer,
-            navIdent = UserConstants.VEILEDER_IDENT,
-        )
+        testApplication {
+            val client = setupApiAndClient()
+            val response = client.get(urlVeiledereEnhetNr)
 
-        @Nested
-        @DisplayName("Happy path")
-        inner class HappyPath {
-            val axsysResponse = generateAxsysResponse()
-
-            @Test
-            fun `should return OK if request is successful and veilederlist should be cached`() {
-                val graphapiUserResponse = graphapiUserResponse.value.first()
-                val redisCache = externalMockEnvironment.redisCache
-                val cacheKey = "${AxsysClient.AXSYS_CACHE_KEY_PREFIX}${UserConstants.ENHET_NR}"
-
-                assertNull(redisCache.getListObject<AxsysVeileder>(cacheKey))
-                testApplication {
-                    val client = setupApiAndClient()
-                    val response = client.get(urlVeiledereEnhetNr) {
-                        bearerAuth(getValidTokenVeileder())
-                    }
-
-                    assertEquals(HttpStatusCode.OK, response.status)
-                    val veilederInfoList = response.body<List<VeilederInfo>>()
-
-                    assertEquals(axsysResponse.size, veilederInfoList.size)
-
-                    assertEquals(axsysResponse.first().appIdent, veilederInfoList.first().ident)
-                    assertEquals(graphapiUserResponse.givenName, veilederInfoList.first().fornavn)
-                    assertEquals(graphapiUserResponse.surname, veilederInfoList.first().etternavn)
-                    assertTrue(veilederInfoList.first().enabled!!)
-
-                    assertEquals(axsysResponse.last().appIdent, veilederInfoList.last().ident)
-                    assertTrue(veilederInfoList.last().fornavn.isEmpty())
-                    assertTrue(veilederInfoList.last().etternavn.isEmpty())
-                    assertTrue(veilederInfoList.last().enabled!!)
-                    assertNotNull(redisCache.getListObject<AxsysVeileder>(cacheKey))
-                }
-            }
-        }
-
-        @Nested
-        @DisplayName("Unhappy paths")
-        inner class UnhappyPaths {
-            @Test
-            fun `should return status Unauthorized if no token is supplied`() {
-                testApplication {
-                    val client = setupApiAndClient()
-                    val response = client.get(urlVeiledereEnhetNr)
-
-                    assertEquals(HttpStatusCode.Unauthorized, response.status)
-                }
-            }
+            assertEquals(HttpStatusCode.Unauthorized, response.status)
         }
     }
 

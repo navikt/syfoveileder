@@ -2,7 +2,6 @@ package no.nav.syfo.testhelper
 
 import io.ktor.server.application.*
 import no.nav.syfo.application.api.apiModule
-import no.nav.syfo.client.axsys.AxsysClient
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.graphapi.GraphApiClient
 import no.nav.syfo.client.graphapi.GraphApiService
@@ -20,13 +19,6 @@ fun Application.testApiModule(
         cache = externalMockEnvironment.redisCache,
         httpClient = externalMockEnvironment.mockHttpClient,
     )
-    val axsysClient = AxsysClient(
-        azureAdClient = azureAdClient,
-        baseUrl = externalMockEnvironment.environment.axsysUrl,
-        clientId = externalMockEnvironment.environment.axsysClientId,
-        cache = externalMockEnvironment.redisCache,
-        httpClient = externalMockEnvironment.mockHttpClient,
-    )
     val graphApiClient = GraphApiClient(
         azureAdClient = azureAdClient,
         baseUrl = externalMockEnvironment.environment.graphapiUrl,
@@ -36,7 +28,6 @@ fun Application.testApiModule(
     )
 
     val veilederService = VeilederService(
-        axsysClient = axsysClient,
         graphApiClient = graphApiClient,
     )
 

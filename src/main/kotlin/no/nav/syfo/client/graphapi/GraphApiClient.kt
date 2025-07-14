@@ -8,7 +8,6 @@ import io.ktor.http.*
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.application.api.authentication.getNAVIdentFromToken
 import no.nav.syfo.application.cache.ValkeyStore
-import no.nav.syfo.client.axsys.AxsysVeileder
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.httpClientProxy
 import no.nav.syfo.util.bearerHeader
@@ -100,70 +99,6 @@ class GraphApiClient(
             callIdArgument(callId),
         )
         throw e
-    }
-
-    suspend fun veilederList(
-        enhetNr: String,
-        axsysVeilederlist: List<AxsysVeileder>,
-        callId: String,
-        token: String,
-    ): List<GraphApiUser> {
-        val cacheKey = "$GRAPH_API_CACHE_VEILEDERE_FRA_ENHET_PREFIX$enhetNr"
-        val cachedObject: List<GraphApiUser>? = cache.getListObject(cacheKey)
-        return if (cachedObject != null) {
-            COUNT_CALL_GRAPHAPI_VEILEDER_LIST_CACHE_HIT.increment()
-            cachedObject
-        } else {
-            val oboToken = azureAdClient.getOnBehalfOfToken(
-                scopeClientId = baseUrl,
-                token = token,
-            )?.accessToken ?: throw RuntimeException("Failed to request access to Enhet: Failed to get OBO token")
-
-            val identChunks = axsysVeilederlist.chunked(15)
-            val url = "$baseUrl/v1.0/\$batch"
-
-            val requests = identChunks.mapIndexed { index, idents ->
-                val query =
-                    idents.joinToString(separator = " or ") { "startsWith(onPremisesSamAccountName, '${it.appIdent}')" }
-                RequestEntry(
-                    id = (index + 1).toString(),
-                    method = "GET",
-                    url = "/users?\$filter=$query&\$select=onPremisesSamAccountName,givenName,surname,mail,businessPhones,accountEnabled&\$count=true",
-                    headers = mapOf("ConsistencyLevel" to "eventual", "Content-Type" to "application/json")
-                )
-            }
-
-            try {
-                val responseData = requests.chunked(20).flatMap { requestList ->
-                    val requestBody = GraphBatchRequest(requestList)
-
-                    val response: BatchResponse = httpClient.post(url) {
-                        accept(ContentType.Application.Json)
-                        header(HttpHeaders.Authorization, bearerHeader(oboToken))
-                        contentType(ContentType.Application.Json)
-                        setBody(requestBody)
-                    }.body()
-                    response.responses.flatMap { it.body.value }
-                }
-                COUNT_CALL_GRAPHAPI_VEILEDER_LIST_SUCCESS.increment()
-                cache.setObject(
-                    expireSeconds = CACHE_EXPIRATION_SECONDS,
-                    key = cacheKey,
-                    value = responseData,
-                )
-                COUNT_CALL_GRAPHAPI_VEILEDER_LIST_CACHE_MISS.increment()
-                return responseData
-            } catch (e: ResponseException) {
-                log.error(
-                    "Error while requesting VeilederList from GraphApi {}, {}, {}",
-                    StructuredArguments.keyValue("statusCode", e.response.status.value.toString()),
-                    StructuredArguments.keyValue("message", e.message),
-                    callIdArgument(callId),
-                )
-                COUNT_CALL_GRAPHAPI_VEILEDER_LIST_FAIL.increment()
-                throw e
-            }
-        }
     }
 
     suspend fun getVeiledereByEnhetNr(token: String, enhetNr: String): List<Veileder> {
