@@ -27,20 +27,16 @@ open class GraphApiServiceImpl : GraphApiService {
      * @throws Exception
      */
     protected open fun getGroupsForVeilederRequest(graphServiceClient: GraphServiceClient): List<Group> {
-        // me/memberOf
         val directoryObjectCollectionResponse = graphServiceClient.me().memberOf().get { requestConfiguration ->
             requestConfiguration.headers.add("ConsistencyLevel", "eventual")
             requestConfiguration.queryParameters.select =
                 arrayOf(
                     "id",
                     "displayName",
-                    "onPremisesSamAccountName",
-                    "description"
                 )
             requestConfiguration.queryParameters.count = true
         }
 
-        // https://learn.microsoft.com/en-us/graph/sdks/paging?tabs=java
         val groups = mutableListOf<Group>()
         PageIterator.Builder<Group, DirectoryObjectCollectionResponse>()
             .client(graphServiceClient)
@@ -69,7 +65,6 @@ open class GraphApiServiceImpl : GraphApiService {
      * @throws Exception
      */
     protected open fun getMembersByGroupIdRequest(graphServiceClient: GraphServiceClient, groupId: String): List<User> {
-        // /groups/<groupId>/members
         val directoryObjectCollectionResponse =
             graphServiceClient.groups().byGroupId(groupId).members().get { requestConfiguration ->
                 requestConfiguration.headers.add("ConsistencyLevel", "eventual")
@@ -102,8 +97,6 @@ open class GraphApiServiceImpl : GraphApiService {
         return Gruppe(
             id = this.id,
             displayName = this.displayName,
-            description = this.description,
-            onPremisesSamAccountName = this.onPremisesSamAccountName,
         )
     }
 

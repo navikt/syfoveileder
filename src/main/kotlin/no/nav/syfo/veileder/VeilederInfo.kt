@@ -9,13 +9,13 @@ data class VeilederInfo(
     val enabled: Boolean? = null,
 )
 
-// TODO: Erstatte med modifisert VeilederInfo? Kan også f.eks. filtrere bort de som ikke har navn og andre ting vi trenger
+// TODO: Erstatte med VeilederInfo? Flere felter kan være null og bør de filtreres bort?
 data class Veileder(
     val onPremisesSamAccountName: String?,
     val givenName: String?,
     val surname: String?,
     val mail: String?,
-    val businessPhones: String?, // FRom list (should only ever contain one) to string
+    val businessPhones: String?,
     val accountEnabled: Boolean,
 ) {
     companion object {
@@ -31,10 +31,7 @@ data class Veileder(
     }
 }
 
-// TODO: Fjerne overflødige properties. Tror bare id + displayNAme er relevant.
 data class Gruppe(
-    val id: String, // UUID
+    val id: String,
     val displayName: String,
-    val description: String?,
-    val onPremisesSamAccountName: String?,
 )
