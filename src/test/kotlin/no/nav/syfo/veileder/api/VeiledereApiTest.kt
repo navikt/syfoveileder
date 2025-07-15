@@ -428,7 +428,7 @@ class VeiledereApiTest {
     }
 
     @Test
-    fun `Henting av veiledere på gruppeId feilet med IllegalAccessException (Exception)`() {
+    fun `Henting av veiledere pa gruppeId feilet med IllegalAccessException (Exception)`() {
         val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
         val veilederIdent = UserConstants.VEILEDER_IDENT
         val redisCache = externalMockEnvironment.redisCache

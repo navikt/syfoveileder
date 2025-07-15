@@ -6,7 +6,7 @@ to veiledere. So far this means a list of veileder names with access to an enhet
 
 
 ## Dependencies
-Syfoveileder henter ut aktive veiledere på oppgitt enhet fra Azura AD / Entra ID via Microsoft Graph.
+Syfoveileder henter ut aktive veiledere på oppgitt enhet fra Azure AD / Entra ID via Microsoft Graph.
 
 ## Technologies used
 

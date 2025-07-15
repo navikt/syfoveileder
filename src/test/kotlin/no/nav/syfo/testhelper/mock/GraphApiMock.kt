@@ -93,7 +93,5 @@ fun group(groupId: String = "UUID", enhetNr: String = UserConstants.ENHET_NR): G
     val group = Group()
     group.id = groupId
     group.displayName = "${ENHETSNAVN_PREFIX}$enhetNr"
-    group.description = "Group 123"
-    group.onPremisesSamAccountName = "GROUP_ID"
     return group
 }
