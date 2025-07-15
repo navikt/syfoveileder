@@ -83,10 +83,10 @@ class VeiledereApiTest {
             @Test
             fun `should return OK if request is successful and graphapi response should be cached`() {
                 val graphapiUserResponse = graphapiUserResponse.value[0]
-                val redisCache = externalMockEnvironment.redisCache
+                val valkeyCache = externalMockEnvironment.valkeyCache
                 val cacheKey = "${GraphApiClient.GRAPH_API_CACHE_VEILEDER_PREFIX}${UserConstants.VEILEDER_IDENT}"
 
-                assertNull(redisCache.getObject<GraphApiUser>(cacheKey))
+                assertNull(valkeyCache.getObject<GraphApiUser>(cacheKey))
                 testApplication {
                     val client = setupApiAndClient()
                     val response = client.get(urlVeilederinfoSelf) {
@@ -101,7 +101,7 @@ class VeiledereApiTest {
                     assertEquals(graphapiUserResponse.surname, veilederInfo.etternavn)
                     assertEquals(graphapiUserResponse.mail, veilederInfo.epost)
                     assertTrue(veilederInfo.enabled!!)
-                    assertNotNull(redisCache.getObject<GraphApiUser>(cacheKey))
+                    assertNotNull(valkeyCache.getObject<GraphApiUser>(cacheKey))
                 }
             }
         }
@@ -214,7 +214,7 @@ class VeiledereApiTest {
     fun `Veileder har ingen grupper`() {
         val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
         val veilederIdent = UserConstants.VEILEDER_IDENT
-        val redisCache = externalMockEnvironment.redisCache
+        val valkeyCache = externalMockEnvironment.valkeyCache
         val gruppeCacheKey = GraphApiClient.cacheKeyGrupper(veilederIdent)
 
         val service: GraphApiService = object : GraphApiServiceImpl() {
@@ -223,7 +223,7 @@ class VeiledereApiTest {
             }
         }
 
-        assertNull(redisCache.getObject<List<Gruppe>>(gruppeCacheKey))
+        assertNull(valkeyCache.getObject<List<Gruppe>>(gruppeCacheKey))
         testApplication {
             val client = setupApiAndClient(service)
 
@@ -235,7 +235,7 @@ class VeiledereApiTest {
             assertEquals(HttpStatusCode.OK, response.status)
             assertTrue(veilederInfo.isEmpty())
 
-            val cachedGrupper = redisCache.getListObject<Gruppe>(gruppeCacheKey)!!
+            val cachedGrupper = valkeyCache.getListObject<Gruppe>(gruppeCacheKey)!!
             assertTrue(cachedGrupper.isEmpty())
         }
     }
@@ -244,7 +244,7 @@ class VeiledereApiTest {
     fun `Veileder har grupper, men tilhorer ikke oppgitt enhet`() {
         val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
         val veilederIdent = UserConstants.VEILEDER_IDENT
-        val redisCache = externalMockEnvironment.redisCache
+        val valkeyCache = externalMockEnvironment.valkeyCache
         val gruppeCacheKey = GraphApiClient.cacheKeyGrupper(veilederIdent)
         val groupId = "UUID"
         val veilederCacheKey = GraphApiClient.cacheKeyVeiledereIEnhet(groupId)
@@ -255,8 +255,8 @@ class VeiledereApiTest {
             }
         }
 
-        assertNull(redisCache.getObject<List<Gruppe>>(gruppeCacheKey))
-        assertNull(redisCache.getObject<List<Veileder>>(veilederCacheKey))
+        assertNull(valkeyCache.getObject<List<Gruppe>>(gruppeCacheKey))
+        assertNull(valkeyCache.getObject<List<Veileder>>(veilederCacheKey))
         testApplication {
             val client = setupApiAndClient(service)
 
@@ -268,9 +268,9 @@ class VeiledereApiTest {
             assertEquals(HttpStatusCode.OK, response.status)
             assertEquals(0, veilederInfo.size)
 
-            val cachedGrupper = redisCache.getListObject<Gruppe>(gruppeCacheKey)!!
+            val cachedGrupper = valkeyCache.getListObject<Gruppe>(gruppeCacheKey)!!
             assertEquals(1, cachedGrupper.size)
-            assertNull(redisCache.getObject<List<Veileder>>(veilederCacheKey))
+            assertNull(valkeyCache.getObject<List<Veileder>>(veilederCacheKey))
         }
     }
 
@@ -278,7 +278,7 @@ class VeiledereApiTest {
     fun `Veileder har grupper og tilhorer oppgitt enhet`() {
         val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
         val veilederIdent = UserConstants.VEILEDER_IDENT
-        val redisCache = externalMockEnvironment.redisCache
+        val valkeyCache = externalMockEnvironment.valkeyCache
         val gruppeCacheKey = GraphApiClient.cacheKeyGrupper(veilederIdent)
         val groupId = "UUID"
         val veilederCacheKey = GraphApiClient.cacheKeyVeiledereIEnhet(groupId)
@@ -296,8 +296,8 @@ class VeiledereApiTest {
             }
         }
 
-        assertNull(redisCache.getObject<List<Gruppe>>(gruppeCacheKey))
-        assertNull(redisCache.getObject<List<Veileder>>(veilederCacheKey))
+        assertNull(valkeyCache.getObject<List<Gruppe>>(gruppeCacheKey))
+        assertNull(valkeyCache.getObject<List<Veileder>>(veilederCacheKey))
         testApplication {
             val client = setupApiAndClient(service)
 
@@ -317,10 +317,10 @@ class VeiledereApiTest {
             assertEquals("00 00 00 00", veileder.telefonnummer)
             assertTrue(veileder.enabled!!)
 
-            val cachedGrupper = redisCache.getListObject<Gruppe>(gruppeCacheKey)!!
+            val cachedGrupper = valkeyCache.getListObject<Gruppe>(gruppeCacheKey)!!
             assertEquals(1, cachedGrupper.size)
 
-            val cachedVeiledere = redisCache.getObject<List<Veileder>>(veilederCacheKey)!!
+            val cachedVeiledere = valkeyCache.getObject<List<Veileder>>(veilederCacheKey)!!
             assertEquals(1, cachedVeiledere.size)
         }
     }
@@ -329,7 +329,7 @@ class VeiledereApiTest {
     fun `Kall pa grupper for veileder feilet med ODataError (ApiException)`() {
         val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
         val veilederIdent = UserConstants.VEILEDER_IDENT
-        val redisCache = externalMockEnvironment.redisCache
+        val valkeyCache = externalMockEnvironment.valkeyCache
         val gruppeCacheKey = GraphApiClient.cacheKeyGrupper(veilederIdent)
 
         val service: GraphApiService = object : GraphApiServiceImpl() {
@@ -341,7 +341,7 @@ class VeiledereApiTest {
             }
         }
 
-        assertNull(redisCache.getObject<List<Gruppe>>(gruppeCacheKey))
+        assertNull(valkeyCache.getObject<List<Gruppe>>(gruppeCacheKey))
         testApplication {
             val client = setupApiAndClient(service)
 
@@ -352,7 +352,7 @@ class VeiledereApiTest {
             val errorMessage = response.body<String>()
             assertEquals(HttpStatusCode.InternalServerError, response.status)
             assertEquals("Error when calling Graph API", errorMessage)
-            assertNull(redisCache.getObject<List<Gruppe>>(gruppeCacheKey))
+            assertNull(valkeyCache.getObject<List<Gruppe>>(gruppeCacheKey))
         }
     }
 
@@ -360,7 +360,7 @@ class VeiledereApiTest {
     fun `Kall pa grupper for veileder feilet med IllegalAccessException (Exception)`() {
         val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
         val veilederIdent = UserConstants.VEILEDER_IDENT
-        val redisCache = externalMockEnvironment.redisCache
+        val valkeyCache = externalMockEnvironment.valkeyCache
         val gruppeCacheKey = GraphApiClient.cacheKeyGrupper(veilederIdent)
 
         val service: GraphApiService = object : GraphApiServiceImpl() {
@@ -369,7 +369,7 @@ class VeiledereApiTest {
             }
         }
 
-        assertNull(redisCache.getObject<List<Gruppe>>(gruppeCacheKey))
+        assertNull(valkeyCache.getObject<List<Gruppe>>(gruppeCacheKey))
         testApplication {
             val client = setupApiAndClient(service)
 
@@ -380,7 +380,7 @@ class VeiledereApiTest {
             val errorMessage = response.body<String>()
             assertEquals(HttpStatusCode.InternalServerError, response.status)
             assertEquals("Some access error", errorMessage)
-            assertNull(redisCache.getObject<List<Gruppe>>(gruppeCacheKey))
+            assertNull(valkeyCache.getObject<List<Gruppe>>(gruppeCacheKey))
         }
     }
 
@@ -388,7 +388,7 @@ class VeiledereApiTest {
     fun `Henting av veiledere pa gruppeId feilet med ODataError (ApiException)`() {
         val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
         val veilederIdent = UserConstants.VEILEDER_IDENT
-        val redisCache = externalMockEnvironment.redisCache
+        val valkeyCache = externalMockEnvironment.valkeyCache
         val gruppeCacheKey = GraphApiClient.cacheKeyGrupper(veilederIdent)
         val groupId = "UUID"
         val veilederCacheKey = GraphApiClient.cacheKeyVeiledereIEnhet(groupId)
@@ -409,7 +409,7 @@ class VeiledereApiTest {
             }
         }
 
-        assertNull(redisCache.getObject<List<Gruppe>>(gruppeCacheKey))
+        assertNull(valkeyCache.getObject<List<Gruppe>>(gruppeCacheKey))
         testApplication {
             val client = setupApiAndClient(service)
 
@@ -421,9 +421,9 @@ class VeiledereApiTest {
             assertEquals(HttpStatusCode.InternalServerError, response.status)
             assertEquals("Error when calling Graph API", errorMessage)
 
-            val cachedGrupper = redisCache.getListObject<Gruppe>(gruppeCacheKey)!!
+            val cachedGrupper = valkeyCache.getListObject<Gruppe>(gruppeCacheKey)!!
             assertEquals(1, cachedGrupper.size)
-            assertNull(redisCache.getObject<List<Veileder>>(veilederCacheKey))
+            assertNull(valkeyCache.getObject<List<Veileder>>(veilederCacheKey))
         }
     }
 
@@ -431,7 +431,7 @@ class VeiledereApiTest {
     fun `Henting av veiledere pa gruppeId feilet med IllegalAccessException (Exception)`() {
         val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
         val veilederIdent = UserConstants.VEILEDER_IDENT
-        val redisCache = externalMockEnvironment.redisCache
+        val valkeyCache = externalMockEnvironment.valkeyCache
         val gruppeCacheKey = GraphApiClient.cacheKeyGrupper(veilederIdent)
         val groupId = "UUID"
         val veilederCacheKey = GraphApiClient.cacheKeyVeiledereIEnhet(groupId)
@@ -449,7 +449,7 @@ class VeiledereApiTest {
             }
         }
 
-        assertNull(redisCache.getObject<List<Gruppe>>(gruppeCacheKey))
+        assertNull(valkeyCache.getObject<List<Gruppe>>(gruppeCacheKey))
         testApplication {
             val client = setupApiAndClient(service)
 
@@ -461,9 +461,9 @@ class VeiledereApiTest {
             assertEquals(HttpStatusCode.InternalServerError, response.status)
             assertEquals("Some access error", errorMessage)
 
-            val cachedGrupper = redisCache.getListObject<Gruppe>(gruppeCacheKey)!!
+            val cachedGrupper = valkeyCache.getListObject<Gruppe>(gruppeCacheKey)!!
             assertEquals(1, cachedGrupper.size)
-            assertNull(redisCache.getObject<List<Veileder>>(veilederCacheKey))
+            assertNull(valkeyCache.getObject<List<Veileder>>(veilederCacheKey))
         }
     }
 }

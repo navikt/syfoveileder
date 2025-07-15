@@ -16,13 +16,13 @@ fun Application.testApiModule(
         azureAppClientSecret = externalMockEnvironment.environment.azureAppClientSecret,
         azureOpenidConfigTokenEndpoint = externalMockEnvironment.environment.azureOpenidConfigTokenEndpoint,
         graphApiUrl = externalMockEnvironment.environment.graphapiUrl,
-        cache = externalMockEnvironment.redisCache,
+        cache = externalMockEnvironment.valkeyCache,
         httpClient = externalMockEnvironment.mockHttpClient,
     )
     val graphApiClient = GraphApiClient(
         azureAdClient = azureAdClient,
         baseUrl = externalMockEnvironment.environment.graphapiUrl,
-        cache = externalMockEnvironment.redisCache,
+        cache = externalMockEnvironment.valkeyCache,
         httpClient = externalMockEnvironment.mockHttpClient,
         graphApiService = graphApiService
     )
