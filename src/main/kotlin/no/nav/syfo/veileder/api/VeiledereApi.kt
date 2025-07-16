@@ -28,6 +28,7 @@ fun Route.registrerVeiledereApi(
                     ?: throw IllegalArgumentException("No Authorization header supplied")
 
                 val veilederList = veilederService.getVeiledere(
+                    callId = callId,
                     enhetNr = enhetNr,
                     token = token,
                 )

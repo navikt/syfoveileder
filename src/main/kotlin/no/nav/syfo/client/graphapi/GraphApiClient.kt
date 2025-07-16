@@ -109,7 +109,7 @@ class GraphApiClient(
         throw e
     }
 
-    suspend fun getVeiledereByEnhetNr(token: String, enhetNr: String): List<Veileder> {
+    suspend fun getVeiledereByEnhetNr(callId: String, token: String, enhetNr: String): List<Veileder> {
         return getEnhetByEnhetNrForVeileder(
             token = token,
             enhetNr = enhetNr,
@@ -118,7 +118,10 @@ class GraphApiClient(
                 token = token,
                 group = group,
             )
-        } ?: emptyList() // TODO: Kaste exception?
+        } ?: run {
+            log.warn("User has no groups or there are no veiledere in specified group. CallId=$callId")
+            emptyList()
+        }
     }
 
     suspend fun getEnhetByEnhetNrForVeileder(token: String, enhetNr: String): Gruppe? {
@@ -277,7 +280,6 @@ class GraphApiClient(
 
     companion object {
         const val GRAPH_API_CACHE_VEILEDER_PREFIX = "graphapiVeileder-"
-        const val GRAPH_API_CACHE_VEILEDERE_FRA_ENHET_PREFIX = "graphapiVeiledereFraEnhet-"
         const val GRAPH_API_CACHE_VEILEDER_GRUPPER_PREFIX = "graphapiVeilederGrupper-"
         const val GRAPH_API_CACHE_VEILEDERE_I_ENHET_PREFIX = "graphapiVeiledereIEnhet-"
 

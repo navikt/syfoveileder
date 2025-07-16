@@ -36,10 +36,12 @@ class VeilederService(
     )?.toVeilederInfo(veilederIdent)
 
     suspend fun getVeiledere(
+        callId: String,
         enhetNr: String,
         token: String,
     ): List<VeilederInfo> {
         return graphApiClient.getVeiledereByEnhetNr(
+            callId = callId,
             token = token,
             enhetNr = enhetNr,
         ).map { it.toVeilederInfo() }
