@@ -2,7 +2,6 @@ package no.nav.syfo.veiledernavn
 
 import no.nav.syfo.client.graphapi.GraphApiClient
 import no.nav.syfo.client.graphapi.toVeilederInfo
-import no.nav.syfo.veileder.Veileder.Companion.toVeilederInfo
 import no.nav.syfo.veileder.VeilederInfo
 import org.slf4j.LoggerFactory
 
@@ -40,11 +39,19 @@ class VeilederService(
         enhetNr: String,
         token: String,
     ): List<VeilederInfo> {
-        return graphApiClient.getVeiledereByEnhetNr(
-            callId = callId,
+        return graphApiClient.getEnhetByEnhetNrForVeileder(
             token = token,
             enhetNr = enhetNr,
-        ).map { it.toVeilederInfo() }
+        )?.let { group ->
+            graphApiClient.getVeiledereVedEnhetByGroupId(
+                callId = callId,
+                token = token,
+                group = group,
+            )
+        } ?: run {
+            log.warn("User has no groups or there are no veiledere in specified group. CallId=$callId")
+            emptyList()
+        }
     }
 
     companion object {

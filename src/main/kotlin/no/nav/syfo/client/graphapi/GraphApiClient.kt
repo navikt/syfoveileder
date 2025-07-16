@@ -18,10 +18,10 @@ import no.nav.syfo.client.httpClientProxy
 import no.nav.syfo.util.bearerHeader
 import no.nav.syfo.util.callIdArgument
 import no.nav.syfo.veileder.Gruppe
-import no.nav.syfo.veileder.Veileder
+import no.nav.syfo.veileder.VeilederInfo
 import org.jetbrains.annotations.VisibleForTesting
 import org.slf4j.LoggerFactory
-import java.util.Objects
+import java.util.*
 
 class GraphApiClient(
     private val azureAdClient: AzureAdClient,
@@ -107,21 +107,6 @@ class GraphApiClient(
         throw e
     }
 
-    suspend fun getVeiledereByEnhetNr(callId: String, token: String, enhetNr: String): List<Veileder> {
-        return getEnhetByEnhetNrForVeileder(
-            token = token,
-            enhetNr = enhetNr,
-        )?.let { group ->
-            getVeiledereVedEnhetByGroupId(
-                token = token,
-                group = group,
-            )
-        } ?: run {
-            log.warn("User has no groups or there are no veiledere in specified group. CallId=$callId")
-            emptyList()
-        }
-    }
-
     suspend fun getEnhetByEnhetNrForVeileder(token: String, enhetNr: String): Gruppe? {
         val veilederIdent = getNAVIdentFromToken(token)
         val key = cacheKeyGrupper(veilederIdent)
@@ -147,7 +132,7 @@ class GraphApiClient(
     }
 
     private fun getGruppeIfAccess(grupper: List<Gruppe>, enhetNr: String): Gruppe? =
-        grupper.find { it.displayName == gruppenavnEnhet(enhetNr) }
+        grupper.find { it.adGruppenavn == gruppenavnEnhet(enhetNr) }
 
     suspend fun getGroupsForVeileder(token: String): List<Gruppe> {
         try {
@@ -197,28 +182,36 @@ class GraphApiClient(
 
     private fun Group.toGruppe(): Gruppe {
         return Gruppe(
-            id = this.id,
-            displayName = this.displayName,
+            uuid = this.id,
+            adGruppenavn = this.displayName,
         )
     }
 
-    suspend fun getVeiledereVedEnhetByGroupId(token: String, group: Gruppe): List<Veileder> {
-        val key = cacheKeyVeiledereIEnhet(group.id)
-        val cachedUsers: List<Veileder>? = cache.getListObject(key)
+    suspend fun getVeiledereVedEnhetByGroupId(callId: String, token: String, group: Gruppe): List<VeilederInfo> {
+        val key = cacheKeyVeiledereIEnhet(group.uuid)
+        val cachedUsers: List<VeilederInfo>? = cache.getListObject(key)
 
         return if (cachedUsers != null) {
             COUNT_CALL_GRAPHAPI_VEILEDER_LIST_CACHE_HIT.increment()
             cachedUsers
         } else {
             COUNT_CALL_GRAPHAPI_VEILEDER_LIST_CACHE_MISS.increment()
-            getMembersByGroupId(token, group.id).also { cacheFor12Hours(key, it) }
+            getMembersInGroupByGroupId(callId, token, group.uuid).also { cacheFor12Hours(key, it) }
         }
     }
 
-    suspend fun getMembersByGroupId(token: String, groupId: String): List<Veileder> {
+    suspend fun getMembersInGroupByGroupId(callId: String, token: String, groupId: String): List<VeilederInfo> {
         try {
-            return getMembersByGroupIdRequest(token, groupId)
-                .map { it.toVeileder() }
+            val users = getMembersInGroupByGroupIdRequest(token, groupId)
+
+            val filter = users.filter { it.onPremisesSamAccountName == null }
+            if (filter.isNotEmpty()) {
+                log.warn("There are: ${filter.size} users without ident. CallId=$callId")
+            }
+
+            return users
+                .filter { it.onPremisesSamAccountName != null }
+                .map { it.toVeilederInfo() }
                 .apply { COUNT_CALL_GRAPHAPI_VEILEDER_LIST_SUCCESS.increment() }
         } catch (e: Exception) {
             COUNT_CALL_GRAPHAPI_VEILEDER_LIST_FAIL.increment()
@@ -231,7 +224,7 @@ class GraphApiClient(
      * @throws Exception
      */
     @VisibleForTesting
-    internal suspend fun getMembersByGroupIdRequest(token: String, groupId: String): List<User> {
+    internal suspend fun getMembersInGroupByGroupIdRequest(token: String, groupId: String): List<User> {
         val systemToken = azureAdClient.getSystemToken(
             token = token,
             scopeClientId = baseUrl,
@@ -266,14 +259,14 @@ class GraphApiClient(
         return users
     }
 
-    private fun User.toVeileder(): Veileder {
-        return Veileder(
-            givenName = this.givenName,
-            surname = this.surname,
-            mail = this.mail,
-            businessPhones = this.businessPhones?.firstOrNull(),
-            accountEnabled = this.accountEnabled,
-            onPremisesSamAccountName = this.onPremisesSamAccountName,
+    private fun User.toVeilederInfo(): VeilederInfo {
+        return VeilederInfo(
+            ident = this.onPremisesSamAccountName,
+            fornavn = this.givenName ?: "",
+            etternavn = this.surname ?: "",
+            epost = this.mail ?: "",
+            telefonnummer = this.businessPhones?.firstOrNull(),
+            enabled = this.accountEnabled,
         )
     }
 

@@ -20,7 +20,6 @@ import no.nav.syfo.testhelper.mock.group
 import no.nav.syfo.testhelper.mock.user
 import no.nav.syfo.util.configure
 import no.nav.syfo.veileder.Gruppe
-import no.nav.syfo.veileder.Veileder
 import no.nav.syfo.veileder.VeilederInfo
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
@@ -268,7 +267,7 @@ class VeiledereApiTest {
         )
 
         assertNull(valkeyCache.getObject<List<Gruppe>>(gruppeCacheKey))
-        assertNull(valkeyCache.getObject<List<Veileder>>(veilederCacheKey))
+        assertNull(valkeyCache.getObject<List<VeilederInfo>>(veilederCacheKey))
         testApplication {
             val client = setupApiAndClient(graphApiClient = graphApiClientStub)
 
@@ -281,7 +280,7 @@ class VeiledereApiTest {
             assertEquals(0, veilederInfo.size)
 
             assertNull(valkeyCache.getListObject<Gruppe>(gruppeCacheKey))
-            assertNull(valkeyCache.getObject<List<Veileder>>(veilederCacheKey))
+            assertNull(valkeyCache.getObject<List<VeilederInfo>>(veilederCacheKey))
         }
     }
 
@@ -305,16 +304,16 @@ class VeiledereApiTest {
                 enhetNr = "0456"
             )
         )
-        coEvery { graphApiClientStub.getMembersByGroupIdRequest(any(), any()) } returns emptyList()
+        coEvery { graphApiClientStub.getMembersInGroupByGroupIdRequest(any(), any()) } returns emptyList()
 
         valkeyCache.setObject(gruppeCacheKey, listOf(Gruppe("UUID2", "0000-GA-ENHET_0456")), 1000)
         val cachedGrupper = valkeyCache.getListObject<Gruppe>(gruppeCacheKey)!!
         assertEquals(1, cachedGrupper.size)
 
         val cachedGruppe = cachedGrupper[0]
-        assertEquals("UUID2", cachedGruppe.id)
-        assertEquals("0000-GA-ENHET_0456", cachedGruppe.displayName)
-        assertNull(valkeyCache.getObject<List<Veileder>>(veilederCacheKey))
+        assertEquals("UUID2", cachedGruppe.uuid)
+        assertEquals("0000-GA-ENHET_0456", cachedGruppe.adGruppenavn)
+        assertNull(valkeyCache.getObject<List<VeilederInfo>>(veilederCacheKey))
         testApplication {
             val client = setupApiAndClient(graphApiClient = graphApiClientStub)
 
@@ -330,13 +329,13 @@ class VeiledereApiTest {
             assertEquals(2, cachedGrupper.size)
 
             val cachedGruppe = cachedGrupper[0]
-            assertEquals("UUID", cachedGruppe.id)
-            assertEquals("0000-GA-ENHET_0123", cachedGruppe.displayName)
+            assertEquals("UUID", cachedGruppe.uuid)
+            assertEquals("0000-GA-ENHET_0123", cachedGruppe.adGruppenavn)
 
             val cachedGruppe2 = cachedGrupper[1]
-            assertEquals("UUID2", cachedGruppe2.id)
-            assertEquals("0000-GA-ENHET_0456", cachedGruppe2.displayName)
-            assertTrue(valkeyCache.getObject<List<Veileder>>(veilederCacheKey)!!.isEmpty())
+            assertEquals("UUID2", cachedGruppe2.uuid)
+            assertEquals("0000-GA-ENHET_0456", cachedGruppe2.adGruppenavn)
+            assertTrue(valkeyCache.getObject<List<VeilederInfo>>(veilederCacheKey)!!.isEmpty())
         }
     }
 
@@ -351,10 +350,10 @@ class VeiledereApiTest {
 
         val graphApiClientStub = spyk(graphApiClient)
         coEvery { graphApiClientStub.getGroupsForVeilederRequest(any()) } returns listOf(group(groupId = groupId))
-        coEvery { graphApiClientStub.getMembersByGroupIdRequest(any(), any()) } returns listOf(user())
+        coEvery { graphApiClientStub.getMembersInGroupByGroupIdRequest(any(), any()) } returns listOf(user())
 
         assertNull(valkeyCache.getObject<List<Gruppe>>(gruppeCacheKey))
-        assertNull(valkeyCache.getObject<List<Veileder>>(veilederCacheKey))
+        assertNull(valkeyCache.getObject<List<VeilederInfo>>(veilederCacheKey))
         testApplication {
             val client = setupApiAndClient(graphApiClient = graphApiClientStub)
 
@@ -377,7 +376,7 @@ class VeiledereApiTest {
             val cachedGrupper = valkeyCache.getListObject<Gruppe>(gruppeCacheKey)!!
             assertEquals(1, cachedGrupper.size)
 
-            val cachedVeiledere = valkeyCache.getObject<List<Veileder>>(veilederCacheKey)!!
+            val cachedVeiledere = valkeyCache.getObject<List<VeilederInfo>>(veilederCacheKey)!!
             assertEquals(1, cachedVeiledere.size)
         }
     }
@@ -446,7 +445,7 @@ class VeiledereApiTest {
 
         val graphApiClientStub = spyk(graphApiClient)
         coEvery { graphApiClientStub.getGroupsForVeilederRequest(any()) } returns listOf(group(groupId = groupId))
-        coEvery { graphApiClientStub.getMembersByGroupIdRequest(any(), any()) } throws ODataError().apply {
+        coEvery { graphApiClientStub.getMembersInGroupByGroupIdRequest(any(), any()) } throws ODataError().apply {
             error =
                 MainError().apply { this.code = "400" }.apply { this.message = "Error when calling Graph API" }
         }
@@ -465,7 +464,7 @@ class VeiledereApiTest {
 
             val cachedGrupper = valkeyCache.getListObject<Gruppe>(gruppeCacheKey)!!
             assertEquals(1, cachedGrupper.size)
-            assertNull(valkeyCache.getObject<List<Veileder>>(veilederCacheKey))
+            assertNull(valkeyCache.getObject<List<VeilederInfo>>(veilederCacheKey))
         }
     }
 
@@ -481,7 +480,7 @@ class VeiledereApiTest {
         val graphApiClientStub = spyk(graphApiClient)
         coEvery { graphApiClientStub.getGroupsForVeilederRequest(any()) } returns listOf(group(groupId = groupId))
         coEvery {
-            graphApiClientStub.getMembersByGroupIdRequest(
+            graphApiClientStub.getMembersInGroupByGroupIdRequest(
                 any(),
                 any()
             )
@@ -501,7 +500,7 @@ class VeiledereApiTest {
 
             val cachedGrupper = valkeyCache.getListObject<Gruppe>(gruppeCacheKey)!!
             assertEquals(1, cachedGrupper.size)
-            assertNull(valkeyCache.getObject<List<Veileder>>(veilederCacheKey))
+            assertNull(valkeyCache.getObject<List<VeilederInfo>>(veilederCacheKey))
         }
     }
 }
