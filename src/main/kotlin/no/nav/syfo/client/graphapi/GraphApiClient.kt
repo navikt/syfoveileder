@@ -1,5 +1,11 @@
 package no.nav.syfo.client.graphapi
 
+import com.microsoft.graph.core.tasks.PageIterator
+import com.microsoft.graph.models.DirectoryObjectCollectionResponse
+import com.microsoft.graph.models.DirectoryObjectCollectionResponse.createFromDiscriminatorValue
+import com.microsoft.graph.models.Group
+import com.microsoft.graph.models.User
+import com.microsoft.graph.serviceclient.GraphServiceClient
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
@@ -7,6 +13,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.application.api.authentication.getNAVIdentFromToken
+import no.nav.syfo.application.api.exception.toRestException
 import no.nav.syfo.application.cache.ValkeyStore
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.httpClientProxy
@@ -14,14 +21,15 @@ import no.nav.syfo.util.bearerHeader
 import no.nav.syfo.util.callIdArgument
 import no.nav.syfo.veileder.Gruppe
 import no.nav.syfo.veileder.Veileder
+import org.jetbrains.annotations.VisibleForTesting
 import org.slf4j.LoggerFactory
+import java.util.Objects
 
 class GraphApiClient(
     private val azureAdClient: AzureAdClient,
     private val baseUrl: String,
     private val cache: ValkeyStore,
     private val httpClient: HttpClient = httpClientProxy(),
-    private val graphApiService: GraphApiService = GraphApiServiceImpl()
 ) {
 
     suspend fun veileder(
@@ -131,10 +139,56 @@ class GraphApiClient(
 
             val graphServiceClient = azureAdClient.createGraphServiceClient(azureAdToken = oboToken)
             // TODO: Skal gruppene caches hvis man ikke har tilgang?
-            graphApiService.getGroupsForVeileder(graphServiceClient).also { cacheFor12Hours(key, it) }
+            getGroupsForVeileder(graphServiceClient).also { cacheFor12Hours(key, it) }
         }
 
         return groups.find { it.displayName == gruppenavnEnhet(enhetNr) }
+    }
+
+    fun getGroupsForVeileder(graphServiceClient: GraphServiceClient): List<Gruppe> {
+        try {
+            return getGroupsForVeilederRequest(graphServiceClient)
+                .map { it.toGruppe() }
+                .apply { COUNT_CALL_GRAPHAPI_GRUPPE_SUCCESS.increment() }
+        } catch (e: Exception) {
+            COUNT_CALL_GRAPHAPI_GRUPPE_FAIL.increment()
+            throw e.toRestException("Error while getting groups for veileder")
+        }
+    }
+
+    /**
+     * @throws com.microsoft.kiota.ApiException
+     * @throws Exception
+     */
+    @VisibleForTesting
+    internal fun getGroupsForVeilederRequest(graphServiceClient: GraphServiceClient): List<Group> {
+        val directoryObjectCollectionResponse = graphServiceClient.me().memberOf().get { requestConfiguration ->
+            requestConfiguration.headers.add("ConsistencyLevel", "eventual")
+            requestConfiguration.queryParameters.select =
+                arrayOf(
+                    "id",
+                    "displayName",
+                )
+            requestConfiguration.queryParameters.count = true
+        }
+
+        val groups = mutableListOf<Group>()
+        PageIterator.Builder<Group, DirectoryObjectCollectionResponse>()
+            .client(graphServiceClient)
+            .collectionPage(Objects.requireNonNull(directoryObjectCollectionResponse))
+            .collectionPageFactory(DirectoryObjectCollectionResponse::createFromDiscriminatorValue)
+            .processPageItemCallback { group -> groups.add(group) }
+            .build()
+            .iterate()
+
+        return groups
+    }
+
+    private fun Group.toGruppe(): Gruppe {
+        return Gruppe(
+            id = this.id,
+            displayName = this.displayName,
+        )
     }
 
     suspend fun getVeiledereVedEnhetByGroupId(token: String, group: Gruppe): List<Veileder> {
@@ -152,8 +206,64 @@ class GraphApiClient(
             ) ?: throw RuntimeException("Failed to request access to Veileder in Graph API: Failed to get system token")
 
             val graphServiceClient = azureAdClient.createGraphServiceClient(azureAdToken = systemToken)
-            graphApiService.getMembersByGroupId(graphServiceClient, group.id).also { cacheFor12Hours(key, it) }
+            getMembersByGroupId(graphServiceClient, group.id).also { cacheFor12Hours(key, it) }
         }
+    }
+
+    fun getMembersByGroupId(graphServiceClient: GraphServiceClient, groupId: String): List<Veileder> {
+        try {
+            return getMembersByGroupIdRequest(graphServiceClient, groupId)
+                .map { it.toVeileder() }
+                .apply { COUNT_CALL_GRAPHAPI_VEILEDER_LIST_SUCCESS.increment() }
+        } catch (e: Exception) {
+            COUNT_CALL_GRAPHAPI_VEILEDER_LIST_FAIL.increment()
+            throw e.toRestException("Error while getting veiledere by group id")
+        }
+    }
+
+    /**
+     * @throws com.microsoft.kiota.ApiException
+     * @throws Exception
+     */
+    @VisibleForTesting
+    internal fun getMembersByGroupIdRequest(graphServiceClient: GraphServiceClient, groupId: String): List<User> {
+        val directoryObjectCollectionResponse =
+            graphServiceClient.groups().byGroupId(groupId).members().get { requestConfiguration ->
+                requestConfiguration.headers.add("ConsistencyLevel", "eventual")
+                requestConfiguration.queryParameters.select =
+                    arrayOf(
+                        "givenName",
+                        "surname",
+                        "mail",
+                        "businessPhones",
+                        "onPremisesSamAccountName",
+                        "accountEnabled"
+                    )
+                requestConfiguration.queryParameters.filter = "accountEnabled eq true"
+                requestConfiguration.queryParameters.count = true
+            }
+
+        val users = mutableListOf<User>()
+        PageIterator.Builder<User, DirectoryObjectCollectionResponse>()
+            .client(graphServiceClient)
+            .collectionPage(Objects.requireNonNull(directoryObjectCollectionResponse))
+            .collectionPageFactory(DirectoryObjectCollectionResponse::createFromDiscriminatorValue)
+            .processPageItemCallback { user -> users.add(user) }
+            .build()
+            .iterate()
+
+        return users
+    }
+
+    private fun User.toVeileder(): Veileder {
+        return Veileder(
+            givenName = this.givenName,
+            surname = this.surname,
+            mail = this.mail,
+            businessPhones = this.businessPhones?.firstOrNull(),
+            accountEnabled = this.accountEnabled,
+            onPremisesSamAccountName = this.onPremisesSamAccountName,
+        )
     }
 
     private fun <T> cacheFor12Hours(cacheKey: String, value: T) {

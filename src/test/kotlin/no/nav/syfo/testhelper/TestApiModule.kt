@@ -4,12 +4,11 @@ import io.ktor.server.application.*
 import no.nav.syfo.application.api.apiModule
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.graphapi.GraphApiClient
-import no.nav.syfo.client.graphapi.GraphApiService
 import no.nav.syfo.veiledernavn.VeilederService
 
 fun Application.testApiModule(
     externalMockEnvironment: ExternalMockEnvironment,
-    graphApiService: GraphApiService = externalMockEnvironment.mockGraphApiService
+    graphApiClientMock: GraphApiClient? = null
 ) {
     val azureAdClient = AzureAdClient(
         azureAppClientId = externalMockEnvironment.environment.azureAppClientId,
@@ -19,12 +18,11 @@ fun Application.testApiModule(
         cache = externalMockEnvironment.valkeyCache,
         httpClient = externalMockEnvironment.mockHttpClient,
     )
-    val graphApiClient = GraphApiClient(
+    val graphApiClient = graphApiClientMock ?: GraphApiClient(
         azureAdClient = azureAdClient,
         baseUrl = externalMockEnvironment.environment.graphapiUrl,
         cache = externalMockEnvironment.valkeyCache,
         httpClient = externalMockEnvironment.mockHttpClient,
-        graphApiService = graphApiService
     )
 
     val veilederService = VeilederService(

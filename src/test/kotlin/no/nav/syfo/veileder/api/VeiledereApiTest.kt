@@ -1,10 +1,7 @@
 package no.nav.syfo.veileder.api
 
-import com.microsoft.graph.models.Group
-import com.microsoft.graph.models.User
 import com.microsoft.graph.models.odataerrors.MainError
 import com.microsoft.graph.models.odataerrors.ODataError
-import com.microsoft.graph.serviceclient.GraphServiceClient
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -12,9 +9,10 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
 import io.ktor.server.testing.*
+import io.mockk.every
+import io.mockk.spyk
+import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.graphapi.GraphApiClient
-import no.nav.syfo.client.graphapi.GraphApiService
-import no.nav.syfo.client.graphapi.GraphApiServiceImpl
 import no.nav.syfo.client.graphapi.GraphApiUser
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.mock.graphapiUserResponse
@@ -36,11 +34,25 @@ import org.junit.jupiter.api.Test
 class VeiledereApiTest {
     private val basePath = "/syfoveileder/api/v3/veiledere"
 
-    private lateinit var externalMockEnvironment: ExternalMockEnvironment
+    private val externalMockEnvironment: ExternalMockEnvironment = ExternalMockEnvironment()
+
+    val azureAdClient = AzureAdClient(
+        azureAppClientId = externalMockEnvironment.environment.azureAppClientId,
+        azureAppClientSecret = externalMockEnvironment.environment.azureAppClientSecret,
+        azureOpenidConfigTokenEndpoint = externalMockEnvironment.environment.azureOpenidConfigTokenEndpoint,
+        graphApiUrl = externalMockEnvironment.environment.graphapiUrl,
+        cache = externalMockEnvironment.valkeyCache,
+        httpClient = externalMockEnvironment.mockHttpClient,
+    )
+    val graphApiClient = GraphApiClient(
+        azureAdClient = azureAdClient,
+        baseUrl = externalMockEnvironment.environment.graphapiUrl,
+        cache = externalMockEnvironment.valkeyCache,
+        httpClient = externalMockEnvironment.mockHttpClient,
+    )
 
     @BeforeEach
     fun setup() {
-        externalMockEnvironment = ExternalMockEnvironment()
         externalMockEnvironment.startExternalMocks()
     }
 
@@ -49,11 +61,13 @@ class VeiledereApiTest {
         externalMockEnvironment.stopExternalMocks()
     }
 
-    private fun ApplicationTestBuilder.setupApiAndClient(graphApiService: GraphApiService = externalMockEnvironment.mockGraphApiService): HttpClient {
+    private fun ApplicationTestBuilder.setupApiAndClient(
+        graphApiClient: GraphApiClient? = null
+    ): HttpClient {
         application {
             testApiModule(
                 externalMockEnvironment = externalMockEnvironment,
-                graphApiService = graphApiService,
+                graphApiClientMock = graphApiClient
             )
         }
         val client = createClient {
@@ -217,15 +231,12 @@ class VeiledereApiTest {
         val valkeyCache = externalMockEnvironment.valkeyCache
         val gruppeCacheKey = GraphApiClient.cacheKeyGrupper(veilederIdent)
 
-        val service: GraphApiService = object : GraphApiServiceImpl() {
-            override fun getGroupsForVeilederRequest(graphServiceClient: GraphServiceClient): List<Group> {
-                return emptyList()
-            }
-        }
+        val graphApiClientStub = spyk(graphApiClient)
+        every { graphApiClientStub.getGroupsForVeilederRequest(any()) } returns emptyList()
 
         assertNull(valkeyCache.getObject<List<Gruppe>>(gruppeCacheKey))
         testApplication {
-            val client = setupApiAndClient(service)
+            val client = setupApiAndClient(graphApiClient = graphApiClientStub)
 
             val response = client.get(urlVeiledereEnhetNr) {
                 bearerAuth(getValidTokenVeileder(veilederIdent))
@@ -249,16 +260,18 @@ class VeiledereApiTest {
         val groupId = "UUID"
         val veilederCacheKey = GraphApiClient.cacheKeyVeiledereIEnhet(groupId)
 
-        val service: GraphApiService = object : GraphApiServiceImpl() {
-            override fun getGroupsForVeilederRequest(graphServiceClient: GraphServiceClient): List<Group> {
-                return listOf(group(groupId = groupId, enhetNr = "0456"))
-            }
-        }
+        val graphApiClientStub = spyk(graphApiClient)
+        every { graphApiClientStub.getGroupsForVeilederRequest(any()) } returns listOf(
+            group(
+                groupId = groupId,
+                enhetNr = "0456"
+            )
+        )
 
         assertNull(valkeyCache.getObject<List<Gruppe>>(gruppeCacheKey))
         assertNull(valkeyCache.getObject<List<Veileder>>(veilederCacheKey))
         testApplication {
-            val client = setupApiAndClient(service)
+            val client = setupApiAndClient(graphApiClient = graphApiClientStub)
 
             val response = client.get(urlVeiledereEnhetNr) {
                 bearerAuth(getValidTokenVeileder(veilederIdent))
@@ -283,23 +296,14 @@ class VeiledereApiTest {
         val groupId = "UUID"
         val veilederCacheKey = GraphApiClient.cacheKeyVeiledereIEnhet(groupId)
 
-        val service: GraphApiService = object : GraphApiServiceImpl() {
-            override fun getGroupsForVeilederRequest(graphServiceClient: GraphServiceClient): List<Group> {
-                return listOf(group(groupId = groupId))
-            }
-
-            override fun getMembersByGroupIdRequest(
-                graphServiceClient: GraphServiceClient,
-                groupId: String
-            ): List<User> {
-                return listOf(user())
-            }
-        }
+        val graphApiClientStub = spyk(graphApiClient)
+        every { graphApiClientStub.getGroupsForVeilederRequest(any()) } returns listOf(group(groupId = groupId))
+        every { graphApiClientStub.getMembersByGroupIdRequest(any(), any()) } returns listOf(user())
 
         assertNull(valkeyCache.getObject<List<Gruppe>>(gruppeCacheKey))
         assertNull(valkeyCache.getObject<List<Veileder>>(veilederCacheKey))
         testApplication {
-            val client = setupApiAndClient(service)
+            val client = setupApiAndClient(graphApiClient = graphApiClientStub)
 
             val response = client.get(urlVeiledereEnhetNr) {
                 bearerAuth(getValidTokenVeileder(veilederIdent))
@@ -332,18 +336,15 @@ class VeiledereApiTest {
         val valkeyCache = externalMockEnvironment.valkeyCache
         val gruppeCacheKey = GraphApiClient.cacheKeyGrupper(veilederIdent)
 
-        val service: GraphApiService = object : GraphApiServiceImpl() {
-            override fun getGroupsForVeilederRequest(graphServiceClient: GraphServiceClient): List<Group> {
-                throw ODataError().apply {
-                    error =
-                        MainError().apply { this.code = "400" }.apply { this.message = "Error when calling Graph API" }
-                }
-            }
+        val graphApiClientStub = spyk(graphApiClient)
+        every { graphApiClientStub.getGroupsForVeilederRequest(any()) } throws ODataError().apply {
+            error =
+                MainError().apply { this.code = "400" }.apply { this.message = "Error when calling Graph API" }
         }
 
         assertNull(valkeyCache.getObject<List<Gruppe>>(gruppeCacheKey))
         testApplication {
-            val client = setupApiAndClient(service)
+            val client = setupApiAndClient(graphApiClient = graphApiClientStub)
 
             val response = client.get(urlVeiledereEnhetNr) {
                 bearerAuth(getValidTokenVeileder(veilederIdent))
@@ -363,15 +364,12 @@ class VeiledereApiTest {
         val valkeyCache = externalMockEnvironment.valkeyCache
         val gruppeCacheKey = GraphApiClient.cacheKeyGrupper(veilederIdent)
 
-        val service: GraphApiService = object : GraphApiServiceImpl() {
-            override fun getGroupsForVeilederRequest(graphServiceClient: GraphServiceClient): List<Group> {
-                throw IllegalAccessException("Some access error")
-            }
-        }
+        val graphApiClientStub = spyk(graphApiClient)
+        every { graphApiClientStub.getGroupsForVeilederRequest(any()) } throws IllegalAccessException("Some access error")
 
         assertNull(valkeyCache.getObject<List<Gruppe>>(gruppeCacheKey))
         testApplication {
-            val client = setupApiAndClient(service)
+            val client = setupApiAndClient(graphApiClient = graphApiClientStub)
 
             val response = client.get(urlVeiledereEnhetNr) {
                 bearerAuth(getValidTokenVeileder(veilederIdent))
@@ -393,25 +391,16 @@ class VeiledereApiTest {
         val groupId = "UUID"
         val veilederCacheKey = GraphApiClient.cacheKeyVeiledereIEnhet(groupId)
 
-        val service: GraphApiService = object : GraphApiServiceImpl() {
-            override fun getGroupsForVeilederRequest(graphServiceClient: GraphServiceClient): List<Group> {
-                return listOf(group(groupId = groupId))
-            }
-
-            override fun getMembersByGroupIdRequest(
-                graphServiceClient: GraphServiceClient,
-                groupId: String
-            ): List<User> {
-                throw ODataError().apply {
-                    error =
-                        MainError().apply { this.code = "400" }.apply { this.message = "Error when calling Graph API" }
-                }
-            }
+        val graphApiClientStub = spyk(graphApiClient)
+        every { graphApiClientStub.getGroupsForVeilederRequest(any()) } returns listOf(group(groupId = groupId))
+        every { graphApiClientStub.getMembersByGroupIdRequest(any(), any()) } throws ODataError().apply {
+            error =
+                MainError().apply { this.code = "400" }.apply { this.message = "Error when calling Graph API" }
         }
 
         assertNull(valkeyCache.getObject<List<Gruppe>>(gruppeCacheKey))
         testApplication {
-            val client = setupApiAndClient(service)
+            val client = setupApiAndClient(graphApiClient = graphApiClientStub)
 
             val response = client.get(urlVeiledereEnhetNr) {
                 bearerAuth(getValidTokenVeileder(veilederIdent))
@@ -436,22 +425,18 @@ class VeiledereApiTest {
         val groupId = "UUID"
         val veilederCacheKey = GraphApiClient.cacheKeyVeiledereIEnhet(groupId)
 
-        val service: GraphApiService = object : GraphApiServiceImpl() {
-            override fun getGroupsForVeilederRequest(graphServiceClient: GraphServiceClient): List<Group> {
-                return listOf(group(groupId = groupId))
-            }
-
-            override fun getMembersByGroupIdRequest(
-                graphServiceClient: GraphServiceClient,
-                groupId: String
-            ): List<User> {
-                throw IllegalAccessException("Some access error")
-            }
-        }
+        val graphApiClientStub = spyk(graphApiClient)
+        every { graphApiClientStub.getGroupsForVeilederRequest(any()) } returns listOf(group(groupId = groupId))
+        every {
+            graphApiClientStub.getMembersByGroupIdRequest(
+                any(),
+                any()
+            )
+        } throws IllegalAccessException("Some access error")
 
         assertNull(valkeyCache.getObject<List<Gruppe>>(gruppeCacheKey))
         testApplication {
-            val client = setupApiAndClient(service)
+            val client = setupApiAndClient(graphApiClient = graphApiClientStub)
 
             val response = client.get(urlVeiledereEnhetNr) {
                 bearerAuth(getValidTokenVeileder(veilederIdent))
