@@ -2,10 +2,8 @@ package no.nav.syfo.client.graphapi
 
 import com.microsoft.graph.core.tasks.PageIterator
 import com.microsoft.graph.models.DirectoryObjectCollectionResponse
-import com.microsoft.graph.models.DirectoryObjectCollectionResponse.createFromDiscriminatorValue
 import com.microsoft.graph.models.Group
 import com.microsoft.graph.models.User
-import com.microsoft.graph.serviceclient.GraphServiceClient
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
@@ -129,28 +127,31 @@ class GraphApiClient(
         val key = cacheKeyGrupper(veilederIdent)
         val cachedGroups: List<Gruppe>? = cache.getListObject(key)
 
-        val groups = if (cachedGroups != null) {
+        val grupper = if (cachedGroups != null) {
             COUNT_CALL_GRAPHAPI_GRUPPE_CACHE_HIT.increment()
-            cachedGroups
+            val harTilgang = getGruppeIfAccess(cachedGroups, enhetNr) != null
+
+            if (harTilgang) {
+                cachedGroups
+            } else {
+                getGroupsForVeileder(token)
+            }
         } else {
             COUNT_CALL_GRAPHAPI_GRUPPE_CACHE_MISS.increment()
-            val oboToken = azureAdClient.getOnBehalfOfToken(
-                scopeClientId = baseUrl,
-                token = token,
-            )
-                ?: throw RuntimeException("Failed to request list of groups for veileder in Graph API: Failed to get system token from AzureAD")
-
-            val graphServiceClient = azureAdClient.createGraphServiceClient(azureAdToken = oboToken)
-            // TODO: Skal gruppene caches hvis man ikke har tilgang?
-            getGroupsForVeileder(graphServiceClient).also { cacheFor12Hours(key, it) }
+            getGroupsForVeileder(token)
         }
 
-        return groups.find { it.displayName == gruppenavnEnhet(enhetNr) }
+        return getGruppeIfAccess(grupper, enhetNr)?.also {
+            cacheFor12Hours(key, grupper)
+        }
     }
 
-    fun getGroupsForVeileder(graphServiceClient: GraphServiceClient): List<Gruppe> {
+    private fun getGruppeIfAccess(grupper: List<Gruppe>, enhetNr: String): Gruppe? =
+        grupper.find { it.displayName == gruppenavnEnhet(enhetNr) }
+
+    suspend fun getGroupsForVeileder(token: String): List<Gruppe> {
         try {
-            return getGroupsForVeilederRequest(graphServiceClient)
+            return getGroupsForVeilederRequest(token)
                 .map { it.toGruppe() }
                 .apply { COUNT_CALL_GRAPHAPI_GRUPPE_SUCCESS.increment() }
         } catch (e: Exception) {
@@ -164,7 +165,14 @@ class GraphApiClient(
      * @throws Exception
      */
     @VisibleForTesting
-    internal fun getGroupsForVeilederRequest(graphServiceClient: GraphServiceClient): List<Group> {
+    internal suspend fun getGroupsForVeilederRequest(token: String): List<Group> {
+        val oboToken = azureAdClient.getOnBehalfOfToken(
+            scopeClientId = baseUrl,
+            token = token,
+        )
+            ?: throw RuntimeException("Failed to request list of groups for veileder in Graph API: Failed to get system token from AzureAD")
+
+        val graphServiceClient = azureAdClient.createGraphServiceClient(azureAdToken = oboToken)
         val directoryObjectCollectionResponse = graphServiceClient.me().memberOf().get { requestConfiguration ->
             requestConfiguration.headers.add("ConsistencyLevel", "eventual")
             requestConfiguration.queryParameters.select =
@@ -203,19 +211,13 @@ class GraphApiClient(
             cachedUsers
         } else {
             COUNT_CALL_GRAPHAPI_VEILEDER_LIST_CACHE_MISS.increment()
-            val systemToken = azureAdClient.getSystemToken(
-                token = token,
-                scopeClientId = baseUrl,
-            ) ?: throw RuntimeException("Failed to request access to Veileder in Graph API: Failed to get system token")
-
-            val graphServiceClient = azureAdClient.createGraphServiceClient(azureAdToken = systemToken)
-            getMembersByGroupId(graphServiceClient, group.id).also { cacheFor12Hours(key, it) }
+            getMembersByGroupId(token, group.id).also { cacheFor12Hours(key, it) }
         }
     }
 
-    fun getMembersByGroupId(graphServiceClient: GraphServiceClient, groupId: String): List<Veileder> {
+    suspend fun getMembersByGroupId(token: String, groupId: String): List<Veileder> {
         try {
-            return getMembersByGroupIdRequest(graphServiceClient, groupId)
+            return getMembersByGroupIdRequest(token, groupId)
                 .map { it.toVeileder() }
                 .apply { COUNT_CALL_GRAPHAPI_VEILEDER_LIST_SUCCESS.increment() }
         } catch (e: Exception) {
@@ -229,7 +231,13 @@ class GraphApiClient(
      * @throws Exception
      */
     @VisibleForTesting
-    internal fun getMembersByGroupIdRequest(graphServiceClient: GraphServiceClient, groupId: String): List<User> {
+    internal suspend fun getMembersByGroupIdRequest(token: String, groupId: String): List<User> {
+        val systemToken = azureAdClient.getSystemToken(
+            token = token,
+            scopeClientId = baseUrl,
+        ) ?: throw RuntimeException("Failed to request access to Veileder in Graph API: Failed to get system token")
+
+        val graphServiceClient = azureAdClient.createGraphServiceClient(azureAdToken = systemToken)
         val directoryObjectCollectionResponse =
             graphServiceClient.groups().byGroupId(groupId).members().get { requestConfiguration ->
                 requestConfiguration.headers.add("ConsistencyLevel", "eventual")
