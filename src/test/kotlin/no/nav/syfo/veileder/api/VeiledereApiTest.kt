@@ -18,6 +18,7 @@ import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.mock.graphapiUserResponse
 import no.nav.syfo.testhelper.mock.group
 import no.nav.syfo.testhelper.mock.user
+import no.nav.syfo.testhelper.mock.userWithNullFields
 import no.nav.syfo.util.configure
 import no.nav.syfo.veileder.Gruppe
 import no.nav.syfo.veileder.VeilederInfo
@@ -228,7 +229,7 @@ class VeiledereApiTest {
         val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
         val veilederIdent = UserConstants.VEILEDER_IDENT
         val valkeyCache = externalMockEnvironment.valkeyCache
-        val gruppeCacheKey = GraphApiClient.cacheKeyGrupper(veilederIdent)
+        val gruppeCacheKey = GraphApiClient.cacheKeyVeilederGrupper(veilederIdent)
 
         val graphApiClientStub = spyk(graphApiClient)
         coEvery { graphApiClientStub.getGroupsForVeilederRequest(any()) } returns emptyList()
@@ -254,9 +255,9 @@ class VeiledereApiTest {
         val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
         val veilederIdent = UserConstants.VEILEDER_IDENT
         val valkeyCache = externalMockEnvironment.valkeyCache
-        val gruppeCacheKey = GraphApiClient.cacheKeyGrupper(veilederIdent)
+        val gruppeCacheKey = GraphApiClient.cacheKeyVeilederGrupper(veilederIdent)
         val groupId = "UUID"
-        val veilederCacheKey = GraphApiClient.cacheKeyVeiledereIEnhet(groupId)
+        val veilederCacheKey = GraphApiClient.cacheKeyVeiledereIGruppe(groupId)
 
         val graphApiClientStub = spyk(graphApiClient)
         coEvery { graphApiClientStub.getGroupsForVeilederRequest(any()) } returns listOf(
@@ -289,9 +290,9 @@ class VeiledereApiTest {
         val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
         val veilederIdent = UserConstants.VEILEDER_IDENT
         val valkeyCache = externalMockEnvironment.valkeyCache
-        val gruppeCacheKey = GraphApiClient.cacheKeyGrupper(veilederIdent)
+        val gruppeCacheKey = GraphApiClient.cacheKeyVeilederGrupper(veilederIdent)
         val groupId = "UUID"
-        val veilederCacheKey = GraphApiClient.cacheKeyVeiledereIEnhet(groupId)
+        val veilederCacheKey = GraphApiClient.cacheKeyVeiledereIGruppe(groupId)
 
         val graphApiClientStub = spyk(graphApiClient)
         coEvery { graphApiClientStub.getGroupsForVeilederRequest(any()) } returns listOf(
@@ -304,7 +305,7 @@ class VeiledereApiTest {
                 enhetNr = "0456"
             )
         )
-        coEvery { graphApiClientStub.getMembersInGroupByGroupIdRequest(any(), any()) } returns emptyList()
+        coEvery { graphApiClientStub.getUsersInGroupByGroupIdRequest(any(), any()) } returns emptyList()
 
         valkeyCache.setObject(gruppeCacheKey, listOf(Gruppe("UUID2", "0000-GA-ENHET_0456")), 1000)
         val cachedGrupper = valkeyCache.getListObject<Gruppe>(gruppeCacheKey)!!
@@ -344,13 +345,58 @@ class VeiledereApiTest {
         val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
         val veilederIdent = UserConstants.VEILEDER_IDENT
         val valkeyCache = externalMockEnvironment.valkeyCache
-        val gruppeCacheKey = GraphApiClient.cacheKeyGrupper(veilederIdent)
+        val gruppeCacheKey = GraphApiClient.cacheKeyVeilederGrupper(veilederIdent)
         val groupId = "UUID"
-        val veilederCacheKey = GraphApiClient.cacheKeyVeiledereIEnhet(groupId)
+        val veilederCacheKey = GraphApiClient.cacheKeyVeiledereIGruppe(groupId)
 
         val graphApiClientStub = spyk(graphApiClient)
         coEvery { graphApiClientStub.getGroupsForVeilederRequest(any()) } returns listOf(group(groupId = groupId))
-        coEvery { graphApiClientStub.getMembersInGroupByGroupIdRequest(any(), any()) } returns listOf(user())
+        coEvery { graphApiClientStub.getUsersInGroupByGroupIdRequest(any(), any()) } returns listOf(user())
+
+        assertNull(valkeyCache.getObject<List<Gruppe>>(gruppeCacheKey))
+        assertNull(valkeyCache.getObject<List<VeilederInfo>>(veilederCacheKey))
+        testApplication {
+            val client = setupApiAndClient(graphApiClient = graphApiClientStub)
+
+            val response = client.get(urlVeiledereEnhetNr) {
+                bearerAuth(getValidTokenVeileder(veilederIdent))
+            }
+
+            val veilederInfo = response.body<List<VeilederInfo>>()
+            assertEquals(HttpStatusCode.OK, response.status)
+            assertEquals(1, veilederInfo.size)
+
+            val veileder = veilederInfo[0]
+            assertEquals(UserConstants.VEILEDER_IDENT, veileder.ident)
+            assertEquals("Given", veileder.fornavn)
+            assertEquals("Surname", veileder.etternavn)
+            assertEquals("given.surname@nav.no", veileder.epost)
+            assertEquals("00 00 00 00", veileder.telefonnummer)
+            assertTrue(veileder.enabled!!)
+
+            val cachedGrupper = valkeyCache.getListObject<Gruppe>(gruppeCacheKey)!!
+            assertEquals(1, cachedGrupper.size)
+
+            val cachedVeiledere = valkeyCache.getObject<List<VeilederInfo>>(veilederCacheKey)!!
+            assertEquals(1, cachedVeiledere.size)
+        }
+    }
+
+    @Test
+    fun `Veileder har grupper, tilhorer oppgitt enhet - Gruppe inneholder bruker uten ident`() {
+        val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
+        val veilederIdent = UserConstants.VEILEDER_IDENT
+        val valkeyCache = externalMockEnvironment.valkeyCache
+        val gruppeCacheKey = GraphApiClient.cacheKeyVeilederGrupper(veilederIdent)
+        val groupId = "UUID"
+        val veilederCacheKey = GraphApiClient.cacheKeyVeiledereIGruppe(groupId)
+
+        val graphApiClientStub = spyk(graphApiClient)
+        coEvery { graphApiClientStub.getGroupsForVeilederRequest(any()) } returns listOf(group(groupId = groupId))
+        coEvery { graphApiClientStub.getUsersInGroupByGroupIdRequest(any(), any()) } returns listOf(
+            user(),
+            userWithNullFields()
+        )
 
         assertNull(valkeyCache.getObject<List<Gruppe>>(gruppeCacheKey))
         assertNull(valkeyCache.getObject<List<VeilederInfo>>(veilederCacheKey))
@@ -386,7 +432,7 @@ class VeiledereApiTest {
         val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
         val veilederIdent = UserConstants.VEILEDER_IDENT
         val valkeyCache = externalMockEnvironment.valkeyCache
-        val gruppeCacheKey = GraphApiClient.cacheKeyGrupper(veilederIdent)
+        val gruppeCacheKey = GraphApiClient.cacheKeyVeilederGrupper(veilederIdent)
 
         val graphApiClientStub = spyk(graphApiClient)
         coEvery { graphApiClientStub.getGroupsForVeilederRequest(any()) } throws ODataError().apply {
@@ -414,7 +460,7 @@ class VeiledereApiTest {
         val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
         val veilederIdent = UserConstants.VEILEDER_IDENT
         val valkeyCache = externalMockEnvironment.valkeyCache
-        val gruppeCacheKey = GraphApiClient.cacheKeyGrupper(veilederIdent)
+        val gruppeCacheKey = GraphApiClient.cacheKeyVeilederGrupper(veilederIdent)
 
         val graphApiClientStub = spyk(graphApiClient)
         coEvery { graphApiClientStub.getGroupsForVeilederRequest(any()) } throws IllegalAccessException("Some access error")
@@ -439,13 +485,13 @@ class VeiledereApiTest {
         val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
         val veilederIdent = UserConstants.VEILEDER_IDENT
         val valkeyCache = externalMockEnvironment.valkeyCache
-        val gruppeCacheKey = GraphApiClient.cacheKeyGrupper(veilederIdent)
+        val gruppeCacheKey = GraphApiClient.cacheKeyVeilederGrupper(veilederIdent)
         val groupId = "UUID"
-        val veilederCacheKey = GraphApiClient.cacheKeyVeiledereIEnhet(groupId)
+        val veilederCacheKey = GraphApiClient.cacheKeyVeiledereIGruppe(groupId)
 
         val graphApiClientStub = spyk(graphApiClient)
         coEvery { graphApiClientStub.getGroupsForVeilederRequest(any()) } returns listOf(group(groupId = groupId))
-        coEvery { graphApiClientStub.getMembersInGroupByGroupIdRequest(any(), any()) } throws ODataError().apply {
+        coEvery { graphApiClientStub.getUsersInGroupByGroupIdRequest(any(), any()) } throws ODataError().apply {
             error =
                 MainError().apply { this.code = "400" }.apply { this.message = "Error when calling Graph API" }
         }
@@ -473,14 +519,14 @@ class VeiledereApiTest {
         val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
         val veilederIdent = UserConstants.VEILEDER_IDENT
         val valkeyCache = externalMockEnvironment.valkeyCache
-        val gruppeCacheKey = GraphApiClient.cacheKeyGrupper(veilederIdent)
+        val gruppeCacheKey = GraphApiClient.cacheKeyVeilederGrupper(veilederIdent)
         val groupId = "UUID"
-        val veilederCacheKey = GraphApiClient.cacheKeyVeiledereIEnhet(groupId)
+        val veilederCacheKey = GraphApiClient.cacheKeyVeiledereIGruppe(groupId)
 
         val graphApiClientStub = spyk(graphApiClient)
         coEvery { graphApiClientStub.getGroupsForVeilederRequest(any()) } returns listOf(group(groupId = groupId))
         coEvery {
-            graphApiClientStub.getMembersInGroupByGroupIdRequest(
+            graphApiClientStub.getUsersInGroupByGroupIdRequest(
                 any(),
                 any()
             )

@@ -8,14 +8,14 @@ import kotlin.test.assertEquals
 class AzureAdTokenTest {
 
     @Test
-    fun `Endre azureAdToken til tokenCredential`() {
+    fun `Opprette tokenCredential basert pa azureAdToken`() {
         val expiresAt = LocalDateTime.of(2025, 7, 14, 10, 0)
-        val azureAdToken = AzureAdToken("ABC", expiresAt)
+        val azureAdToken = AzureAdToken("eyJhbGciOiJIUz...", expiresAt)
 
         val tokenCredential = azureAdToken.toTokenCredential()
         val accessToken = tokenCredential.getTokenSync(TokenRequestContext())
 
-        assertEquals("ABC", accessToken.token)
+        assertEquals("eyJhbGciOiJIUz...", accessToken.token)
         assertEquals(expiresAt, accessToken.expiresAt.toLocalDateTime())
     }
 }

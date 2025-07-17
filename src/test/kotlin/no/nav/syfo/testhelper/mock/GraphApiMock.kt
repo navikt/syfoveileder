@@ -80,12 +80,12 @@ fun user(): User {
 
 fun userWithNullFields(): User {
     val user = User()
-    user.givenName = ""
-    user.surname = ""
-    user.onPremisesSamAccountName = VEILEDER_IDENT_2
+    user.givenName = null
+    user.surname = null
+    user.onPremisesSamAccountName = null
     user.mail = null
     user.businessPhones = emptyList()
-    user.accountEnabled = true
+    user.accountEnabled = false
     return user
 }
 

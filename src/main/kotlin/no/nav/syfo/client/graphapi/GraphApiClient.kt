@@ -109,8 +109,8 @@ class GraphApiClient(
 
     suspend fun getEnhetByEnhetNrForVeileder(token: String, enhetNr: String): Gruppe? {
         val veilederIdent = getNAVIdentFromToken(token)
-        val key = cacheKeyGrupper(veilederIdent)
-        val cachedGroups: List<Gruppe>? = cache.getListObject(key)
+        val cacheKey = cacheKeyVeilederGrupper(veilederIdent)
+        val cachedGroups: List<Gruppe>? = cache.getListObject(cacheKey)
 
         val grupper = if (cachedGroups != null) {
             COUNT_CALL_GRAPHAPI_GRUPPE_CACHE_HIT.increment()
@@ -127,7 +127,7 @@ class GraphApiClient(
         }
 
         return getGruppeIfAccess(grupper, enhetNr)?.also {
-            cacheFor12Hours(key, grupper)
+            cacheFor12Hours(cacheKey, grupper)
         }
     }
 
@@ -188,25 +188,25 @@ class GraphApiClient(
     }
 
     suspend fun getVeiledereVedEnhetByGroupId(callId: String, token: String, group: Gruppe): List<VeilederInfo> {
-        val key = cacheKeyVeiledereIEnhet(group.uuid)
-        val cachedUsers: List<VeilederInfo>? = cache.getListObject(key)
+        val cacheKey = cacheKeyVeiledereIGruppe(group.uuid)
+        val cachedUsers: List<VeilederInfo>? = cache.getListObject(cacheKey)
 
         return if (cachedUsers != null) {
             COUNT_CALL_GRAPHAPI_VEILEDER_LIST_CACHE_HIT.increment()
             cachedUsers
         } else {
             COUNT_CALL_GRAPHAPI_VEILEDER_LIST_CACHE_MISS.increment()
-            getMembersInGroupByGroupId(callId, token, group.uuid).also { cacheFor12Hours(key, it) }
+            getUsersInGroupByGroupId(callId, token, group.uuid).also { cacheFor12Hours(cacheKey, it) }
         }
     }
 
-    suspend fun getMembersInGroupByGroupId(callId: String, token: String, groupId: String): List<VeilederInfo> {
+    suspend fun getUsersInGroupByGroupId(callId: String, token: String, groupId: String): List<VeilederInfo> {
         try {
-            val users = getMembersInGroupByGroupIdRequest(token, groupId)
+            val users = getUsersInGroupByGroupIdRequest(token, groupId)
 
-            val filter = users.filter { it.onPremisesSamAccountName == null }
-            if (filter.isNotEmpty()) {
-                log.warn("There are: ${filter.size} users without ident. CallId=$callId")
+            val usersWithoutIdent = users.filter { it.onPremisesSamAccountName == null }
+            if (usersWithoutIdent.isNotEmpty()) {
+                log.warn("There are: ${usersWithoutIdent.size} users without ident. CallId=$callId")
             }
 
             return users
@@ -224,7 +224,7 @@ class GraphApiClient(
      * @throws Exception
      */
     @VisibleForTesting
-    internal suspend fun getMembersInGroupByGroupIdRequest(token: String, groupId: String): List<User> {
+    internal suspend fun getUsersInGroupByGroupIdRequest(token: String, groupId: String): List<User> {
         val systemToken = azureAdClient.getSystemToken(
             token = token,
             scopeClientId = baseUrl,
@@ -274,8 +274,7 @@ class GraphApiClient(
         cache.setObject(
             key = cacheKey,
             value = value,
-//            expireSeconds = CACHE_EXPIRATION_SECONDS,
-            expireSeconds = 60 * 5, // TODO: For testing
+            expireSeconds = CACHE_EXPIRATION_SECONDS,
         )
     }
 
@@ -290,8 +289,8 @@ class GraphApiClient(
         private val log = LoggerFactory.getLogger(GraphApiClient::class.java)
 
         private fun cacheKey(veilederIdent: String) = "$GRAPH_API_CACHE_VEILEDER_PREFIX$veilederIdent"
-        fun cacheKeyGrupper(veilederIdent: String) = "$GRAPH_API_CACHE_VEILEDER_GRUPPER_PREFIX$veilederIdent"
-        fun cacheKeyVeiledereIEnhet(groupId: String) = "$GRAPH_API_CACHE_VEILEDERE_I_ENHET_PREFIX$groupId"
+        fun cacheKeyVeilederGrupper(veilederIdent: String) = "$GRAPH_API_CACHE_VEILEDER_GRUPPER_PREFIX$veilederIdent"
+        fun cacheKeyVeiledereIGruppe(groupId: String) = "$GRAPH_API_CACHE_VEILEDERE_I_ENHET_PREFIX$groupId"
 
         fun gruppenavnEnhet(enhetNr: String) = "$ENHETSNAVN_PREFIX$enhetNr"
     }
