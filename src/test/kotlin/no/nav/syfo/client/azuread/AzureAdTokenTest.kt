@@ -1,9 +1,9 @@
 package no.nav.syfo.client.azuread
 
 import com.azure.core.credential.TokenRequestContext
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
-import kotlin.test.assertEquals
 
 class AzureAdTokenTest {
 
