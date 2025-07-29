@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 class AzureAdTokenTest {
 
     @Test
-    fun `Opprette tokenCredential basert pa azureAdToken`() {
+    fun `Opprette tokenCredential basert på azureAdToken`() {
         val expiresAt = LocalDateTime.of(2025, 7, 14, 10, 0)
         val azureAdToken = AzureAdToken("eyJhbGciOiJIUz...", expiresAt)
 

@@ -251,7 +251,7 @@ class VeiledereApiTest {
     }
 
     @Test
-    fun `Veileder har grupper, men tilhorer ikke oppgitt enhet`() {
+    fun `Veileder har grupper, men tilhører ikke oppgitt enhet`() {
         val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
         val veilederIdent = UserConstants.VEILEDER_IDENT
         val valkeyCache = externalMockEnvironment.valkeyCache
@@ -341,7 +341,7 @@ class VeiledereApiTest {
     }
 
     @Test
-    fun `Veileder har grupper og tilhorer oppgitt enhet`() {
+    fun `Veileder har grupper og tilhører oppgitt enhet`() {
         val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
         val veilederIdent = UserConstants.VEILEDER_IDENT
         val valkeyCache = externalMockEnvironment.valkeyCache
@@ -383,7 +383,7 @@ class VeiledereApiTest {
     }
 
     @Test
-    fun `Veileder har grupper, tilhorer oppgitt enhet - Gruppe inneholder bruker uten ident`() {
+    fun `Veileder har grupper, tilhører oppgitt enhet - Gruppe inneholder bruker uten ident`() {
         val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
         val veilederIdent = UserConstants.VEILEDER_IDENT
         val valkeyCache = externalMockEnvironment.valkeyCache
@@ -428,7 +428,7 @@ class VeiledereApiTest {
     }
 
     @Test
-    fun `Kall pa grupper for veileder feilet med ODataError (ApiException)`() {
+    fun `Kall på grupper for veileder feilet med ODataError (ApiException)`() {
         val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
         val veilederIdent = UserConstants.VEILEDER_IDENT
         val valkeyCache = externalMockEnvironment.valkeyCache
@@ -437,7 +437,7 @@ class VeiledereApiTest {
         val graphApiClientStub = spyk(graphApiClient)
         coEvery { graphApiClientStub.getGroupsForVeilederRequest(any()) } throws ODataError().apply {
             error =
-                MainError().apply { this.code = "400" }.apply { this.message = "Error when calling Graph API" }
+                MainError().apply { this.code = "400" }.apply { this.message = "Error when calling Microsoft Graph API" }
         }
 
         assertNull(valkeyCache.getObject<List<Gruppe>>(gruppeCacheKey))
@@ -450,13 +450,13 @@ class VeiledereApiTest {
 
             val errorMessage = response.body<String>()
             assertEquals(HttpStatusCode.InternalServerError, response.status)
-            assertEquals("Error when calling Graph API", errorMessage)
+            assertEquals("Error when calling Microsoft Graph API", errorMessage)
             assertNull(valkeyCache.getObject<List<Gruppe>>(gruppeCacheKey))
         }
     }
 
     @Test
-    fun `Kall pa grupper for veileder feilet med IllegalAccessException (Exception)`() {
+    fun `Kall på grupper for veileder feilet med IllegalAccessException (Exception)`() {
         val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
         val veilederIdent = UserConstants.VEILEDER_IDENT
         val valkeyCache = externalMockEnvironment.valkeyCache
@@ -481,7 +481,7 @@ class VeiledereApiTest {
     }
 
     @Test
-    fun `Henting av veiledere pa gruppeId feilet med ODataError (ApiException)`() {
+    fun `Henting av veiledere på gruppeId feilet med ODataError (ApiException)`() {
         val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
         val veilederIdent = UserConstants.VEILEDER_IDENT
         val valkeyCache = externalMockEnvironment.valkeyCache
@@ -493,7 +493,7 @@ class VeiledereApiTest {
         coEvery { graphApiClientStub.getGroupsForVeilederRequest(any()) } returns listOf(group(groupId = groupId))
         coEvery { graphApiClientStub.getUsersInGroupByGroupIdRequest(any(), any()) } throws ODataError().apply {
             error =
-                MainError().apply { this.code = "400" }.apply { this.message = "Error when calling Graph API" }
+                MainError().apply { this.code = "400" }.apply { this.message = "Error when calling Microsoft Graph API" }
         }
 
         assertNull(valkeyCache.getObject<List<Gruppe>>(gruppeCacheKey))
@@ -506,7 +506,7 @@ class VeiledereApiTest {
 
             val errorMessage = response.body<String>()
             assertEquals(HttpStatusCode.InternalServerError, response.status)
-            assertEquals("Error when calling Graph API", errorMessage)
+            assertEquals("Error when calling Microsoft Graph API", errorMessage)
 
             val cachedGrupper = valkeyCache.getListObject<Gruppe>(gruppeCacheKey)!!
             assertEquals(1, cachedGrupper.size)
@@ -515,7 +515,7 @@ class VeiledereApiTest {
     }
 
     @Test
-    fun `Henting av veiledere pa gruppeId feilet med IllegalAccessException (Exception)`() {
+    fun `Henting av veiledere på gruppeId feilet med IllegalAccessException (Exception)`() {
         val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
         val veilederIdent = UserConstants.VEILEDER_IDENT
         val valkeyCache = externalMockEnvironment.valkeyCache

@@ -113,7 +113,7 @@ class GraphApiClient(
         val cachedGroups: List<Gruppe>? = cache.getListObject(cacheKey)
 
         val grupper = if (cachedGroups != null) {
-            COUNT_CALL_GRAPHAPI_GRUPPE_CACHE_HIT.increment()
+            COUNT_CALL_MS_GRAPH_API_GRUPPE_CACHE_HIT.increment()
             val harTilgang = getGruppeIfAccess(cachedGroups, enhetNr) != null
 
             if (harTilgang) {
@@ -122,7 +122,7 @@ class GraphApiClient(
                 getGroupsForVeileder(token)
             }
         } else {
-            COUNT_CALL_GRAPHAPI_GRUPPE_CACHE_MISS.increment()
+            COUNT_CALL_MS_GRAPH_API_GRUPPE_CACHE_MISS.increment()
             getGroupsForVeileder(token)
         }
 
@@ -138,10 +138,10 @@ class GraphApiClient(
         try {
             return getGroupsForVeilederRequest(token)
                 .map { it.toGruppe() }
-                .apply { COUNT_CALL_GRAPHAPI_GRUPPE_SUCCESS.increment() }
+                .apply { COUNT_CALL_MS_GRAPH_API_GRUPPE_SUCCESS.increment() }
         } catch (e: Exception) {
-            COUNT_CALL_GRAPHAPI_GRUPPE_FAIL.increment()
-            throw e.toRestException("Error while getting groups for veileder")
+            COUNT_CALL_MS_GRAPH_API_GRUPPE_FAIL.increment()
+            throw e.toRestException("Error while getting groups for veileder from Microsoft Graph API")
         }
     }
 
@@ -155,7 +155,7 @@ class GraphApiClient(
             scopeClientId = baseUrl,
             token = token,
         )
-            ?: throw RuntimeException("Failed to request list of groups for veileder in Graph API: Failed to get system token from AzureAD")
+            ?: throw RuntimeException("Failed to request list of groups for veileder in Microsoft Graph API: Failed to get system token from AzureAD")
 
         val graphServiceClient = azureAdClient.createGraphServiceClient(azureAdToken = oboToken)
         val directoryObjectCollectionResponse = graphServiceClient.me().memberOf().get { requestConfiguration ->
@@ -215,7 +215,7 @@ class GraphApiClient(
                 .apply { COUNT_CALL_GRAPHAPI_VEILEDER_LIST_SUCCESS.increment() }
         } catch (e: Exception) {
             COUNT_CALL_GRAPHAPI_VEILEDER_LIST_FAIL.increment()
-            throw e.toRestException("Error while getting veiledere by group id")
+            throw e.toRestException("Error while getting veiledere by group id from Microsoft Graph API")
         }
     }
 
@@ -228,7 +228,7 @@ class GraphApiClient(
         val systemToken = azureAdClient.getSystemToken(
             token = token,
             scopeClientId = baseUrl,
-        ) ?: throw RuntimeException("Failed to request access to Veileder in Graph API: Failed to get system token")
+        ) ?: throw RuntimeException("Failed to request access to Veileder in Microsoft Graph API: Failed to get system token")
 
         val graphServiceClient = azureAdClient.createGraphServiceClient(azureAdToken = systemToken)
         val directoryObjectCollectionResponse =
@@ -280,8 +280,8 @@ class GraphApiClient(
 
     companion object {
         const val GRAPH_API_CACHE_VEILEDER_PREFIX = "graphapiVeileder-"
-        const val GRAPH_API_CACHE_VEILEDER_GRUPPER_PREFIX = "graphapiVeilederGrupper-"
-        const val GRAPH_API_CACHE_VEILEDERE_I_ENHET_PREFIX = "graphapiVeiledereIEnhet-"
+        const val MS_GRAPH_API_CACHE_VEILEDER_GRUPPER_PREFIX = "graphapiVeilederGrupper-"
+        const val MS_GRAPH_API_CACHE_VEILEDERE_I_ENHET_PREFIX = "graphapiVeiledereIEnhet-"
 
         const val ENHETSNAVN_PREFIX = "0000-GA-ENHET_"
 
@@ -289,9 +289,8 @@ class GraphApiClient(
         private val log = LoggerFactory.getLogger(GraphApiClient::class.java)
 
         private fun cacheKey(veilederIdent: String) = "$GRAPH_API_CACHE_VEILEDER_PREFIX$veilederIdent"
-        fun cacheKeyVeilederGrupper(veilederIdent: String) = "$GRAPH_API_CACHE_VEILEDER_GRUPPER_PREFIX$veilederIdent"
-        fun cacheKeyVeiledereIGruppe(groupId: String) = "$GRAPH_API_CACHE_VEILEDERE_I_ENHET_PREFIX$groupId"
-
+        fun cacheKeyVeilederGrupper(veilederIdent: String) = "$MS_GRAPH_API_CACHE_VEILEDER_GRUPPER_PREFIX$veilederIdent"
+        fun cacheKeyVeiledereIGruppe(groupId: String) = "$MS_GRAPH_API_CACHE_VEILEDERE_I_ENHET_PREFIX$groupId"
         fun gruppenavnEnhet(enhetNr: String) = "$ENHETSNAVN_PREFIX$enhetNr"
     }
 }
