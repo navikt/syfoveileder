@@ -428,7 +428,7 @@ class VeiledereApiTest {
     }
 
     @Test
-    fun `Kall på grupper for veileder feilet med ODataError (ApiException)`() {
+    fun `Kall på grupper for veileder feiler med ODataError (ApiException)`() {
         val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
         val veilederIdent = UserConstants.VEILEDER_IDENT
         val valkeyCache = externalMockEnvironment.valkeyCache
@@ -456,7 +456,7 @@ class VeiledereApiTest {
     }
 
     @Test
-    fun `Kall på grupper for veileder feilet med IllegalAccessException (Exception)`() {
+    fun `Kall på grupper for veileder feiler med IllegalAccessException (Exception)`() {
         val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
         val veilederIdent = UserConstants.VEILEDER_IDENT
         val valkeyCache = externalMockEnvironment.valkeyCache
@@ -481,7 +481,7 @@ class VeiledereApiTest {
     }
 
     @Test
-    fun `Henting av veiledere på gruppeId feilet med ODataError (ApiException)`() {
+    fun `Henting av veiledere på gruppeId feiler med ODataError (ApiException)`() {
         val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
         val veilederIdent = UserConstants.VEILEDER_IDENT
         val valkeyCache = externalMockEnvironment.valkeyCache
@@ -515,7 +515,7 @@ class VeiledereApiTest {
     }
 
     @Test
-    fun `Henting av veiledere på gruppeId feilet med IllegalAccessException (Exception)`() {
+    fun `Henting av veiledere på gruppeId feiler med IllegalAccessException (Exception)`() {
         val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
         val veilederIdent = UserConstants.VEILEDER_IDENT
         val valkeyCache = externalMockEnvironment.valkeyCache
