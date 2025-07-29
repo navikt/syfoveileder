@@ -56,7 +56,6 @@ spec:
     outbound:
       external:
         - host: "graph.microsoft.com"
-        - host: "axsys.dev-fss-pub.nais.io"
   azure:
     application:
       allowAllUsers: true
@@ -68,7 +67,3 @@ spec:
   env:
     - name: GRAPHAPI_URL
       value: "https://graph.microsoft.com"
-    - name: AXSYS_CLIENT_ID
-      value: "dev-fss.org.axsys"
-    - name: AXSYS_URL
-      value: "https://axsys.dev-fss-pub.nais.io"

@@ -1,13 +1,11 @@
 package no.nav.syfo.veiledernavn
 
-import no.nav.syfo.client.axsys.*
 import no.nav.syfo.client.graphapi.GraphApiClient
 import no.nav.syfo.client.graphapi.toVeilederInfo
-import no.nav.syfo.veileder.*
+import no.nav.syfo.veileder.VeilederInfo
 import org.slf4j.LoggerFactory
 
 class VeilederService(
-    private val axsysClient: AxsysClient,
     private val graphApiClient: GraphApiClient,
 ) {
     suspend fun veilederInfo(
@@ -41,42 +39,19 @@ class VeilederService(
         enhetNr: String,
         token: String,
     ): List<VeilederInfo> {
-        val axsysVeilederList = axsysClient.veilederList(
-            callId = callId,
-            enhetNr = enhetNr,
+        return graphApiClient.getEnhetByEnhetNrForVeileder(
             token = token,
-        )
-        val graphApiUsers = graphApiClient.veilederList(
             enhetNr = enhetNr,
-            axsysVeilederlist = axsysVeilederList,
-            callId = callId,
-            token = token,
-        )
-        val usersNotEnabled = graphApiUsers.filter { !it.accountEnabled }.map { it.onPremisesSamAccountName }
-        if (usersNotEnabled.isNotEmpty()) {
-            log.warn("Fant ${usersNotEnabled.size} veiledere i Microsoft Graph som er disabled. Identer: ${usersNotEnabled.joinToString()}")
-        }
-        val veiledere = graphApiUsers.map { it.toVeilederInfo(it.onPremisesSamAccountName) }
-
-        val missingInGraphAPI = mutableListOf<String>()
-        val returnList: List<VeilederInfo> = axsysVeilederList.map { axsysVeileder ->
-            veiledere.find { it.ident == axsysVeileder.appIdent } ?: noGraphApiVeileder(
-                axsysVeileder,
-                missingInGraphAPI,
+        )?.let { group ->
+            graphApiClient.getVeiledereVedEnhetByGroupId(
+                callId = callId,
+                token = token,
+                group = group,
             )
+        } ?: run {
+            log.warn("User has no groups or there are no veiledere in specified group. CallId=$callId")
+            emptyList()
         }
-        if (missingInGraphAPI.isNotEmpty()) {
-            log.warn("Fant ikke navn for ${missingInGraphAPI.size} av ${axsysVeilederList.size} veiledere i graphApi! Feilende identer: ${missingInGraphAPI.joinToString()}")
-        }
-        return returnList
-    }
-
-    private fun noGraphApiVeileder(
-        axsysVeileder: AxsysVeileder,
-        missingInGraphAPI: MutableList<String>,
-    ): VeilederInfo {
-        missingInGraphAPI.add(axsysVeileder.appIdent)
-        return axsysVeileder.toVeilederInfo()
     }
 
     companion object {

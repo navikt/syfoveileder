@@ -12,8 +12,6 @@ data class Environment(
     val azureOpenidConfigTokenEndpoint: String = getEnvVar("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"),
     val preAuthorizedApps: List<PreAuthorizedApp> = configuredJacksonMapper().readValue(getEnvVar("AZURE_APP_PRE_AUTHORIZED_APPS")),
 
-    val axsysClientId: String = getEnvVar("AXSYS_CLIENT_ID"),
-    val axsysUrl: String = getEnvVar("AXSYS_URL"),
     val graphapiUrl: String = getEnvVar("GRAPHAPI_URL"),
     val valkeyConfig: ValkeyConfig = ValkeyConfig(
         valkeyUri = URI(getEnvVar("VALKEY_URI_CACHE")),

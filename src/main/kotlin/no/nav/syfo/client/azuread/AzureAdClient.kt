@@ -1,5 +1,6 @@
 package no.nav.syfo.client.azuread
 
+import com.microsoft.graph.serviceclient.GraphServiceClient
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
@@ -84,6 +85,10 @@ class AzureAdClient(
                 COUNT_CALL_AZUREAD_TOKEN_SYSTEM_CACHE_MISS.increment()
             }
         }
+    }
+
+    fun createGraphServiceClient(azureAdToken: AzureAdToken): GraphServiceClient {
+        return GraphServiceClient(azureAdToken.toTokenCredential(), scope(graphApiUrl))
     }
 
     private suspend fun getAccessToken(
