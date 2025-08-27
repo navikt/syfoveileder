@@ -286,61 +286,6 @@ class VeiledereApiTest {
     }
 
     @Test
-    fun `Eksisterende cache med annen enhet - Cache erstattes ettersom veileder har tilgang til en ny enhet`() {
-        val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
-        val veilederIdent = UserConstants.VEILEDER_IDENT
-        val valkeyCache = externalMockEnvironment.valkeyCache
-        val gruppeCacheKey = GraphApiClient.cacheKeyVeilederGrupper(veilederIdent)
-        val groupId = "UUID"
-        val veilederCacheKey = GraphApiClient.cacheKeyVeiledereIGruppe(groupId)
-
-        val graphApiClientStub = spyk(graphApiClient)
-        coEvery { graphApiClientStub.getGroupsForVeilederRequest(any()) } returns listOf(
-            group(
-                groupId = groupId,
-                enhetNr = UserConstants.ENHET_NR
-            ),
-            group(
-                groupId = "UUID2",
-                enhetNr = "0456"
-            )
-        )
-        coEvery { graphApiClientStub.getUsersInGroupByGroupIdRequest(any(), any()) } returns emptyList()
-
-        valkeyCache.setObject(gruppeCacheKey, listOf(Gruppe("UUID2", "0000-GA-ENHET_0456")), 1000)
-        val cachedGrupper = valkeyCache.getListObject<Gruppe>(gruppeCacheKey)!!
-        assertEquals(1, cachedGrupper.size)
-
-        val cachedGruppe = cachedGrupper[0]
-        assertEquals("UUID2", cachedGruppe.uuid)
-        assertEquals("0000-GA-ENHET_0456", cachedGruppe.adGruppenavn)
-        assertNull(valkeyCache.getObject<List<VeilederInfo>>(veilederCacheKey))
-        testApplication {
-            val client = setupApiAndClient(graphApiClient = graphApiClientStub)
-
-            val response = client.get(urlVeiledereEnhetNr) {
-                bearerAuth(getValidTokenVeileder(veilederIdent))
-            }
-
-            val veilederInfo = response.body<List<VeilederInfo>>()
-            assertEquals(HttpStatusCode.OK, response.status)
-            assertEquals(0, veilederInfo.size)
-
-            val cachedGrupper = valkeyCache.getListObject<Gruppe>(gruppeCacheKey)!!
-            assertEquals(2, cachedGrupper.size)
-
-            val cachedGruppe = cachedGrupper[0]
-            assertEquals("UUID", cachedGruppe.uuid)
-            assertEquals("0000-GA-ENHET_0123", cachedGruppe.adGruppenavn)
-
-            val cachedGruppe2 = cachedGrupper[1]
-            assertEquals("UUID2", cachedGruppe2.uuid)
-            assertEquals("0000-GA-ENHET_0456", cachedGruppe2.adGruppenavn)
-            assertTrue(valkeyCache.getObject<List<VeilederInfo>>(veilederCacheKey)!!.isEmpty())
-        }
-    }
-
-    @Test
     fun `Veileder har grupper og tilhører oppgitt enhet`() {
         val urlVeiledereEnhetNr = "$basePath?enhetNr=${UserConstants.ENHET_NR}"
         val veilederIdent = UserConstants.VEILEDER_IDENT

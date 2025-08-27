@@ -114,21 +114,18 @@ class GraphApiClient(
 
         val grupper = if (cachedGroups != null) {
             COUNT_CALL_MS_GRAPH_API_GRUPPE_CACHE_HIT.increment()
-            val harTilgang = getGruppeIfAccess(cachedGroups, enhetNr) != null
-
-            if (harTilgang) {
-                cachedGroups
-            } else {
-                getGroupsForVeileder(token)
-            }
+            cachedGroups
         } else {
             COUNT_CALL_MS_GRAPH_API_GRUPPE_CACHE_MISS.increment()
-            getGroupsForVeileder(token)
+            getGroupsForVeileder(token).also { grupper ->
+                val harTilgang = getGruppeIfAccess(grupper, enhetNr) != null
+                if (harTilgang) {
+                    cacheFor12Hours(cacheKey, grupper)
+                }
+            }
         }
 
-        return getGruppeIfAccess(grupper, enhetNr)?.also {
-            cacheFor12Hours(cacheKey, grupper)
-        }
+        return getGruppeIfAccess(grupper, enhetNr)
     }
 
     private fun getGruppeIfAccess(grupper: List<Gruppe>, enhetNr: String): Gruppe? =
@@ -228,7 +225,8 @@ class GraphApiClient(
         val systemToken = azureAdClient.getSystemToken(
             token = token,
             scopeClientId = baseUrl,
-        ) ?: throw RuntimeException("Failed to request access to Veileder in Microsoft Graph API: Failed to get system token")
+        )
+            ?: throw RuntimeException("Failed to request access to Veileder in Microsoft Graph API: Failed to get system token")
 
         val graphServiceClient = azureAdClient.createGraphServiceClient(azureAdToken = systemToken)
         val directoryObjectCollectionResponse =
