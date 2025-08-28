@@ -9,7 +9,6 @@ import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.Environment
 import no.nav.syfo.application.api.apiModule
 import no.nav.syfo.application.cache.ValkeyStore
-import no.nav.syfo.client.axsys.AxsysClient
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.graphapi.GraphApiClient
 import no.nav.syfo.client.wellknown.getWellKnown
@@ -44,12 +43,6 @@ fun main() {
         graphApiUrl = environment.graphapiUrl,
         cache = cache,
     )
-    val axsysClient = AxsysClient(
-        azureAdClient = azureAdClient,
-        baseUrl = environment.axsysUrl,
-        clientId = environment.axsysClientId,
-        cache = cache,
-    )
     val graphApiClient = GraphApiClient(
         azureAdClient = azureAdClient,
         baseUrl = environment.graphapiUrl,
@@ -57,7 +50,6 @@ fun main() {
     )
 
     val veilederService = VeilederService(
-        axsysClient = axsysClient,
         graphApiClient = graphApiClient,
     )
 

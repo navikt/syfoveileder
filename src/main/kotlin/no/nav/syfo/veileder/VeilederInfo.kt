@@ -8,3 +8,8 @@ data class VeilederInfo(
     val telefonnummer: String? = null,
     val enabled: Boolean? = null,
 )
+
+data class Gruppe(
+    val uuid: String,
+    val adGruppenavn: String,
+)

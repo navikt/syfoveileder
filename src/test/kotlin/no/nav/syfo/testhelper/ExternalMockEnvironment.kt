@@ -15,7 +15,7 @@ class ExternalMockEnvironment() {
     val mockHttpClient = getMockHttpClient(env = environment)
 
     val redisConfig = environment.valkeyConfig
-    val redisCache = ValkeyStore(
+    val valkeyCache = ValkeyStore(
         JedisPool(
             JedisPoolConfig(),
             HostAndPort(redisConfig.host, redisConfig.port),
