@@ -29,7 +29,7 @@ val COUNT_CALL_GRAPHAPI_VEILEDER_CACHE_MISS: Counter = Counter
     .description("Counts the number of cache miss GraphAPI - Veileder")
     .register(METRICS_REGISTRY)
 
-const val CALL_MS_GRAPH_API_GRUPPE_BASE = "${CALL_GRAPHAPI_BASE}_GRUPPE"
+const val CALL_MS_GRAPH_API_GRUPPE_BASE = "${CALL_GRAPHAPI_BASE}_gruppe"
 const val CALL_MS_GRAPH_API_GRUPPE_SUCCESS = "${CALL_MS_GRAPH_API_GRUPPE_BASE}_success_count"
 const val CALL_MS_GRAPH_API_GRUPPE_FAIL = "${CALL_MS_GRAPH_API_GRUPPE_BASE}_fail_count"
 const val CALL_MS_GRAPH_API_GRUPPE_CACHE_HIT = "${CALL_MS_GRAPH_API_GRUPPE_BASE}_cache_hit"
