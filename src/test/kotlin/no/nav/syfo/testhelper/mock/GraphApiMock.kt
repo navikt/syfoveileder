@@ -15,8 +15,6 @@ val veilederUser = GraphApiUser(
     givenName = "Given",
     surname = "Surname",
     onPremisesSamAccountName = VEILEDER_IDENT,
-    mail = "give.surname@nav.no",
-    businessPhones = emptyList(),
     accountEnabled = true,
 )
 
@@ -72,8 +70,6 @@ fun user(): User {
     user.givenName = "Given"
     user.surname = "Surname"
     user.onPremisesSamAccountName = VEILEDER_IDENT
-    user.mail = "given.surname@nav.no"
-    user.businessPhones = listOf("00 00 00 00")
     user.accountEnabled = true
     return user
 }
@@ -83,8 +79,6 @@ fun userWithNullFields(): User {
     user.givenName = null
     user.surname = null
     user.onPremisesSamAccountName = null
-    user.mail = null
-    user.businessPhones = emptyList()
     user.accountEnabled = false
     return user
 }

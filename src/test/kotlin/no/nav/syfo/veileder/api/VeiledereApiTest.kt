@@ -113,7 +113,6 @@ class VeiledereApiTest {
                     assertEquals(UserConstants.VEILEDER_IDENT, veilederInfo.ident)
                     assertEquals(graphapiUserResponse.givenName, veilederInfo.fornavn)
                     assertEquals(graphapiUserResponse.surname, veilederInfo.etternavn)
-                    assertEquals(graphapiUserResponse.mail, veilederInfo.epost)
                     assertTrue(veilederInfo.enabled!!)
                     assertNotNull(valkeyCache.getObject<GraphApiUser>(cacheKey))
                 }
@@ -166,7 +165,6 @@ class VeiledereApiTest {
                     assertEquals(UserConstants.VEILEDER_IDENT, veilederInfoDTO.ident)
                     assertEquals(graphapiUserResponse.givenName, veilederInfoDTO.fornavn)
                     assertEquals(graphapiUserResponse.surname, veilederInfoDTO.etternavn)
-                    assertEquals(graphapiUserResponse.mail, veilederInfoDTO.epost)
                     assertTrue(veilederInfoDTO.enabled!!)
                 }
             }
@@ -185,7 +183,6 @@ class VeiledereApiTest {
                     assertEquals(UserConstants.VEILEDER_IDENT_2, veilederInfoDTO.ident)
                     assertEquals(graphapiUserResponse.givenName, veilederInfoDTO.fornavn)
                     assertEquals(graphapiUserResponse.surname, veilederInfoDTO.etternavn)
-                    assertEquals(graphapiUserResponse.mail, veilederInfoDTO.epost)
                     assertFalse(veilederInfoDTO.enabled!!)
                 }
             }
@@ -315,8 +312,6 @@ class VeiledereApiTest {
             assertEquals(UserConstants.VEILEDER_IDENT, veileder.ident)
             assertEquals("Given", veileder.fornavn)
             assertEquals("Surname", veileder.etternavn)
-            assertEquals("given.surname@nav.no", veileder.epost)
-            assertEquals("00 00 00 00", veileder.telefonnummer)
             assertTrue(veileder.enabled!!)
 
             val cachedGrupper = valkeyCache.getListObject<Gruppe>(gruppeCacheKey)!!
@@ -360,8 +355,6 @@ class VeiledereApiTest {
             assertEquals(UserConstants.VEILEDER_IDENT, veileder.ident)
             assertEquals("Given", veileder.fornavn)
             assertEquals("Surname", veileder.etternavn)
-            assertEquals("given.surname@nav.no", veileder.epost)
-            assertEquals("00 00 00 00", veileder.telefonnummer)
             assertTrue(veileder.enabled!!)
 
             val cachedGrupper = valkeyCache.getListObject<Gruppe>(gruppeCacheKey)!!
