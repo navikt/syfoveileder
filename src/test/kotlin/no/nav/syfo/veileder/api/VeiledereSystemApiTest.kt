@@ -70,7 +70,6 @@ class VeiledereSystemApiTest {
                 assertEquals(UserConstants.VEILEDER_IDENT, veilederInfo.ident)
                 assertEquals(veilederUser.givenName, veilederInfo.fornavn)
                 assertEquals(veilederUser.surname, veilederInfo.etternavn)
-                assertEquals(veilederUser.mail, veilederInfo.epost)
                 assertTrue(veilederInfo.enabled!!)
             }
         }
