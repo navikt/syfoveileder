@@ -4,7 +4,7 @@ group = "no.nav.syfo"
 version = "1.0.0-SNAPSHOT"
 
 val jacksonDataTypeVersion = "2.20.1"
-val jedisVersion = "5.2.0"
+val jedisVersion = "7.2.0"
 val jsonVersion = "20250517"
 val ktorVersion = "3.3.3"
 val logbackVersion = "1.5.22"
