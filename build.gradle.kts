@@ -3,7 +3,8 @@ import com.adarshr.gradle.testlogger.theme.ThemeType
 group = "no.nav.syfo"
 version = "1.0.0-SNAPSHOT"
 
-val jacksonDataTypeVersion = "2.21.0"
+val jacksonDataTypeVersion = "2.21.1"
+val jacksonDatabindVersion = "3.1.0"
 val jedisVersion = "5.2.0"
 val jsonVersion = "20250517"
 val ktorVersion = "3.4.1"
@@ -54,6 +55,7 @@ dependencies {
 
     // (De-)serialization
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonDataTypeVersion")
+    implementation("tools.jackson.core:jackson-databind:$jacksonDatabindVersion")
 
     // Cache
     implementation("redis.clients:jedis:$jedisVersion")
