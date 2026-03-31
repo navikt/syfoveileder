@@ -5,5 +5,5 @@ import redis.embedded.RedisServer
 
 fun testRedis(environment: Environment): RedisServer = RedisServer.builder()
     .setting("requirepass " + environment.valkeyConfig.valkeyPassword)
-    .setting("maxheap 10MB")
+    .setting("maxheap 100MB")
     .build()
