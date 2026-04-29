@@ -66,6 +66,13 @@ dependencies {
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("io.ktor:ktor-client-mock:$ktorVersion")
     testImplementation(kotlin("test"))
+
+    constraints {
+        implementation("io.netty:netty-codec-http2") {
+            because("CVE-2026-33871: HTTP/2 CONTINUATION frame flood DoS, fixed in 4.2.10.Final")
+            version { require("4.2.10.Final") }
+        }
+    }
 }
 
 kotlin {
