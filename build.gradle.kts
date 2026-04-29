@@ -7,7 +7,7 @@ val jacksonDataTypeVersion = "2.21.2"
 val jacksonDatabindVersion = "3.1.2"
 val jedisVersion = "5.2.0"
 val jsonVersion = "20250517"
-val ktorVersion = "3.4.2"
+val ktorVersion = "3.4.3"
 val logbackVersion = "1.5.32"
 val logstashEncoderVersion = "9.0"
 val mockkVersion = "1.14.9"
@@ -66,13 +66,6 @@ dependencies {
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("io.ktor:ktor-client-mock:$ktorVersion")
     testImplementation(kotlin("test"))
-
-    constraints {
-        implementation("io.netty:netty-codec-http2") {
-            because("CVE-2026-33871: HTTP/2 CONTINUATION frame flood DoS, fixed in 4.2.10.Final")
-            version { require("4.2.10.Final") }
-        }
-    }
 }
 
 kotlin {
