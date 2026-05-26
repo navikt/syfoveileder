@@ -51,16 +51,6 @@ class VeiledereApiTest {
         httpClient = externalMockEnvironment.mockHttpClient,
     )
 
-    @BeforeEach
-    fun setup() {
-        externalMockEnvironment.startExternalMocks()
-    }
-
-    @AfterEach
-    fun tearDown() {
-        externalMockEnvironment.stopExternalMocks()
-    }
-
     private fun ApplicationTestBuilder.setupApiAndClient(
         graphApiClient: GraphApiClient? = null
     ): HttpClient {

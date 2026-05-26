@@ -22,12 +22,6 @@ class VeiledereSystemApiTest {
     @BeforeEach
     fun setup() {
         externalMockEnvironment = ExternalMockEnvironment()
-        externalMockEnvironment.startExternalMocks()
-    }
-
-    @AfterEach
-    fun tearDown() {
-        externalMockEnvironment.stopExternalMocks()
     }
 
     private fun ApplicationTestBuilder.setupApiAndClient(): HttpClient {
