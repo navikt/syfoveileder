@@ -1,38 +1,17 @@
 package no.nav.syfo.application.cache
 
 import com.fasterxml.jackson.databind.exc.MismatchedInputException
-import no.nav.syfo.util.configuredJacksonMapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import redis.clients.jedis.JedisPool
 import redis.clients.jedis.exceptions.JedisConnectionException
 import java.lang.Exception
 
-class ValkeyStore(private val jedisPool: JedisPool) {
+class ValkeyStore(private val jedisPool: JedisPool) : IValkeyStore {
 
     private val log: Logger = LoggerFactory.getLogger("no.nav.syfo.application.cache")
-    val mapper = configuredJacksonMapper()
 
-    inline fun <reified T> getObject(key: String): T? {
-        val value = get(key)
-        return if (value != null) mapper.readValue(value, T::class.java) else null
-    }
-
-    inline fun <reified T> getListObject(key: String): List<T>? {
-        val value = get(key)
-        return if (value != null) {
-            mapper.readValue(value, mapper.typeFactory.constructCollectionType(ArrayList::class.java, T::class.java))
-        } else null
-    }
-
-    inline fun <reified T> getSetObject(key: String): Set<T>? {
-        val value = get(key)
-        return if (value != null) {
-            mapper.readValue(value, mapper.typeFactory.constructCollectionType(HashSet::class.java, T::class.java))
-        } else null
-    }
-
-    fun get(key: String): String? {
+    override fun get(key: String): String? {
         try {
             jedisPool.resource.use { jedis -> return jedis.get(key) }
         } catch (e: JedisConnectionException) {
@@ -47,11 +26,7 @@ class ValkeyStore(private val jedisPool: JedisPool) {
         }
     }
 
-    fun <T> setObject(key: String, value: T, expireSeconds: Long) {
-        set(key, mapper.writeValueAsString(value), expireSeconds)
-    }
-
-    fun set(key: String, value: String, expireSeconds: Long) {
+    override fun set(key: String, value: String, expireSeconds: Long) {
         try {
             jedisPool.resource.use { jedis ->
                 jedis.setex(

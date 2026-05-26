@@ -11,6 +11,8 @@ import io.ktor.serialization.jackson.*
 import io.ktor.server.testing.*
 import io.mockk.coEvery
 import io.mockk.spyk
+import no.nav.syfo.application.cache.getListObject
+import no.nav.syfo.application.cache.getObject
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.graphapi.GraphApiClient
 import no.nav.syfo.client.graphapi.GraphApiUser
