@@ -15,7 +15,6 @@ import no.nav.syfo.client.wellknown.getWellKnown
 import no.nav.syfo.veiledernavn.VeilederService
 import org.slf4j.LoggerFactory
 import redis.clients.jedis.*
-import java.util.concurrent.TimeUnit
 
 const val applicationPort = 8080
 
@@ -82,12 +81,9 @@ fun main() {
                 applicationState.ready = true
                 application.environment.log.info("Application is ready, running Java VM ${Runtime.version()}")
             }
-        }
-    )
-
-    Runtime.getRuntime().addShutdownHook(
-        Thread {
-            server.stop(10, 10, TimeUnit.SECONDS)
+            monitor.subscribe(ApplicationStopPreparing) {
+                applicationState.ready = false
+            }
         }
     )
 
