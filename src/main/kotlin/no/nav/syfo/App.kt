@@ -15,7 +15,6 @@ import no.nav.syfo.client.wellknown.getWellKnown
 import no.nav.syfo.veiledernavn.VeilederService
 import org.slf4j.LoggerFactory
 import redis.clients.jedis.*
-import java.util.concurrent.TimeUnit
 
 const val applicationPort = 8080
 
