@@ -12,7 +12,10 @@ import io.ktor.http.*
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.application.api.authentication.getNAVIdentFromToken
 import no.nav.syfo.application.api.exception.toRestException
-import no.nav.syfo.application.cache.ValkeyStore
+import no.nav.syfo.application.cache.IValkeyStore
+import no.nav.syfo.application.cache.getListObject
+import no.nav.syfo.application.cache.getObject
+import no.nav.syfo.application.cache.setObject
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.httpClientProxy
 import no.nav.syfo.util.bearerHeader
@@ -26,7 +29,7 @@ import java.util.*
 class GraphApiClient(
     private val azureAdClient: AzureAdClient,
     private val baseUrl: String,
-    private val cache: ValkeyStore,
+    private val cache: IValkeyStore,
     private val httpClient: HttpClient = httpClientProxy(),
 ) {
 

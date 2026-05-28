@@ -11,6 +11,8 @@ import io.ktor.serialization.jackson.*
 import io.ktor.server.testing.*
 import io.mockk.coEvery
 import io.mockk.spyk
+import no.nav.syfo.application.cache.getListObject
+import no.nav.syfo.application.cache.getObject
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.graphapi.GraphApiClient
 import no.nav.syfo.client.graphapi.GraphApiUser
@@ -22,11 +24,9 @@ import no.nav.syfo.testhelper.mock.userWithNullFields
 import no.nav.syfo.util.configure
 import no.nav.syfo.veileder.Gruppe
 import no.nav.syfo.veileder.VeilederInfo
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -50,16 +50,6 @@ class VeiledereApiTest {
         cache = externalMockEnvironment.valkeyCache,
         httpClient = externalMockEnvironment.mockHttpClient,
     )
-
-    @BeforeEach
-    fun setup() {
-        externalMockEnvironment.startExternalMocks()
-    }
-
-    @AfterEach
-    fun tearDown() {
-        externalMockEnvironment.stopExternalMocks()
-    }
 
     private fun ApplicationTestBuilder.setupApiAndClient(
         graphApiClient: GraphApiClient? = null
