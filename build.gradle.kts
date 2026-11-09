@@ -16,7 +16,7 @@ val micrometerRegistryVersion = "1.17.2"
 val microsoftGraphVersion = "6.72.0"
 
 plugins {
-    kotlin("jvm") version "2.4.21"
+    kotlin("jvm") version "2.3.21"
     id("com.gradleup.shadow") version "8.3.8"
     id("org.jlleitschuh.gradle.ktlint") version "11.6.1"
     id("com.adarshr.test-logger") version "4.0.0"
