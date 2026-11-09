@@ -13,7 +13,7 @@ val logstashEncoderVersion = "9.0"
 val mockkVersion = "1.14.11"
 val nimbusJoseJwtVersion = "10.10"
 val micrometerRegistryVersion = "1.17.2"
-val microsoftGraphVersion = "6.72.0"
+val microsoftGraphVersion = "6.70.0"
 
 plugins {
     kotlin("jvm") version "2.3.21"
