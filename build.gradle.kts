@@ -5,7 +5,7 @@ version = "1.0.0-SNAPSHOT"
 
 val jacksonDataTypeVersion = "2.22.4"
 val jacksonDatabindVersion = "3.2.4"
-val jedisVersion = "5.2.0"
+val jedisVersion = "8.0.2"
 val jsonVersion = "20260522"
 val ktorVersion = "3.6.1"
 val logbackVersion = "1.6.6"
