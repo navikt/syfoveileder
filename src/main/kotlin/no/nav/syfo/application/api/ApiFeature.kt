@@ -18,6 +18,7 @@ import no.nav.syfo.util.getCallId
 import no.nav.syfo.util.getConsumerId
 import java.time.Duration
 import java.util.*
+import java.util.concurrent.CancellationException
 
 fun Application.installMetrics() {
     install(MicrometerMetrics) {
@@ -48,6 +49,11 @@ fun Application.installContentNegotiation() {
 
 fun Application.installStatusPages() {
     install(StatusPages) {
+        // Client disconnected before the response was sent; rethrow so cancellation propagates
+        exception<CancellationException> { call, cause ->
+            call.application.log.debug("Request cancelled, callId=${call.callId}: ${cause.message}")
+            throw cause
+        }
         exception<Throwable> { call, cause ->
             call.respond(HttpStatusCode.InternalServerError, cause.message ?: "Unknown error")
             val callId = call.getCallId()
