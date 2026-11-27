@@ -5,7 +5,7 @@ on:
     inputs:
       gitCommit:
         description: "Git ref to deploy (the complete hash):"
-        required: true
+        required: false
         default: ""
 
 jobs:
@@ -13,6 +13,7 @@ jobs:
     name: Deploy to NAIS Dev-gcp
     permissions:
       contents: read
+      packages: read
       id-token: write
     uses: navikt/isworkflows/.github/workflows/manual-deploy-dev.yml@master
     with:
