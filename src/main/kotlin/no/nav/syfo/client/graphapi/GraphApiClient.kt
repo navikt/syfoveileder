@@ -24,7 +24,6 @@ import no.nav.syfo.veileder.Gruppe
 import no.nav.syfo.veileder.VeilederInfo
 import org.jetbrains.annotations.VisibleForTesting
 import org.slf4j.LoggerFactory
-import java.util.*
 
 class GraphApiClient(
     private val azureAdClient: AzureAdClient,
@@ -160,18 +159,19 @@ class GraphApiClient(
         val graphServiceClient = azureAdClient.createGraphServiceClient(azureAdToken = oboToken)
         val directoryObjectCollectionResponse = graphServiceClient.me().memberOf().get { requestConfiguration ->
             requestConfiguration.headers.add("ConsistencyLevel", "eventual")
-            requestConfiguration.queryParameters.select =
+            val queryParameters = requireNotNull(requestConfiguration.queryParameters)
+            queryParameters.select =
                 arrayOf(
                     "id",
                     "displayName",
                 )
-            requestConfiguration.queryParameters.count = true
+            queryParameters.count = true
         }
 
         val groups = mutableListOf<Group>()
         PageIterator.Builder<Group, DirectoryObjectCollectionResponse>()
             .client(graphServiceClient)
-            .collectionPage(Objects.requireNonNull(directoryObjectCollectionResponse))
+            .collectionPage(requireNotNull(directoryObjectCollectionResponse) { "Microsoft Graph returned no group page" })
             .collectionPageFactory(DirectoryObjectCollectionResponse::createFromDiscriminatorValue)
             .processPageItemCallback { group -> groups.add(group) }
             .build()
@@ -182,8 +182,8 @@ class GraphApiClient(
 
     private fun Group.toGruppe(): Gruppe {
         return Gruppe(
-            uuid = this.id,
-            adGruppenavn = this.displayName,
+            uuid = requireNotNull(this.id) { "Microsoft Graph group has no id" },
+            adGruppenavn = requireNotNull(this.displayName) { "Microsoft Graph group has no display name" },
         )
     }
 
@@ -210,8 +210,9 @@ class GraphApiClient(
             }
 
             return users
-                .filter { it.onPremisesSamAccountName != null }
-                .map { it.toVeilederInfo() }
+                .mapNotNull { user ->
+                    user.onPremisesSamAccountName?.let { user.toVeilederInfo(it) }
+                }
                 .apply { COUNT_CALL_GRAPHAPI_VEILEDER_LIST_SUCCESS.increment() }
         } catch (e: Exception) {
             COUNT_CALL_GRAPHAPI_VEILEDER_LIST_FAIL.increment()
@@ -235,21 +236,22 @@ class GraphApiClient(
         val directoryObjectCollectionResponse =
             graphServiceClient.groups().byGroupId(groupId).members().get { requestConfiguration ->
                 requestConfiguration.headers.add("ConsistencyLevel", "eventual")
-                requestConfiguration.queryParameters.select =
+                val queryParameters = requireNotNull(requestConfiguration.queryParameters)
+                queryParameters.select =
                     arrayOf(
                         "givenName",
                         "surname",
                         "onPremisesSamAccountName",
                         "accountEnabled"
                     )
-                requestConfiguration.queryParameters.filter = "accountEnabled eq true"
-                requestConfiguration.queryParameters.count = true
+                queryParameters.filter = "accountEnabled eq true"
+                queryParameters.count = true
             }
 
         val users = mutableListOf<User>()
         PageIterator.Builder<User, DirectoryObjectCollectionResponse>()
             .client(graphServiceClient)
-            .collectionPage(Objects.requireNonNull(directoryObjectCollectionResponse))
+            .collectionPage(requireNotNull(directoryObjectCollectionResponse) { "Microsoft Graph returned no member page" })
             .collectionPageFactory(DirectoryObjectCollectionResponse::createFromDiscriminatorValue)
             .processPageItemCallback { user -> users.add(user) }
             .build()
@@ -258,9 +260,9 @@ class GraphApiClient(
         return users
     }
 
-    private fun User.toVeilederInfo(): VeilederInfo {
+    private fun User.toVeilederInfo(ident: String): VeilederInfo {
         return VeilederInfo(
-            ident = this.onPremisesSamAccountName,
+            ident = ident,
             fornavn = this.givenName ?: "",
             etternavn = this.surname ?: "",
             enabled = this.accountEnabled,
